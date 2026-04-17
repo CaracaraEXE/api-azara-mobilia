@@ -12,16 +12,17 @@
 
 ## 🗂️ Estado Actual
 
-- ✅ Scaffold del proyecto Next.js creado
-- ✅ README.md y PLAN.md documentados
 - ✅ Estructura mono-repo (backend + discord-bot)
-- ✅ Setup Express.js básico
+- ✅ Express.js con API Routes
+- ✅ API optimizada (lee JSONs individuales)
+- ✅ Scraper Cheerio (funciona con método navegador)
+- ✅ Institucionales: 10 libros
+- ✅ Paleontología: 18 libros (completo)
+- 🔲 Resto de categorías (11 faltantes)
 - 🔲 Probar API local
-- 🔲 Completar/correcter scraper
-- 🔲 Scraper básico (JSON)
 - 🔲 Migración a PostgreSQL
-- 🔲 Cronjobs de actualización
 - 🔲 Bot de Discord
+- 🔲 Deploy en Railway
 
 ## 📝 Decisiones Tomadas
 
@@ -35,77 +36,53 @@
 | Cronjob | cron-job.org (gratis, llama endpoint) |
 | Scraping | Cheerio + Axios |
 
-## 📦 Datos del Scraper (Importante)
+## 📦 Estructura de Datos (JSON Individual por Categoría)
 
-**Limitación detectada:** Los PDFs en fundacionazara.org.ar NO necesariamente tienen metadata completa (autor, año, descripción).
+### Archivo por categoría
 
-### Estructura de categorías
+Cada categoría tiene su propio archivo JSON: `data/libros-[categoria].json`
 
-Los libros están organizados en **subcategorías** dentro de `fundacionazara.org.ar/libros/`. El sitemap NO las refleja, las categorías identificadas son:
-
-| Categoría | URL |
-|-----------|-----|
-| Institucionales | `/libros/` (página principal) |
-| Astronomía y Geología | `/libros/libros-de-astronomia-y-geologia/` |
-| Paleontología | `/libros/libros-de-paleontologia/` |
-| Evolución, genética, ecología y etología | `/libros/libros-de-evolucion-genetica-ecologia-y-etologia/` |
-| Divulgación científica | `/libros/libros-de-divulgacion-cientifica/` |
-| Exploraciones, historia de la ciencia y biografías | `/libros/libros-de-historia-de-la-ciencia/`) |
-| Ambiente | `/libros-de-ambiente/` |
-| Antropología | `/libros/libros-de-antropologia/` |
-| Flora y Fauna | `/libros/libros-de-flora-y-fauna/` |
-| Áreas naturales | `/libros/libros-de-areas-naturales/` |
-| Historia y patrimonio cultural | `/libros/libros-de-patrimonio-cultural/` |
-| Infantiles | `/libros/libros-infantiles/` |
-| Auspiciados | `/libros/libros-auspiciados/` ⚠️ |
-
-> ⚠️ **Nota sobre Auspiciados:** Los libros de esta categoría poseen imágenes de portada pero **NO todos tienen PDF descargable**. El scraper debe manejar este caso (verificar si `linkPdf` existe antes de guardar).
-
-### Datos iniciales (lo que extrae el scraper):
-- `id` — identificador único
-- `titulo` — nombre del libro
-- `linkPdf` — URL al archivo PDF (puede ser `null` para Auspiciados)
-- `imagenPortada` — URL de la imagen de portada
-- `categoria` — categoría del libro
-- `fechaExtraccion` — cuándo fue scrapeado
-
-### Datos opcionales (extraer si están disponibles):
-- `autor` — autor del libro
-- `anio` — año de publicación
-- `descripcion` — descripción/resumen
-- `paginas` — número de páginas
-
-**Plan:** Extraer lo que se pueda → luego mejorar el scraper o enriquecer datos manualmente.
-
-### Estructura de datos (JSON)
-
-```json
-{
-  "categorias": [
-    {
-      "nombre": "Paleontología",
-      "slug": "paleontologia",
-      "url": "/libros/libros-de-paleontologia/",
-      "libros": [
-        {
-          "id": "lib-abc123",
-          "titulo": "Enciclopedia de los Dinosaurios Argentinos",
-          "linkPdf": "https://fundacionazara.org.ar/wp-content/uploads/...",
-          "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/...",
-          "autor": null,
-          "anio": null,
-          "descripcion": null,
-          "paginas": null,
-          "fechaExtraccion": "2026-04-10T15:30:00.000Z"
-        }
-      ]
-    }
-  ],
-  "ultimaActualizacion": "2026-04-10T15:30:00.000Z"
-}
+```
+data/
+├── libros-institucionales.json   ← 10 libros
+├── libros-paleontologia.json     ← 18 libros
+├── libros-astronomia.json        ← (próximo)
+└── ...
 ```
 
-**Nota:** Se genera un solo archivo JSON con todas las categorías. La API filtra por categoría internamente.
+### Estructura de cada archivo JSON
+
+```json
+[
+  {
+    "id": "lib-abc123",
+    "titulo": "Enciclopedia de los Dinosaurios Argentinos",
+    "linkPdf": "https://fundacionazara.org.ar/wp-content/uploads/...",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/...",
+    "autor": "José F. Bonaparte",
+    "anio": 2024,
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-10T15:30:00.000Z"
+  }
+]
+```
+
+### Campos de un libro
+
+| Campo | Tipo | Obligatorio | Descripción |
+|-------|------|-------------|-------------|
+| `id` | string | ✅ | Identificador único |
+| `titulo` | string | ✅ | Nombre del libro |
+| `linkPdf` | string/null | ✅ | URL al PDF (null si no tiene) |
+| `imagenPortada` | string/null | ✅ | URL de la imagen |
+| `autor` | string/null | ❌ | Autor |
+| `anio` | number/null | ❌ | Año de publicación |
+| `descripcion` | string/null | ❌ | Descripción |
+| `paginas` | number/null | ❌ | Cantidad de páginas |
+| `fechaExtraccion` | string | ✅ | Cuándo fue extraído |
+
+> ⚠️ **Nota sobre Auspiciados:** NO todos tienen PDF descargable.
 
 ## 🔄 Plan de Escalabilidad (JSON → PostgreSQL)
 
@@ -124,46 +101,43 @@ API lee JSON        →   API lee PostgreSQL
 
 ## 📋 Roadmap de Desarrollo
 
-### Fase 1: Base (JSON) ✅
-- [x] Documentar arquitectura
-- [ ] Crear estructura mono-repo
-- [ ] Setup Express.js básico
+### Fase 1: Base ✅
+- [x] Estructura mono-repo
+- [x] Express.js configurado
+- [x] Dependencias instaladas (axios, cheerio)
 
-### Fase 2: Scraper + JSON
-- [ ] Instalar dependencias (axios, cheerio, fs)
-- [ ] Crear `scripts/scraper.js` → genera `data/libros.json`
-- [ ] Probar scraping de un libro
-- [ ] Escalar a todos los libros
+### Fase 2: API Express ✅
+- [x] GET /api/libros (listar + filtrar)
+- [x] GET /api/libros/:id (uno solo)
+- [x] GET /api/libros/categorias/lista
+- [x] GET /api/libros/stats/general
+- [ ] Probar endpoints
 
-### Fase 3: API Express
-- [ ] Crear endpoints CRUD
-- [ ] GET /api/libros (listar + filtrar)
-- [ ] GET /api/libros/:id (uno solo)
-- [ ] POST /api/libros (crear)
-- [ ] Probar con Postman/Thunder Client
+### Fase 3: Scraping ✅ (parcial)
+- [x] Método navegador funciona
+- [x] Script extraerLibros.js creado
+- [x] Script combinarLibros.js creado
+- [x] Institucionales: 10 libros
+- [x] Paleontología: 18 libros
+- [ ] Resto de categorías (11 faltantes)
 
-### Fase 4: Discord Bot (básico)
+### Fase 4: Discord Bot
 - [ ] Crear discord-bot/
 - [ ] Comandos: /buscar, /libro, /categorias
 - [ ] Conectar con API
 
-### Fase 5: PostgreSQL (migración)
+### Fase 5: PostgreSQL (futuro)
 - [ ] Crear cuenta Railway + PostgreSQL
-- [ ] Definir schema con SQL
+- [ ] Definir schema SQL
 - [ ] Migrar datos de JSON
 - [ ] Actualizar API para usar DB
 
-### Fase 6: Cronjobs
-- [ ] Crear endpoint /api/scrape
-- [ ] Configurar cron-job.org
-- [ ] Testear actualizaciones automáticas
-
-### Fase 7: Deploy
+### Fase 6: Deploy
 - [ ] Deploy Express en Railway
-- [ ] Deploy Discord Bot ( Railway o Glitch)
-- [ ] Configurar variables de entorno
+- [ ] Deploy Discord Bot
+- [ ] Configurar cron-job.org
 
-## 📁 Estructura Objetivo (Mono-repo)
+## 📁 Estructura del Proyecto
 
 ```
 azara/
@@ -173,9 +147,12 @@ azara/
 │   │   ├── routes/
 │   │   │   └── libros.js        ← endpoints /api/libros
 │   │   └── data/
-│   │       └── libros.json       ← datos (Fase 1)
+│   │       ├── libros-institucionales.json
+│   │       ├── libros-paleontologia.json
+│   │       └── libros-[categoria].json  ← uno por categoría
 │   ├── scripts/
-│   │   └── scraper.js           ← scraping → libros.json
+│   │   ├── extraerLibros.js     ← extrae de páginas individuales
+│   │   └── combinarLibros.js     ← combina en archivo de categoría
 │   └── package.json
 │
 ├── discord-bot/

@@ -1,0 +1,189 @@
+[
+  {
+    "id": "lib-wccgyrxa",
+    "titulo": "Arqueología y paleontología de la provincia de Catamarca",
+    "autor": "Rita del Valle Rodríguez y Mónica Alejandra López (editoras)",
+    "anio": 2015,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/catamarca.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/catamarca-300x258.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:05.211Z"
+  },
+  {
+    "id": "lib-ip3svccx",
+    "titulo": "Bestiario fósil. Mamíferos del Pleistoceno de la Argentina",
+    "autor": "Editorial Albatros | Colección: Sudamérica prehistórica. Analía Forasiepi, Agustín Martinelli y Jorge Blanco",
+    "anio": 2007,
+    "pdfLink": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Bestiario-fosil.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:06.323Z"
+  },
+  {
+    "id": "lib-o0ltktt4",
+    "titulo": "Dinosaurios de Entre Ríos",
+    "autor": "Sebastián Apesteguía",
+    "anio": 2021,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/dinosaurios-de-entre-rios.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/09/dinosaurios-de-entre-rios.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:07.434Z"
+  },
+  {
+    "id": "lib-bso81yy4",
+    "titulo": "Dinosaurios y pterosaurios de América del Sur",
+    "autor": "Editorial Albatros | Colección: Sudamérica prehistórica. José F. Bonaparte",
+    "anio": 2007,
+    "pdfLink": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Dinosaurios-y-pterosaurios-de-America-del-Sur.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:08.526Z"
+  },
+  {
+    "id": "lib-3wu01cjb",
+    "titulo": "El Uruguay de los dinosaurios",
+    "autor": "Sebastián Apesteguía y Matías Soto",
+    "anio": 2023,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/el-uruguay-de-los-dinosaurios.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/el-uruguay-de-los-dinosaurios.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:10.805Z"
+  },
+  {
+    "id": "lib-9k81rqpu",
+    "titulo": "Historia de las técnicas paleontológicas y su desarrollo en la Argentina",
+    "autor": "José H. Laza",
+    "anio": 2019,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/Historia-de-tecnicas-en-paleontologia.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/06/historia-de-tecnicas-en-paleontologia.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:11.891Z"
+  },
+  {
+    "id": "lib-8jy0lzho",
+    "titulo": "Historia natural de los gliptodontes",
+    "autor": "Carlos A. Quintana",
+    "anio": 2026,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/historia-natural-de-los-gliptodontes.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/03/historia-natural-de-los-gliptodontes-300x258.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:12.969Z"
+  },
+  {
+    "id": "lib-9o4fb34i",
+    "titulo": "Los fósiles de Mar del Plata. Un viaje al pasado de nuestra región",
+    "autor": "Carlos Adrián Quintana",
+    "anio": 2015,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/los-fosiles-de-mar-del-plata.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Los-fosiles-de-Mar-del-Plata.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:14.116Z"
+  },
+  {
+    "id": "lib-53rz3r80",
+    "titulo": "Los invertebrados fósiles",
+    "autor": null,
+    "anio": null,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/invertebrados-fosiles-I.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Los-invertebrados-fosiles-01.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:15.322Z"
+  },
+  {
+    "id": "lib-4gvso0gw",
+    "titulo": "Los que sobrevivieron a los dinosaurios. La historia de los mamíferos en América del Sur",
+    "autor": "Eduardo P. Tonni y Ricardo C. Pasquali",
+    "anio": 2002,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/los-que-sobrevivieron-a-los-dinosaurios.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/los-que-sobrevivieron-a-los-dinosaurios-550-300x258.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:16.429Z"
+  },
+  {
+    "id": "lib-7r8gz4zi",
+    "titulo": "Protomamíferos y mamíferos mesozoicos de América del Sur",
+    "autor": "José F. Bonaparte y Laura A. Migale",
+    "anio": 2015,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/protomamiferos-y-mamiferos-mesozoicos.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/protomamiferos-y-mamiferos-mesozoicos-550-300x258.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:17.558Z"
+  },
+  {
+    "id": "lib-nurfksw3",
+    "titulo": "Sistemática y filogenia de las aves Fororracoideas (Gruiformes, Cariamae)",
+    "autor": "Federico Agnolin",
+    "anio": 2009,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/sistematica-y-filogenia-de-aves-fororracoideas-ok.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/sistematica-y-filogenia-de-aves-fororracoideas-550-300x258.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:18.667Z"
+  },
+  {
+    "id": "lib-qt98rnr6",
+    "titulo": "Tetrápodos, plantas y paleoambientes del Triásico continental de la Argentina y Brasil",
+    "autor": "José F. Bonaparte, Federico Agnolin, Josefina Bodnar, César L. Schultz y Luis A. Spalletti",
+    "anio": 2021,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/Triasico.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/07/Triasico.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:19.767Z"
+  },
+  {
+    "id": "lib-kbep0xmu",
+    "titulo": "Trabajos de las Primeras Jornadas Paleontológicas Chapadmalenses: Chapadmalal en la visión de Florentino Ameghino",
+    "autor": "Federico L. Agnolín, Sebastián Apesteguía, Mariano Bonomo, Gustavo Caponi, Eduardo P. Tonni y Marcelo Zárate",
+    "anio": 2022,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/trabajos-de-las-primeras-jornadas-paleontologicas-chapadmalenses.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/trabajos-de-las-primeras-jornadas-paleontologicas-chapadmalenses.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:20.868Z"
+  },
+  {
+    "id": "lib-sseubvwa",
+    "titulo": "Trabajos de las Segundas Jornadas Paleontológicas Chapadmalenses",
+    "autor": "Federico Agnolín, Daniel Boh y Carlos Quintana (editores)",
+    "anio": 2025,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/trabajos-de-las-segundas-jornadas-paleontologicas-chapadmalenses.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/03/trabajos-de-las-segundas-jornadas-paleontologicas-chapadmalenses-300x258.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:21.962Z"
+  },
+  {
+    "id": "lib-74qf5tdt",
+    "titulo": "Tras las huellas del megaterio. Plantas y animales que la última extinción olvidó",
+    "autor": "Federico L. Agnolin, Agustín M. Agnolin y Elián L. Guerrero",
+    "anio": 2021,
+    "pdfLink": "http://www.fundacionazara.org.ar/img/libros/Tras-las-huella-del-megaterio.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/02/Tras-las-huella-del-megaterio.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:23.035Z"
+  },
+  {
+    "id": "lib-qa9z1xsh",
+    "titulo": "Una historia de la Península de Valdés, Chubut, Patagonia Argentina",
+    "autor": "Sebastián Apesteguía",
+    "anio": 2025,
+    "pdfLink": "https://fundacionazara.org.ar/img/libros/una-historia-de-la-peninsula-de-valdes.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/03/una-historia-de-la-peninsula-de-valdes-300x258.jpg",
+    "descripcion": null,
+    "paginas": null,
+    "fechaExtraccion": "2026-04-17T03:25:24.115Z"
+  }
+]

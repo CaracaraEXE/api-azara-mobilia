@@ -34,7 +34,7 @@ const CATEGORIAS = [
 // Cambiar 'TODAS' por el slug de la categoría que querés scrapear
 // Ej: 'paleontologia', 'antropologia', 'institucionales'
 // Poner 'TODAS' para hacer todas las categorías
-const SCRAPEAR_CATEGORIA = 'paleontologia';
+const SCRAPEAR_CATEGORIA = 'institucionales';
 // ====================
 
 // Esperar entre requests (evitar ser bloqueado)
