@@ -1,4 +1,11 @@
 {
-  "categorias": [],
-  "ultimaActualizacion": null
+  "categorias": [
+    {
+      "nombre": "Paleontología",
+      "slug": "paleontologia",
+      "url": "https://fundacionazara.org.ar/libros/libros-de-paleontologia/",
+      "libros": []
+    }
+  ],
+  "ultimaActualizacion": "2026-04-17T02:46:59.819Z"
 }
