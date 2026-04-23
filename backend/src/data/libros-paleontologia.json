@@ -6,8 +6,6 @@
     "anio": 2015,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/catamarca.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/catamarca-300x258.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:05.211Z"
   },
   {
@@ -17,8 +15,6 @@
     "anio": 2007,
     "pdfLink": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Bestiario-fosil.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:06.323Z"
   },
   {
@@ -28,8 +24,6 @@
     "anio": 2021,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/dinosaurios-de-entre-rios.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/09/dinosaurios-de-entre-rios.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:07.434Z"
   },
   {
@@ -38,9 +32,7 @@
     "autor": "Editorial Albatros | Colección: Sudamérica prehistórica. José F. Bonaparte",
     "anio": 2007,
     "pdfLink": null,
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Dinosaurios-y-pterosaurios-de-America-del-Sur.jpg",
-    "descripcion": null,
-    "paginas": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Dinosaurios-y-pterosaurios-de-America-del-Sur.jpg",    
     "fechaExtraccion": "2026-04-17T03:25:08.526Z"
   },
   {
@@ -49,9 +41,7 @@
     "autor": "Sebastián Apesteguía y Matías Soto",
     "anio": 2023,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/el-uruguay-de-los-dinosaurios.pdf",
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/el-uruguay-de-los-dinosaurios.jpg",
-    "descripcion": null,
-    "paginas": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/el-uruguay-de-los-dinosaurios.jpg",        
     "fechaExtraccion": "2026-04-17T03:25:10.805Z"
   },
   {
@@ -61,8 +51,6 @@
     "anio": 2019,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/Historia-de-tecnicas-en-paleontologia.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/06/historia-de-tecnicas-en-paleontologia.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:11.891Z"
   },
   {
@@ -72,8 +60,8 @@
     "anio": 2026,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/historia-natural-de-los-gliptodontes.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/03/historia-natural-de-los-gliptodontes-300x258.jpg",
-    "descripcion": null,
-    "paginas": null,
+    
+    
     "fechaExtraccion": "2026-04-17T03:25:12.969Z"
   },
   {
@@ -83,8 +71,6 @@
     "anio": 2015,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/los-fosiles-de-mar-del-plata.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Los-fosiles-de-Mar-del-Plata.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:14.116Z"
   },
   {
@@ -94,8 +80,6 @@
     "anio": null,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/invertebrados-fosiles-I.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Los-invertebrados-fosiles-01.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:15.322Z"
   },
   {
@@ -105,8 +89,6 @@
     "anio": 2002,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/los-que-sobrevivieron-a-los-dinosaurios.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/los-que-sobrevivieron-a-los-dinosaurios-550-300x258.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:16.429Z"
   },
   {
@@ -116,8 +98,8 @@
     "anio": 2015,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/protomamiferos-y-mamiferos-mesozoicos.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/protomamiferos-y-mamiferos-mesozoicos-550-300x258.jpg",
-    "descripcion": null,
-    "paginas": null,
+    
+    
     "fechaExtraccion": "2026-04-17T03:25:17.558Z"
   },
   {
@@ -127,8 +109,6 @@
     "anio": 2009,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/sistematica-y-filogenia-de-aves-fororracoideas-ok.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/sistematica-y-filogenia-de-aves-fororracoideas-550-300x258.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:18.667Z"
   },
   {
@@ -138,8 +118,6 @@
     "anio": 2021,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/Triasico.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/07/Triasico.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:19.767Z"
   },
   {
@@ -149,8 +127,6 @@
     "anio": 2022,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/trabajos-de-las-primeras-jornadas-paleontologicas-chapadmalenses.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/trabajos-de-las-primeras-jornadas-paleontologicas-chapadmalenses.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:20.868Z"
   },
   {
@@ -160,8 +136,6 @@
     "anio": 2025,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/trabajos-de-las-segundas-jornadas-paleontologicas-chapadmalenses.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/03/trabajos-de-las-segundas-jornadas-paleontologicas-chapadmalenses-300x258.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:21.962Z"
   },
   {
@@ -171,8 +145,6 @@
     "anio": 2021,
     "pdfLink": "http://www.fundacionazara.org.ar/img/libros/Tras-las-huella-del-megaterio.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/02/Tras-las-huella-del-megaterio.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:23.035Z"
   },
   {
@@ -182,8 +154,6 @@
     "anio": 2025,
     "pdfLink": "https://fundacionazara.org.ar/img/libros/una-historia-de-la-peninsula-de-valdes.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/03/una-historia-de-la-peninsula-de-valdes-300x258.jpg",
-    "descripcion": null,
-    "paginas": null,
     "fechaExtraccion": "2026-04-17T03:25:24.115Z"
   }
 ]

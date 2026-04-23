@@ -70,17 +70,15 @@ data/
 
 ### Campos de un libro
 
-| Campo | Tipo | Obligatorio | Descripción |
-|-------|------|-------------|-------------|
-| `id` | string | ✅ | Identificador único |
-| `titulo` | string | ✅ | Nombre del libro |
-| `linkPdf` | string/null | ✅ | URL al PDF (null si no tiene) |
-| `imagenPortada` | string/null | ✅ | URL de la imagen |
-| `autor` | string/null | ❌ | Autor |
-| `anio` | number/null | ❌ | Año de publicación |
-| `descripcion` | string/null | ❌ | Descripción |
-| `paginas` | number/null | ❌ | Cantidad de páginas |
-| `fechaExtraccion` | string | ✅ | Cuándo fue extraído |
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `id` | string | Identificador único |
+| `titulo` | string | Nombre del libro |
+| `linkPdf` | string/null | URL al PDF (null si no tiene) |
+| `imagenPortada` | string/null | URL de la imagen |
+| `autor` | string/null | Autor |
+| `anio` | number/null | Año de publicación |
+| `fechaExtraccion` | string | Cuándo fue extraído |
 
 > ⚠️ **Nota sobre Auspiciados:** NO todos tienen PDF descargable.
 

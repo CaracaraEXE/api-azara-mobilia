@@ -47,55 +47,33 @@ Los libros están organizados en **subcategorías**. El sitemap del sitio NO las
 
 ## 📦 Modelo de Datos
 
-### Datos que extrae el Scraper (iniciales):
+### Campos de un libro:
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id` | string | Identificador único generado |
+| `id` | string | Identificador único |
 | `titulo` | string | Nombre del libro |
-| `linkPdf` | string | URL al archivo PDF |
-| `imagenPortada` | string | URL de la imagen de portada |
-| `categoria` | string | Categoría del libro |
-| `fechaExtraccion` | string | Fecha ISO de cuando fue extraído |
+| `linkPdf` | string/null | URL al PDF (null si no tiene) |
+| `imagenPortada` | string/null | URL de la imagen |
+| `autor` | string/null | Autor |
+| `anio` | number/null | Año de publicación |
+| `fechaExtraccion` | string | Cuándo fue extraído |
 
-### Datos opcionales (si están disponibles en la página):
-
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| `autor` | string | Autor del libro |
-| `anio` | number | Año de publicación |
-| `descripcion` | string | Descripción/resumen del libro |
-| `paginas` | number | Cantidad de páginas |
-
-> ⚠️ **Nota:** Los PDFs en fundacionazara.org.ar no necesariamente tienen metadata completa (autor, año, etc.). El scraper extrae lo que puede y los datos opcionales se van completando si están disponibles.
-
-### Ejemplo de estructura JSON completa:
+### Ejemplo de libro en JSON:
 
 ```json
 {
-  "categorias": [
-    {
-      "nombre": "Paleontología",
-      "slug": "paleontologia",
-      "url": "/libros/libros-de-paleontologia/",
-      "libros": [
-        {
-          "id": "lib-abc123",
-          "titulo": "Enciclopedia de los Dinosaurios Argentinos",
-          "linkPdf": "https://fundacionazara.org.ar/wp-content/uploads/...",
-          "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/...",
-          "autor": null,
-          "anio": null,
-          "descripcion": null,
-          "paginas": null,
-          "fechaExtraccion": "2026-04-10T15:30:00.000Z"
-        }
-      ]
-    }
-  ],
-  "ultimaActualizacion": "2026-04-10T15:30:00.000Z"
+  "id": "lib-abc123",
+  "titulo": "Enciclopedia de los Dinosaurios Argentinos",
+  "linkPdf": "https://fundacionazara.org.ar/wp-content/uploads/...",
+  "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/...",
+  "autor": "José F. Bonaparte",
+  "anio": 2024,
+  "fechaExtraccion": "2026-04-17T15:30:00.000Z"
 }
 ```
+
+> **Nota:** Los campos `autor` y `anio` se extraen automáticamente si están disponibles en la página del libro.
 
 ## 🏗️ Arquitectura del Proyecto
 
