@@ -1,0 +1,47 @@
+[
+  {
+    "id": "lib-jx4s9swd",
+    "titulo": "Bienes destacados del transporte del Complejo Museográfico Provincial Enrique Udaondo",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/bienes-destacados-del-transporte-del-complejo-museografico-provincial-enrique-udaondo.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/11/bienes-destacados-del-transporte-del-complejo-museografico-provincial-enrique-udaondo-300x258.jpg",
+    "autor": "Hernán V. Ibáñez",
+    "anio": 2023,
+    "fechaExtraccion": "2026-05-07T19:01:42.106Z"
+  },
+  {
+    "id": "lib-gcbk74dr",
+    "titulo": "La canoa vieja se hace bicho… y otras historias con barcos y barquitos",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/la-canoa-vieja-se-hace-bicho.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/la-canoa-vieja-se-hace-bicho-300x258.jpg",
+    "autor": "Guillermo Haut",
+    "anio": 2025,
+    "fechaExtraccion": "2026-05-07T19:01:46.655Z"
+  },
+  {
+    "id": "lib-h2lmvp35",
+    "titulo": "La lechería argentina, sus comienzos",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/la-lecheria-argentina-sus-comienzos.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/La-lecheria-argentina-sus-comienzos.jpg",
+    "autor": "Raúl L. Cárman",
+    "anio": 2014,
+    "fechaExtraccion": "2026-05-07T19:01:51.356Z"
+  },
+  {
+    "id": "lib-fv7wnz6u",
+    "titulo": "Un amor de Tigre",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/un-amor-de-tigre.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/02/un-amor-de-tigre-550-300x258.jpg",
+    "autor": "Guillermo Haut",
+    "anio": 2016,
+    "fechaExtraccion": "2026-05-07T19:01:55.286Z"
+  },
+  {
+    "id": "lib-8v2n8p08",
+    "titulo": "Un amor de Tigre II",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/un-amor-de-tigre-2.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/02/un-amor-de-tigre-2-550-300x258.jpg",
+    "autor": "Guillermo Haut",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T19:02:00.489Z"
+  }
+]

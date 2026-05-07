@@ -1,0 +1,569 @@
+[
+  {
+    "id": "lib-ouzr47ub",
+    "titulo": "Actualización de las aves del Área Natural Protegida Dique Ingeniero Roggero y su área de influencia",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Guia-Aves-ANP-Dique-Roggero.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/04/actualizacion-de-las-aves-del-area-natural-protegida-dique-ingeniero-roggero-y-su-area-de-influencia.jpg",
+    "autor": "Hernán Ibáñez, Bernardo Lartigau, Marcos Lartigau y Julián Lorenzi",
+    "anio": 2020,
+    "fechaExtraccion": "2026-05-07T18:52:43.265Z"
+  },
+  {
+    "id": "lib-v974c0bm",
+    "titulo": "Algas marinas de la Patagonia. Una guía ilustrada",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/algas-marinas-de-la-patagonia.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/algas-marinas-de-la-patagonia.jpg",
+    "autor": "Alicia L. Boraso. Alicia E. Rico, Susana Perales, Laura Pérez e Hilda Salazar",
+    "anio": 2005,
+    "fechaExtraccion": "2026-05-07T18:52:46.907Z"
+  },
+  {
+    "id": "lib-q3qlesj9",
+    "titulo": "Anfibios del Área Natural Protegida Dique Ingeniero Roggero y su zona de influencia",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/anfibios-del-area-natural-protegida-dique-ingeniero-roggero-y-su-zona-de-influencia.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/06/anfibios-del-area-natural-protegida-dique-ingeniero-roggero-y-su-zona-de-influencia-300x258.jpg",
+    "autor": "Walter S. Prado, Hernán Ibáñez y Jorge Meriggi",
+    "anio": 2025,
+    "fechaExtraccion": "2026-05-07T18:52:50.504Z"
+  },
+  {
+    "id": "lib-axkyxz7r",
+    "titulo": "Anfibios y reptiles de las Sierras de Ventania",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/anfibios-y-reptiles-de-las-sierras-de-ventania.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/02/anfibios-y-reptiles-de-las-sierras-de-ventania.jpg",
+    "autor": "Jorge D. Williams, Diego O. Di Pietro y David G. Vera",
+    "anio": 2022,
+    "fechaExtraccion": "2026-05-07T18:52:54.055Z"
+  },
+  {
+    "id": "lib-jqm0m554",
+    "titulo": "Arañas Saltícidas de Misiones",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/aranas-salticidas-de-misiones.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/04/aranas-salticidas-de-misiones.jpg",
+    "autor": "Gonzalo D. Rubio, Julián E. Baigorria y Cristina L. Scioscia",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T18:52:57.566Z"
+  },
+  {
+    "id": "lib-nil6d1pg",
+    "titulo": "Árboles de la Patagonia",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/10/arboles-de-la-patagonia.jpg",
+    "autor": "Bernardo Gut",
+    "anio": 2017,
+    "fechaExtraccion": "2026-05-07T18:53:01.161Z"
+  },
+  {
+    "id": "lib-zo04tyx3",
+    "titulo": "Atlas ornitogeográfico de la provincia de Formosa, República Argentina. I. No Passeriformes",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/atlas-ornitogeografico-de-la-provincia-de-formosa.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/atlas-ornitogeografico-de-la-provincia-de-formosa.jpg",
+    "autor": "Julio R. Contreras, Federico Agnolin, Yolanda Ester Davies, Ianina Godoy, Adrián Giacchino y Erica Elisa Ríos",
+    "anio": 2014,
+    "fechaExtraccion": "2026-05-07T18:53:04.745Z"
+  },
+  {
+    "id": "lib-on5t6ihj",
+    "titulo": "Aves de la ciudad de Santiago del Estero: especies comunes en la época estival",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/aves-de-la-ciudad-de-santiago-del-estero-especies-comunes-en-la-epoca-estival.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/aves-de-la-ciudad-de-santiago-del-estero-especies-comunes-en-la-epoca-estival-300x258.jpg",
+    "autor": "Oscar R. Coria",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T18:53:08.449Z"
+  },
+  {
+    "id": "lib-fa7h3p4n",
+    "titulo": "Aves de Santiago del Estero, ecología y conservación",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Aves-de-Santiago-del-Estero.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/Aves-de-Santiago-del-Estero.jpg",
+    "autor": "Oscar R. Coria, Ricardo Torres, Martín R. de la Peña y Javier J. Lima",
+    "anio": 2023,
+    "fechaExtraccion": "2026-05-07T18:53:11.988Z"
+  },
+  {
+    "id": "lib-i0r1ju0y",
+    "titulo": "Aves del área natural protegida Dique Ingeniero Roggero (Moreno, Merlo, Marzos Paz y Gral. Rodríguez, provincia de Buenos Aires)",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/aves-area-natural-protegida-dique-roggero.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/aves-area-natural-protegida-dique-roggero.jpg",
+    "autor": "Alejandro Morici",
+    "anio": 2016,
+    "fechaExtraccion": "2026-05-07T18:53:15.702Z"
+  },
+  {
+    "id": "lib-ft1ybpok",
+    "titulo": "Aves del Área Natural Protegida Dique Ingeniero Roggero y sus alrededores",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/guia-de-aves-roggero.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2022/12/aves-del-area-natural-protegida-dique-ingeniero-roggero-y-sus-alrededores.jpg",
+    "autor": "Fabián Pinasco, Hernán Ibáñez y Pablo Petracci",
+    "anio": 2022,
+    "fechaExtraccion": "2026-05-07T18:53:19.356Z"
+  },
+  {
+    "id": "lib-vy1nvbyt",
+    "titulo": "Aves del Área Protegida Parque Provincial Presidente Sarmiento",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/aves-del-area-protegida-parque-provincial-presidente-sarmiento.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/09/aves-del-area-protegida-parque-provincial-presidente-sarmiento-300x258.jpg",
+    "autor": "Hernán Ibáñez, Cristián Piedrahita, Fabián Pinasco y Marina Homberg",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T18:53:22.936Z"
+  },
+  {
+    "id": "lib-555sljvy",
+    "titulo": "Aves del Parque de Mayo y áreas verdes cercanas",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/aves-del-Parque-de-Mayo-y-areas-verdes-cercanas.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/aves-del-Parque-de-Mayo-y-areas-verdes-cercanas-300x258.jpg",
+    "autor": "Pablo Petracci, Cristóbal Doiny Cabré, Martín Carrizo y Kaspar Delhey",
+    "anio": 2023,
+    "fechaExtraccion": "2026-05-07T18:53:26.428Z"
+  },
+  {
+    "id": "lib-29xgxdyn",
+    "titulo": "Aves: vida y conducta",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/aves-vida-y-conducta.jpg",
+    "autor": "Roberto Ares, coeditado con Vázquez Mazzini Editores",
+    "anio": 2013,
+    "fechaExtraccion": "2026-05-07T18:53:29.932Z"
+  },
+  {
+    "id": "lib-hhhxeu0q",
+    "titulo": "Centro de Información de Fauna Marina (Las Grutas – Río Negro)",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/centro-de-informacion-de-fauna-marina-las-grutas-rio-negro.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/centro-de-informacion-de-fauna-marina-las-grutas-rio-negro-300x258.jpg",
+    "autor": null,
+    "anio": null,
+    "fechaExtraccion": "2026-05-07T18:53:33.328Z"
+  },
+  {
+    "id": "lib-hwn9pnvl",
+    "titulo": "Cetáceos del Golfo San Jorge: guía de identificación",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/09/cetaceos-del-golfo-san-jorge.jpg",
+    "autor": "Mariano Coscarella, Marina Riera, Silvana Dans y Daniel Lucchetti",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T18:53:39.286Z"
+  },
+  {
+    "id": "lib-9woff67z",
+    "titulo": "Checklist de Aves/Birds de Gral. Conesa, Río Negro",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/ChecklistConesa.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/ChecklistConesa-300x258.jpg",
+    "autor": "Luis Alberto Valenzuela Riquelme y colaboradores",
+    "anio": 2016,
+    "fechaExtraccion": "2026-05-07T18:53:43.015Z"
+  },
+  {
+    "id": "lib-6jrgftm3",
+    "titulo": "Chinches terrestres de Buenos Aires (Hemiptera: Heteroptera)",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/chinches.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/04/chinches-300x258.jpg",
+    "autor": "Diego L. Carpintero y Roberto Mario Güller",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T18:53:46.186Z"
+  },
+  {
+    "id": "lib-2yhbjm5r",
+    "titulo": "Clave para determinar géneros de nematodos del suelo de la República Argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/clave-para-determinar-generos-de-nematodos-del-suelo-de-la-republica-argentina.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/04/clave-para-determinar-generos-de-nematodos-del-suelo-de-la-republica-argentina-550-300x258.jpg",
+    "autor": "Eliseo Chaves, M. Mercedes Echeverría, Hugo Merlo Álvarez y Augusto Salas",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T18:53:49.291Z"
+  },
+  {
+    "id": "lib-dawgpbei",
+    "titulo": "Crónica de un tiburón en Miramar: 70 años (1954-2024)",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/cronica-de-un-tiburon-en-miramar.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/03/cronica-de-un-tiburon-en-miramar-300x258.jpg",
+    "autor": "Marcela Junín y Mariano Magnussen",
+    "anio": 2026,
+    "fechaExtraccion": "2026-05-07T18:53:52.444Z"
+  },
+  {
+    "id": "lib-hlcf0r1r",
+    "titulo": "Cultivo de plantas autóctonas de la Argentina, en hogares, escuelas y viveros pequeños",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Cultivo-de-plantas-autoctonas.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/02/Cultivo-de-plantas-autoctonas.jpg",
+    "autor": "Gustavo Aparicio",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T18:53:55.883Z"
+  },
+  {
+    "id": "lib-9yl216n8",
+    "titulo": "Dos décadas de trabajo con especies amenazadas de la Argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/especies-amenazadas-de-la-argentina.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/01/especies-amenazadas-de-la-argentina.jpg",
+    "autor": "Analía V. Dalia, Valeria Bauni, Marina Homberg y Adrián Giacchino (editores)",
+    "anio": 2023,
+    "fechaExtraccion": "2026-05-07T18:53:59.628Z"
+  },
+  {
+    "id": "lib-j0ogd25j",
+    "titulo": "El aguará guazú (Chrysocyon brachyurus) en Argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/aguara-guazu.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/El-aguar%C3%A1-guaz%C3%BA.jpg",
+    "autor": "María Marcela Orozco, Paula González Ciccia y Lucía Soler (editoras)",
+    "anio": 2015,
+    "fechaExtraccion": "2026-05-07T18:54:03.203Z"
+  },
+  {
+    "id": "lib-zjohsjoh",
+    "titulo": "El ñandú (Rhea americana)",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/el-nandu.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/el-%C3%B1andu.jpg",
+    "autor": "Bárbara Gasparri y José Athor (editores)",
+    "anio": 2016,
+    "fechaExtraccion": "2026-05-07T18:54:07.020Z"
+  },
+  {
+    "id": "lib-kxhxe9kf",
+    "titulo": "El venado de las pampas. Una historia de conservación en la provincia de Buenos Aires",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/12/El-venado-de-las-pampas-2020.jpg",
+    "autor": "Marco Andrés Quelas",
+    "anio": 2016,
+    "fechaExtraccion": "2026-05-07T18:54:10.810Z"
+  },
+  {
+    "id": "lib-gidln3ym",
+    "titulo": "Etimología de los nombres científicos de las aves de Argentina. Su significado y origen",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/etimologia-de-aves.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/06/etimologia-de-aves.jpg",
+    "autor": "Alejandro Mouchard",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T18:54:14.521Z"
+  },
+  {
+    "id": "lib-ykdcqxty",
+    "titulo": "Etimología de los nombres científicos de los mamíferos de Argentina. Su significado y origen",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/etimologia-de-mamiferos.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/06/etimologia-de-mamiferos.jpg",
+    "autor": "Alejandro Mouchard",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T18:54:18.387Z"
+  },
+  {
+    "id": "lib-zqtj2wgi",
+    "titulo": "Fauna argentina amenazada: Los que se van",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/los-que-se-van-001.jpg",
+    "autor": "Editorial Albatros | Juan Carlos Chebez",
+    "anio": 2008,
+    "fechaExtraccion": "2026-05-07T18:54:22.163Z"
+  },
+  {
+    "id": "lib-xlnfcyaw",
+    "titulo": "Guía de huellas de los mamíferos de la Reserva Natural San Sebastián de la Selva y su área de influencia. Misiones, Argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/guia-de-huellas-de-los-mamiferos-de-la-reserva-natural-san-sebastian-de-la-selva-y-su-area-de-influencia.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/06/guia-de-huellas-de-los-mamiferos-de-la-reserva-natural-san-sebastian-de-la-selva-300x258.jpg",
+    "autor": "Hernán Ibáñez y Marina Homberg",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T18:54:25.861Z"
+  },
+  {
+    "id": "lib-24btso75",
+    "titulo": "Guía de huellas de los mamíferos del Área Natural Protegida Dique Roggero y sus alrededores",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Guia-de-huellas-de-los-mamiferos-ok.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2022/05/Guia-de-huellas-de-los-mamiferos.jpg",
+    "autor": "Hernán Ibánez y Marcelo Canevari",
+    "anio": 2022,
+    "fechaExtraccion": "2026-05-07T18:54:29.519Z"
+  },
+  {
+    "id": "lib-5541xsfp",
+    "titulo": "Guía para la identificación de huellas de mamíferos del Parque Provincial Presidente Sarmiento",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/guia-para-la-identificacion-de-huellas-de-mamiferos-del-parque-provincial-presidente-sarmiento.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/05/guia-para-la-identificacion-de-huellas-de-mamiferos-del-parque-provincial-presidente-sarmiento-300x258.jpg",
+    "autor": "Hernán Ibáñez, Cristián Piedrahita y Marina Homberg",
+    "anio": 2026,
+    "fechaExtraccion": "2026-05-07T18:54:33.384Z"
+  },
+  {
+    "id": "lib-deu6o4d5",
+    "titulo": "Güirá Oga, Centro de Rescate, Rehabilitación y Recría de Fauna Silvestre",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/guira-oga.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/guira-oga.jpg",
+    "autor": null,
+    "anio": null,
+    "fechaExtraccion": "2026-05-07T18:54:38.647Z"
+  },
+  {
+    "id": "lib-odjq3rbd",
+    "titulo": "Hablar de formas de vida: el lenguaje de la conservación",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/hablar-de-formas-de-vida-el-lenguaje-de-la-conservacion.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/03/hablar-de-formas-de-vida-el-lenguaje-de-la-conservacion-300x258.jpg",
+    "autor": "Claudio Campagna y Daniel Guevara",
+    "anio": 2025,
+    "fechaExtraccion": "2026-05-07T18:54:42.259Z"
+  },
+  {
+    "id": "lib-jfv83ya2",
+    "titulo": "Historia natural del carau (Aramus guarauna)",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/historia-natural-del-carau.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/02/historia-natural-del-carau.jpg",
+    "autor": "Julio Rafael Contreras Roqué, Horacio A. Aguilar, Gabriel Piloni, Federico Agnolín, Miguel Ángel Delpino Aguayo, Adrián Giacchino, Claudio Bertonatti, Pablo Tubaro, Bárbara Gasparri y Yolanda E. Davies",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T18:54:46.039Z"
+  },
+  {
+    "id": "lib-tzmy4j65",
+    "titulo": "Historias de la fauna perdida",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Historias-de-la-fauna-perdida-550-300x258.jpg",
+    "autor": "Cristian Blanco, Claudio Bertonatti, Egon Ciklai, Eduardo F. Esparrach y Carlos Fernández Balboa",
+    "anio": 2015,
+    "fechaExtraccion": "2026-05-07T18:54:49.657Z"
+  },
+  {
+    "id": "lib-ulsotzvp",
+    "titulo": "Iconografía de moluscos continentales de la Argentina: primera parte",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/iconografia-de-moluscos-continentales-de-la-argentina-primera-parte.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/10/iconografia-de-moluscos-continentales-de-la-argentina-primera-parte-300x258.jpg",
+    "autor": "Rubén Francisco Montenegro, Daniel Oscar Forcelli, Eugenia Salas Oroño y Sergio Eduardo Miquel",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T18:54:53.351Z"
+  },
+  {
+    "id": "lib-2jng6yyb",
+    "titulo": "Inventario biológico argentino",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/inventario-biologico-argentino.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/11/inventario-biologico-argentino.jpg",
+    "autor": "Valeria Bauni, Claudio Bertonatti y Adrián Giacchino (editores)",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T18:54:56.913Z"
+  },
+  {
+    "id": "lib-tnt0v1r9",
+    "titulo": "La conducta de las plantas",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/la-conducta-de-las-plantas.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/04/la-conducta-de-las-plantas.jpg",
+    "autor": "Roberto Ares",
+    "anio": 2020,
+    "fechaExtraccion": "2026-05-07T18:55:02.127Z"
+  },
+  {
+    "id": "lib-de725xb0",
+    "titulo": "La fauna gringa. Especies introducidas en la Argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/la-fauna-gringa.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/la-fauna-gringa-550-300x258.jpg",
+    "autor": "Juan Carlos Chebez y Gabriel O. Rodríguez",
+    "anio": 2013,
+    "fechaExtraccion": "2026-05-07T18:55:07.334Z"
+  },
+  {
+    "id": "lib-m8354j23",
+    "titulo": "Lista actualizada de las aves de la provincia de Buenos Aires",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/lista-actualizada-de-las-aves-de-la-provincia-de-bsas.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/lista-actualizada-de-las-aves-de-la-provincia-de-bsas-550-300x258.jpg",
+    "autor": "Carlos Darrieu, Aníbal Camperi, Gabriel Piloni y Natalia Bogado",
+    "anio": 2013,
+    "fechaExtraccion": "2026-05-07T18:55:12.397Z"
+  },
+  {
+    "id": "lib-5lkdexu4",
+    "titulo": "Lista comentada de las especies de mamíferos de la provincia de Entre Ríos, Argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/mamiferos-de-entre-rios.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Lista-comentada-de-las-especies-de-mam%C3%ADferos-de-la-provincia-de-Entre-R%C3%ADos.jpg",
+    "autor": "Norberto Muzzachiodi",
+    "anio": 2007,
+    "fechaExtraccion": "2026-05-07T18:55:17.364Z"
+  },
+  {
+    "id": "lib-28u8b39l",
+    "titulo": "Listado de las aves del Área Natural Protegida Parque Provincial Presidente Sarmiento",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/listado-de-las-aves-del-area-natural-protegida-parque-provincial-presidente-sarmiento.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/02/listado-de-las-aves-del-area-natural-protegida-parque-provincial-presidente-sarmiento-300x258.jpg",
+    "autor": "Cristián Piedrahita, Hernán Ibáñez, Marina Homberg y Vanina Velasco",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T18:55:21.368Z"
+  },
+  {
+    "id": "lib-45v5ay95",
+    "titulo": "Localidades, coordenadas geográficas y literatura de la avifauna argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/localidades-coordenadas-geograficas-y-literatura-de-la-avifauna-argentina.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/localidades-coordenadas-geograficas-y-literatura-de-la-avifauna-argentina-300x258.jpg",
+    "autor": "Gabriel Piloni y Aníbal R. Camperi",
+    "anio": 2012,
+    "fechaExtraccion": "2026-05-07T18:55:26.759Z"
+  },
+  {
+    "id": "lib-dk3q5wd8",
+    "titulo": "Localidades, coordenadas geográficas y literatura de la avifauna argentina II",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/Coordenadas-II.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/06/localidades-coordenadas-geograficas-y-literatura-de-la-avifauna-argentina-2-300x258.jpg",
+    "autor": "Gabriel Piloni y Aníbal R. Camperi",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T18:55:31.696Z"
+  },
+  {
+    "id": "lib-az9c02vp",
+    "titulo": "Los invertebrados marinos",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/invertebrados-marinos.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Los-invertebrados-marinos.jpg",
+    "autor": "Javier A. Calcagno (editor)",
+    "anio": 2014,
+    "fechaExtraccion": "2026-05-07T18:55:39.149Z"
+  },
+  {
+    "id": "lib-wq4jgema",
+    "titulo": "Los mamíferos silvestres de la provincia de Misiones, Argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/los-mamiferos-silvestres-de-la-provincia-de-misiones.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Los-mamiferos-silvestres-de-la-provincia-de-Misiones-550-1-300x258.jpg",
+    "autor": null,
+    "anio": null,
+    "fechaExtraccion": "2026-05-07T18:55:43.959Z"
+  },
+  {
+    "id": "lib-dz0ff66o",
+    "titulo": "Mamíferos marinos de la costa bonaerense",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/mamiferos-marinos-de-la-costa-bonaerense-ok.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/06/mamiferos-marinos-de-la-costa-bonaerense-300x258.jpg",
+    "autor": "Marcela Junín y Daniel Boh",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T18:55:49.171Z"
+  },
+  {
+    "id": "lib-kakdids4",
+    "titulo": "Mamíferos marinos del Golfo San Matías: guía de identificación",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/guia-de-los-mamiferos-marinos-del-golfo-san-matias.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/06/guia-de-los-mamiferos-marinos-del-golfo-san-matias-300x258.jpg",
+    "autor": "Silvana Dans, Mariano Coscarella, Magdalena Arias y Marina Riera",
+    "anio": 2023,
+    "fechaExtraccion": "2026-05-07T18:55:53.613Z"
+  },
+  {
+    "id": "lib-pv5my9pp",
+    "titulo": "Mamíferos terrestres de la Patagonia, sur de Argentina y Chile",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Mam%C3%ADferos-terrestres-de-la-Patagonia.jpg",
+    "autor": "Vázquez Mazzini Editores | Juan Carlos Chebez, Ulyses Pardiñas y Pablo Teta",
+    "anio": 2014,
+    "fechaExtraccion": "2026-05-07T18:55:58.002Z"
+  },
+  {
+    "id": "lib-ho9biaeq",
+    "titulo": "Mariposas / Butterflies Argentina",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/01/mariposas-butterflies-argentina.jpg",
+    "autor": "Vázquez Mazzini Editores | Juan F. Klimaitis, Ezequiel O. Nuñez Bustos, Cristian L. Klimaitis y Roberto M. Güller",
+    "anio": 2018,
+    "fechaExtraccion": "2026-05-07T18:56:02.322Z"
+  },
+  {
+    "id": "lib-t03x092d",
+    "titulo": "Medicina en quelonios y otros reptiles",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/01/medicina-de-quelonios.jpg",
+    "autor": "Alejandro Carlos Tracchia",
+    "anio": 2018,
+    "fechaExtraccion": "2026-05-07T18:56:07.040Z"
+  },
+  {
+    "id": "lib-rmd0doiu",
+    "titulo": "Moluscos marinos de Argentina, Uruguay y Brasil",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/06/Moluscos-marinos-de-Argentina-Uruguay-y-Brasil.jpg",
+    "autor": "Daniel Forcelli y Tito Narosky",
+    "anio": 2015,
+    "fechaExtraccion": "2026-05-07T18:56:11.663Z"
+  },
+  {
+    "id": "lib-e1lr4zlo",
+    "titulo": "Monumentos naturales nacionales y provinciales de la Argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/monumentos-naturales.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/06/monumentos-naturales-300x258.jpg",
+    "autor": "Bárbara Gasparri y Norberto Ángel Nigro",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T18:56:15.915Z"
+  },
+  {
+    "id": "lib-a63wxswm",
+    "titulo": "Nidificación de las aves Argentinas: Vireonidae a Motacillidae",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/nidificacion-de-las-aves-argentinas-vireonidae-a-motacillidae.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/04/nidificacion-de-las-aves-argentinas-vireonidae-a-motacillidae-300x258.jpg",
+    "autor": "Sergio A. Salvador y Tito Narosky",
+    "anio": 2025,
+    "fechaExtraccion": "2026-05-07T18:56:20.366Z"
+  },
+  {
+    "id": "lib-eaz1t97y",
+    "titulo": "Ofidios, en torno a una condena",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/ofidios.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Ofidios-en-torno-a-una-condena-550-300x258.jpg",
+    "autor": "Raúl L. Cárman",
+    "anio": 2014,
+    "fechaExtraccion": "2026-05-07T18:56:24.705Z"
+  },
+  {
+    "id": "lib-8uaz38s9",
+    "titulo": "Perros y otros cánidos de las Américas. Origen, evolución e historia natural",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Perros-y-otros-canidos-de-las-americas.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/06/Perros-y-otros-canidos-de-las-americas-300x258.jpg",
+    "autor": "Sebastián Apesteguía y Stella Maris Alvarez (editores)",
+    "anio": 2023,
+    "fechaExtraccion": "2026-05-07T18:56:28.534Z"
+  },
+  {
+    "id": "lib-8bxnhy33",
+    "titulo": "Plantas nativas. Renaturalizando las ciudades",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/plantas-nativas-renaturalizando-las-ciudades.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2022/01/plantas-nativas-renaturalizando-las-ciudades.jpg",
+    "autor": "Bárbara Gasparri, Gastón Rodríguez Tourón y Luciana Cristaldo",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T18:56:32.791Z"
+  },
+  {
+    "id": "lib-y0pwsqr7",
+    "titulo": "Programa de Conservación y Rescate de Anfibios Argentinos: Cururú",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/cururu.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Programa-de-Conservaci%C3%B3n-y-Rescate-de-Anfibios-Argentinos-Cururu.jpg",
+    "autor": "Jorge Daniel Williams y Federico Kacoliris",
+    "anio": 2015,
+    "fechaExtraccion": "2026-05-07T18:56:39.762Z"
+  },
+  {
+    "id": "lib-55k4mfu1",
+    "titulo": "Reptiles del Área Natural Protegida Dique Ingeniero Roggero y su área de influencia",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/reptiles-del-area-natural-protegida-dique-ingeniero-roggero-y-su-area-de-influencia.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/11/reptiles-del-area-natural-protegida-dique-ingeniero-roggero-y-su-area-de-influencia-300x258.jpg",
+    "autor": "Walter S. Prado y Hernán Ibáñez",
+    "anio": 2025,
+    "fechaExtraccion": "2026-05-07T18:56:44.291Z"
+  },
+  {
+    "id": "lib-fylw2k54",
+    "titulo": "Reserva Natural Municipal Chadilauquen: Aves",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/guia-de-aves-de-chadilauquen.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Reserva-Natural-Municipal-Chadilauquen-Aves.jpg",
+    "autor": "Federico Bruno, Daniela Acevedo, Juan J. Maceda y María I. Mero",
+    "anio": 2007,
+    "fechaExtraccion": "2026-05-07T18:56:48.624Z"
+  },
+  {
+    "id": "lib-kmfbsw5g",
+    "titulo": "Tarántulas de Argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/tarantulas-de-argentina.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/10/tarantulas-de-argentina-300x258.jpg",
+    "autor": "Nelson Ferretti, Gabriel Pompozzi, Sofía Copperi y Jorge Barneche",
+    "anio": 2025,
+    "fechaExtraccion": "2026-05-07T18:56:52.921Z"
+  },
+  {
+    "id": "lib-2ja7tjg5",
+    "titulo": "Taxonomía, distribución y estado actual del conocimiento bioecológico de las especies del género Ctenomys (Mammalia, Rodentia, Octodontidae)",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Ctenomys.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/06/Ctenomys.jpg",
+    "autor": "Julio R. Contreras Roqué, versión comentada por Federico Agnolin y Sergio Lucero",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T18:56:57.245Z"
+  },
+  {
+    "id": "lib-s05ji41z",
+    "titulo": "Xenartros argentinos, guía para su identificación",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/xenartros.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/06/xenartros-argentinos-300x258.jpg",
+    "autor": "Norberto Ángel Nigro, Bárbara Gasparri y Elisabeth Pepe Steger",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T18:57:01.435Z"
+  }
+]

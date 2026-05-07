@@ -1,0 +1,317 @@
+[
+  {
+    "id": "lib-au82ohpp",
+    "titulo": "Alfredo Castellanos. Un hombre de acción por la ciencia y la cultura",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Alfredo-Castellanos.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/10/Alfredo-Castellanos-300x258.jpg",
+    "autor": "Silvia Elena Cornero y Eduardo Pedro Tonni",
+    "anio": 2023,
+    "fechaExtraccion": "2026-05-07T18:39:53.324Z"
+  },
+  {
+    "id": "lib-1orb2qi2",
+    "titulo": "Andrés Gaspar Giai. Memorias de un naturalista en Misiones",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/andres-giai.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/01/Andres-Gaspar-Giai-550-300x258.jpg",
+    "autor": "Barbara Gasparri, Adrián Giacchino y Jorge Anfuso",
+    "anio": 2020,
+    "fechaExtraccion": "2026-05-07T18:39:57.967Z"
+  },
+  {
+    "id": "lib-vimugbtn",
+    "titulo": "Aportes españoles al conocimiento de la flora y fauna argentina. Desde el siglo XVI al XIX",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/aportes-espanoles-al-conocimiento-de-la-flora-y-fauna-argentina.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/10/aportes-espanoles-al-conocimiento-de-la-flora-y-fauna-argentina-300x258.jpg",
+    "autor": "José Athor",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T18:40:02.204Z"
+  },
+  {
+    "id": "lib-4ny6uusi",
+    "titulo": "Arnaldo Winkelried Bertoni – primer zoólogo paraguayo",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/arnaldo-winkelried-bertoni-primer-zoologo-paraguayo.pdf",
+    "imagenPortada": null,
+    "autor": "Julio Rafael Contreras Roqué",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T18:40:06.755Z"
+  },
+  {
+    "id": "lib-137jgvlc",
+    "titulo": "Aventuras y desventuras de un biólogo latinoamericano",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/aventuras-desventuras-biologo-latinoamericano.pdf",
+    "imagenPortada": null,
+    "autor": "Eduardo H. Rapoport",
+    "anio": 2015,
+    "fechaExtraccion": "2026-05-07T18:40:11.107Z"
+  },
+  {
+    "id": "lib-dicsdh4y",
+    "titulo": "Bonaparte, el amo de los dinosaurios",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/bonaparte-el-amo-de-los-dinosaurios.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2022/06/bonaparte-el-amo-de-los-dinosaurios.jpg",
+    "autor": "Sebastián Apesteguía, Stella Maris Alvarez y Adrián Giacchino (editores)",
+    "anio": 2022,
+    "fechaExtraccion": "2026-05-07T18:40:14.845Z"
+  },
+  {
+    "id": "lib-l973aqbh",
+    "titulo": "Carlos Selva Andrade 1903-1980: escritor, periodista, amante de las aves y pionero en la conservación de la naturaleza",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/carlos-selva-andrade.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/10/carlos-selva-andrade-300x258.jpg",
+    "autor": "José Athor",
+    "anio": 2025,
+    "fechaExtraccion": "2026-05-07T18:40:19.696Z"
+  },
+  {
+    "id": "lib-utstglwc",
+    "titulo": "Charles Darwin, autobiografía",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Charles-Darwin-autobiograf%C3%ADa.jpg",
+    "autor": "En coedición con Ediciones Continente",
+    "anio": 2008,
+    "fechaExtraccion": "2026-05-07T18:40:24.606Z"
+  },
+  {
+    "id": "lib-rhjdcixo",
+    "titulo": "Colección: Viajeros olvidados",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Viajes-a-Misiones-300x258.jpg",
+    "autor": "Editorial Albatros | Juan Bautista Ambrosetti",
+    "anio": 2008,
+    "fechaExtraccion": "2026-05-07T18:40:29.476Z"
+  },
+  {
+    "id": "lib-94h5t9nq",
+    "titulo": "Colección: Viajeros y exploradores de la Patagonia",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/coleccion-viajeros-y-exploradores-de-la-Patagonia-Cautivo-en-la-Patagonia.jpg",
+    "autor": null,
+    "anio": null,
+    "fechaExtraccion": "2026-05-07T18:40:36.855Z"
+  },
+  {
+    "id": "lib-per0cxyo",
+    "titulo": "Cosme Bueno (1711-1798). Su vida, su tiempo y su descripción del Paraguay y el Gran Chaco",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/cosme-bueno.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/12/cosme-bueno-300x258.jpg",
+    "autor": "Julio Rafael Contreras, Miguel Ángel Delpino Aguayo, Manuel Español, Bárbara Gasparri y Adrián Giacchino",
+    "anio": 2020,
+    "fechaExtraccion": "2026-05-07T18:40:41.319Z"
+  },
+  {
+    "id": "lib-2x9q1v2z",
+    "titulo": "El guardaparque: historias vividas",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/el-guardaparque-historias-vividas.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/12/el-guardaparque-historias-vividas-300x258.jpg",
+    "autor": "Carlos Saibene",
+    "anio": 2025,
+    "fechaExtraccion": "2026-05-07T18:40:45.623Z"
+  },
+  {
+    "id": "lib-mhddqbr9",
+    "titulo": "El Museo Argentino de Ciencias Naturales “Bernardino Rivadavia”… en pantuflas",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/el-museo-argentino-de-ciencias-naturales-bernardino-rivadavia-en-pantuflas.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/01/el-museo-argentino-de-ciencias-naturales-bernardino-rivadavia-en-pantuflas-300x258.jpg",
+    "autor": "Juan José Parodiz y Enrique Balech (reedición con comentarios de Alejandro Tablado y Manuel G. Quintana)",
+    "anio": 2023,
+    "fechaExtraccion": "2026-05-07T18:40:49.891Z"
+  },
+  {
+    "id": "lib-vf5bao59",
+    "titulo": "El río Paraguay natural e histórico, aportes para la biografía de un río",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Libro-Rio-Paraguay-web.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/04/Libro-Rio-Paraguay.jpg",
+    "autor": "Julio Rafael Contreras Roqué, Adrián Giacchino, Bárbara Gasparri y Yolanda Davies",
+    "anio": 2020,
+    "fechaExtraccion": "2026-05-07T18:40:54.298Z"
+  },
+  {
+    "id": "lib-fkwzqrst",
+    "titulo": "Elio Massoia, su personalidad y su obra. Ensayo bio-bibliográfico del destacado naturalista argentino y su tiempo",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Elio-Massoia.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/04/Elio-Massoia-550-300x258.jpg",
+    "autor": "Julio Rafael Contreras Roqué",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T18:40:58.562Z"
+  },
+  {
+    "id": "lib-ondbpuxa",
+    "titulo": "Ensayos sobre Aimé Bonpland (1773-1858). Bonpland y el Paraguay, el botánico y su relacionamiento humano, y un enigmático visitante",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Bonpland-web.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/05/Bonpland.jpg",
+    "autor": "Julio Rafael Contreras Roqué, Adrián Giacchino, Bárbara Gasparri y Yolanda Davies",
+    "anio": 2020,
+    "fechaExtraccion": "2026-05-07T18:41:02.807Z"
+  },
+  {
+    "id": "lib-t2yqe1m2",
+    "titulo": "Félix de Azara",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/Felix-de-Azara-web.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/10/Felix-de-Azara.jpg",
+    "autor": "Bárbara Gasparri, José Athor y Mónica Ávila",
+    "anio": 2017,
+    "fechaExtraccion": "2026-05-07T18:41:07.440Z"
+  },
+  {
+    "id": "lib-7dqxx37d",
+    "titulo": "Félix de Azara (1742-1821). A 200 años de su fallecimiento",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/Felix-de-Azara-1742-1821.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2022/05/Felix-de-Azara-1742-1821.jpg",
+    "autor": "Adrián Giacchino, Bárbara Gasparri, José Athor y Mónica Ávila",
+    "anio": 2022,
+    "fechaExtraccion": "2026-05-07T18:41:11.732Z"
+  },
+  {
+    "id": "lib-3d2dy95r",
+    "titulo": "Guido Boggiani, entre la memoria y el olvido",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Guido-Boggiani.jpg",
+    "autor": "Julio Rafael Contreras Roqué",
+    "anio": 2009,
+    "fechaExtraccion": "2026-05-07T18:41:16.027Z"
+  },
+  {
+    "id": "lib-kmrjuy0l",
+    "titulo": "Historia del Zoológico de Buenos Aires (1888-2020)",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/Historia-de-Zoo-de-Buenos-Aires.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2022/02/Historia-de-Zoo-de-Buenos-Aires.jpg",
+    "autor": "Eduardo Esparrach y Juan Carlos Sassaroli",
+    "anio": 2022,
+    "fechaExtraccion": "2026-05-07T18:41:20.311Z"
+  },
+  {
+    "id": "lib-l85c6xm6",
+    "titulo": "Juan Carlos Chebez. El mayor difusor y protector de la naturaleza argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/chebez.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Juan-Carlos-Chebez.jpg",
+    "autor": "Barbara Gasparri (editora)",
+    "anio": 2016,
+    "fechaExtraccion": "2026-05-07T18:41:24.531Z"
+  },
+  {
+    "id": "lib-r1xwe3av",
+    "titulo": "Julio Rafael Contreras (1933-2017). El último naturalista enciclopedista argentino del siglo XX",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/Julio-Contreras-web.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/01/Julio-Contreras.jpg",
+    "autor": "Bárbara Gasparri, Adrián Giacchino, Yolanda Davies y Claudio Bertonatti (editores)",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T18:41:28.795Z"
+  },
+  {
+    "id": "lib-hm09dp53",
+    "titulo": "La paleontología de los vertebrados. Actores y circunstancias en la Argentina del siglo XX",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/la-paleontologia-de-los-vertebrados.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/04/la-paleontologia-de-los-vertebrados-300x258.jpg",
+    "autor": "Guillermo M. López y Eduardo P. Tonni",
+    "anio": 2026,
+    "fechaExtraccion": "2026-05-07T18:41:32.417Z"
+  },
+  {
+    "id": "lib-dijar8dp",
+    "titulo": "La teoría de las membranas en la historia de la medicina. Marie François Xavier Bichat (1771-1802). Su segundo centenario",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/la-teoria-de-la-membranas.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/La-teor%C3%ADa-de-las-membranas-en-la-historia-de-la-medicina.jpg",
+    "autor": "Julio Rafael Contreras Roqué",
+    "anio": 2005,
+    "fechaExtraccion": "2026-05-07T18:41:38.834Z"
+  },
+  {
+    "id": "lib-y18zd9zv",
+    "titulo": "Las descripciones de San Luis en el siglo XIX según Germán Avé-Lallemant",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/las-descripciones-de-san-luis-en-el-siglo-xix-segun-german-ave-lallemant.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/08/las-descripciones-de-san-luis-en-el-siglo-xix-segun-german-ave-lallemant-300x258.jpg",
+    "autor": "Federico L. Agnolín, Roberto A. Ferrari, Elián L. Guerrero y Regula Rohland",
+    "anio": 2025,
+    "fechaExtraccion": "2026-05-07T18:41:43.157Z"
+  },
+  {
+    "id": "lib-f0jliug7",
+    "titulo": "Las fronteras de Francisco P. Moreno: exploraciones más allá de la geografía",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/las-fronteras-de-francisco-p-moreno-exploraciones-mas-alla-de-la-geografia.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/las-fronteras-de-francisco-p-moreno-exploraciones-mas-alla-de-la-geografia-300x258.jpg",
+    "autor": "Alberto C. Riccardi",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T18:41:46.959Z"
+  },
+  {
+    "id": "lib-19rclofj",
+    "titulo": "Los Parodi. Un siglo de protagonismo en la paleontología de los vertebrados",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/los-parodi-web.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/08/los-parodi.jpg",
+    "autor": "Eduardo Pedro Tonni",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T18:41:51.299Z"
+  },
+  {
+    "id": "lib-fym7jqgi",
+    "titulo": "Mikrokosmos, Christofredo Jakob y el inicio de la neurociencia argentina",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Alfredo-Castellanos.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/10/Mikrokosmos-Christofredo-Jakob-300x258.jpg",
+    "autor": "Alejandra Molina",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T18:41:55.708Z"
+  },
+  {
+    "id": "lib-rp2csars",
+    "titulo": "Mujeres de las piedras. Breves biografías de algunas geólogas y paleontólogas que nos precedieron",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/mujeres-de-las-piedras.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/08/mujeres-de-las-piedras-300x258.jpg",
+    "autor": "Fernanda Castaño y Sebastián Apesteguía",
+    "anio": 2023,
+    "fechaExtraccion": "2026-05-07T18:42:00.102Z"
+  },
+  {
+    "id": "lib-c8rpv27u",
+    "titulo": "Pedro Scalabrini (1848-1916), educador y naturalista",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Pedro-Scalabrini.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/05/Pedro-Scalabrini.jpg",
+    "autor": "Julio Rafael Contreras Roqué, Bárbara Gasparri, Adrián Giacchino y Yolanda Davies",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T18:42:05.473Z"
+  },
+  {
+    "id": "lib-u6uv576k",
+    "titulo": "Pensar en grande. Adrián Giacchino: una historia de vocación y compromiso en el mundo de la ciencia y la cultura",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/pensar-en-grande-adrian-giacchino-2026.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/04/pensar-en-grande-adrian-giacchino.pdf-300x258.jpg",
+    "autor": "Vázquez Mazzini Editores | María Folatelli (editora)",
+    "anio": 2026,
+    "fechaExtraccion": "2026-05-07T18:42:09.360Z"
+  },
+  {
+    "id": "lib-avtxpluu",
+    "titulo": "Perito Francisco Pascasio Moreno. Un héroe civil",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Perito-Francisco-Pascasio-Moreno.jpg",
+    "autor": "Héctor L. Fasano",
+    "anio": 2016,
+    "fechaExtraccion": "2026-05-07T18:42:13.620Z"
+  },
+  {
+    "id": "lib-xc6vn9g3",
+    "titulo": "Pioneros de la agricultura orgánica. Algunos antecedentes desarrollados en la región que dieron origen a nuevas formas de producir y conservar los suelos y la biodiversidad",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/pioneros-de-la-agricultura-organica.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/01/pioneros-de-la-agricultura-organica-300x258.jpg",
+    "autor": "Luis Alberto Rey",
+    "anio": 2023,
+    "fechaExtraccion": "2026-05-07T18:42:18.017Z"
+  },
+  {
+    "id": "lib-xtrgaumw",
+    "titulo": "Primeras notas autobiográficas en relación a la Fundación Azara",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/primeras-notas-autobiografica-adrian-giacchino.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Primeras-notas-autobiogr%C3%A1ficas-en-relaci%C3%B3n-a-la-Fundaci%C3%B3n-Azara.jpg",
+    "autor": "Adrián Giacchino",
+    "anio": 2013,
+    "fechaExtraccion": "2026-05-07T18:42:22.543Z"
+  },
+  {
+    "id": "lib-0jit5ro0",
+    "titulo": "Un evolucionista en el Plata, Florentino Ameghino",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/un-evolucionista-en-el-plata-florentino-ameghino.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/un-evolucionista-en-el-plata-florentino-ameghino-550-300x258.jpg",
+    "autor": "Adrià Casinos",
+    "anio": 2012,
+    "fechaExtraccion": "2026-05-07T18:42:26.876Z"
+  }
+]
