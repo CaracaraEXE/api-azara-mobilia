@@ -1,6 +1,6 @@
 # PLAN.md - API Azara
 
-> **Última actualización:** 10/04/2026
+> **Última actualización:** 07/05/2026
 
 ## 📌 Resumen del Proyecto
 
@@ -14,15 +14,17 @@
 
 - ✅ Estructura mono-repo (backend + discord-bot)
 - ✅ Express.js con API Routes
-- ✅ API optimizada (lee JSONs individuales)
-- ✅ Scraper Cheerio (funciona con método navegador)
-- ✅ Institucionales: 10 libros
-- ✅ Paleontología: 18 libros (completo)
-- 🔲 Resto de categorías (11 faltantes)
-- 🔲 Probar API local
-- 🔲 Migración a PostgreSQL
+- ✅ API dinámica (lee JSONs individuales por categoría)
+- ✅ **13/13 categorías scrapeadas** — 267 libros total
+- ✅ 190 libros con PDF descargable (71.2%)
+- ✅ Scraper Playwright (navegador real, evita CloudFlare)
+- ✅ Scraper Cheerio retirado → `scraper-cheerio-old.js` (guardado para estudio)
+- ✅ Schema simplificado (sin `descripcion` ni `paginas`)
+- ✅ Scraper optimizado en branch `optimization` (CLI args, guardado incremental, fallback título)
 - 🔲 Bot de Discord
+- 🔲 Merge de `optimization` a `master`
 - 🔲 Deploy en Railway
+- 🔲 Migración a PostgreSQL
 
 ## 📝 Decisiones Tomadas
 
@@ -30,25 +32,36 @@
 |----------|---------|
 | API Backend | Express.js (estándar industria) |
 | Frontend | Bot de Discord (interfaz pública) |
-| DB Inicial | Archivo JSON (`data/libros.json`) |
+| Scraper | **Playwright** (CloudFlare bloquea Axios/Cheerio) |
+| DB Inicial | JSON por categoría (`data/libros-*.json`) |
 | DB Final | PostgreSQL (migración posterior) |
 | Hosting | Railway (API + DB) |
 | Cronjob | cron-job.org (gratis, llama endpoint) |
-| Scraping | Cheerio + Axios |
 
 ## 📦 Estructura de Datos (JSON Individual por Categoría)
 
 ### Archivo por categoría
 
-Cada categoría tiene su propio archivo JSON: `data/libros-[categoria].json`
+Cada categoría tiene su propio archivo JSON en `data/libros-[slug].json`:
 
 ```
 data/
-├── libros-institucionales.json   ← 10 libros
-├── libros-paleontologia.json     ← 18 libros
-├── libros-astronomia.json        ← (próximo)
-└── ...
+├── libros-institucionales.json                10 libros
+├── libros-paleontologia.json                  17 libros
+├── libros-astronomia-y-geologia.json           9 libros
+├── libros-evolucion-genetica-ecologia-y-etologia.json   5 libros
+├── libros-divulgacion-cientifica.json          1 libro
+├── libros-historia-de-la-ciencia.json         35 libros
+├── libros-ambiente.json                       12 libros
+├── libros-antropologia.json                   29 libros
+├── libros-flora-y-fauna.json                  63 libros
+├── libros-areas-naturales.json                21 libros
+├── libros-patrimonio-cultural.json             5 libros
+├── libros-infantiles.json                      8 libros
+├── libros-auspiciados.json                    52 libros
 ```
+
+**Total: 267 libros | 190 con PDF (71.2%) | 77 sin PDF**
 
 ### Estructura de cada archivo JSON
 
@@ -57,13 +70,11 @@ data/
   {
     "id": "lib-abc123",
     "titulo": "Enciclopedia de los Dinosaurios Argentinos",
-    "linkPdf": "https://fundacionazara.org.ar/wp-content/uploads/...",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/...",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/...",
     "autor": "José F. Bonaparte",
     "anio": 2024,
-    "descripcion": null,
-    "paginas": null,
-    "fechaExtraccion": "2026-04-10T15:30:00.000Z"
+    "fechaExtraccion": "2026-05-07T15:30:00.000Z"
   }
 ]
 ```
@@ -72,22 +83,31 @@ data/
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id` | string | Identificador único |
+| `id` | string | Identificador único (`lib-` + 8 aleatorio) |
 | `titulo` | string | Nombre del libro |
 | `linkPdf` | string/null | URL al PDF (null si no tiene) |
-| `imagenPortada` | string/null | URL de la imagen |
-| `autor` | string/null | Autor |
+| `imagenPortada` | string/null | URL de la imagen de portada |
+| `autor` | string/null | Autor del libro |
 | `anio` | number/null | Año de publicación |
-| `fechaExtraccion` | string | Cuándo fue extraído |
+| `fechaExtraccion` | string | Cuándo fue extraído (ISO 8601) |
 
-> ⚠️ **Nota sobre Auspiciados:** NO todos tienen PDF descargable.
+> ⚠️ **Nota:** Auspiciados (52 libros) y Paleontología (2 libros) no tienen PDF descargable.
+
+### URLs corregidas
+
+Dos categorías tenían URLs incorrectas originalmente, corregidas durante el scraping:
+
+| Categoría | URL original (404) | URL correcta |
+|-----------|--------------------|--------------|
+| Exploraciones, historia de la ciencia y biografías | `/libros/libros-de-historia-de-la-ciencia/` | `/libros-de-exploraciones-historia-de-la-ciencia-y-biografias/` |
+| Historia y patrimonio cultural | `/libros/libros-de-patrimonio-cultural/` | `/libros-de-historia-y-patrimonio-cultural/` |
 
 ## 🔄 Plan de Escalabilidad (JSON → PostgreSQL)
 
 ```
 FASE 1 (Ahora)          FASE 2 (Después)
 ─────────────────       ─────────────────
-JSON como storage    →   PostgreSQL
+JSON como storage   →   PostgreSQL
 Scraper → JSON      →   Scraper → PostgreSQL
 API lee JSON        →   API lee PostgreSQL
 ```
@@ -102,22 +122,26 @@ API lee JSON        →   API lee PostgreSQL
 ### Fase 1: Base ✅
 - [x] Estructura mono-repo
 - [x] Express.js configurado
-- [x] Dependencias instaladas (axios, cheerio)
+- [x] Dependencias instaladas (express, playwright, cors, dotenv)
 
 ### Fase 2: API Express ✅
 - [x] GET /api/libros (listar + filtrar)
 - [x] GET /api/libros/:id (uno solo)
-- [x] GET /api/libros/categorias/lista
-- [x] GET /api/libros/stats/general
-- [ ] Probar endpoints
+- [x] GET /api/categorias (lista de categorías)
+- [x] GET /api/libros/stats/general (estadísticas)
 
-### Fase 3: Scraping ✅ (parcial)
-- [x] Método navegador funciona
-- [x] Script extraerLibros.js creado
-- [x] Script combinarLibros.js creado
-- [x] Institucionales: 10 libros
-- [x] Paleontología: 18 libros
-- [ ] Resto de categorías (11 faltantes)
+### Fase 3: Scraping ✅
+- [x] Scraper Playwright funcional (navegador real)
+- [x] Scraper Cheerio retirado (bloqueado por CloudFlare)
+- [x] **13/13 categorías scrapeadas**
+- [x] 267 libros extraídos (190 con PDF)
+- [x] URLs corregidas para 2 categorías
+- [x] Schema simplificado (sin descripcion/paginas)
+- [x] Scraper optimizado en branch `optimization`:
+  - [x] Argumentos CLI (`--categoria=X`, `--todas`)
+  - [x] Guardado incremental cada 5 libros
+  - [x] Fallback para títulos sin `<h4>`
+  - [x] `npm run scrape-todas`
 
 ### Fase 4: Discord Bot
 - [ ] Crear discord-bot/
@@ -143,27 +167,25 @@ azara/
 │   ├── src/
 │   │   ├── index.js             ← entry point Express
 │   │   ├── routes/
-│   │   │   └── libros.js        ← endpoints /api/libros
+│   │   │   ├── libros.js        ← endpoints /api/libros
+│   │   │   └── categorias.js    ← endpoint /api/categorias
 │   │   └── data/
-│   │       ├── libros-institucionales.json
-│   │       ├── libros-paleontologia.json
-│   │       └── libros-[categoria].json  ← uno por categoría
+│   │       ├── libros-*.json    ← 13 archivos (uno por categoría)
+│   │       └── libros-*.temp.json ← progreso temporal (autogenerado)
 │   ├── scripts/
-│   │   ├── extraerLibros.js     ← extrae de páginas individuales
-│   │   └── combinarLibros.js     ← combina en archivo de categoría
+│   │   ├── scraper-playwright.js   ← scraper activo (Playwright)
+│   │   ├── scraper-cheerio-old.js  ← scraper retirado (referencia)
+│   │   ├── extraerLibros.js        ← extrae de páginas individuales
+│   │   └── combinarLibros.js       ← combina en archivo de categoría
 │   └── package.json
 │
-├── discord-bot/
-│   ├── src/
-│   │   ├── index.js             ← login del bot
-│   │   └── commands/
-│   │       ├── buscar.js         ← /buscar
-│   │       ├── libro.js          ← /libro
-│   │       └── categorias.js     ← /categorias
-│   └── package.json
+├── discord-bot/                  ← (pendiente)
+│   └── ...
 │
+├── AGENTS.md                    ← contexto para la IA
+├── PLAN.md
 ├── README.md
-└── PLAN.md
+└── .env.example
 ```
 
 ## 🔗 Links Importantes
@@ -180,6 +202,8 @@ azara/
 - Bot de Discord requiere "bot token" del Discord Developer Portal
 - API de producción necesita URL pública (Railway proporciona)
 - Variables de entorno: `DATABASE_URL`, `DISCORD_TOKEN`, `API_URL`
+- Playwright necesita Chromium: `npx playwright install chromium`
+- El sitio usa CloudFlare → solo Playwright (navegador real) funciona
 
 ---
 

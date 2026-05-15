@@ -1,74 +1,74 @@
 [
   {
-    "id": "lib-bgjlao81",
+    "id": "lib-3cj31je3",
     "titulo": "Aprender a volar",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/aprender-a-volar.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Aprender-a-volar.jpg",
     "autor": "Karina Novillo Ramírez",
     "anio": 2014,
-    "fechaExtraccion": "2026-05-07T19:02:25.055Z"
+    "fechaExtraccion": "2026-05-07T23:13:24.750Z"
   },
   {
-    "id": "lib-libx94y3",
+    "id": "lib-85naa24x",
     "titulo": "Colección: Voces ancestrales de los Valles Calchaquíes",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-001.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales.jpg",
     "autor": null,
     "anio": null,
-    "fechaExtraccion": "2026-05-07T19:02:30.523Z"
+    "fechaExtraccion": "2026-05-07T23:13:28.325Z"
   },
   {
-    "id": "lib-oz6tnxhk",
+    "id": "lib-penzihiz",
     "titulo": "Dinommumy",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Dinommumy.jpg",
     "autor": "Phillip Lars Manning, edición en español con Albatros",
     "anio": 2008,
-    "fechaExtraccion": "2026-05-07T19:02:37.598Z"
+    "fechaExtraccion": "2026-05-07T23:13:31.438Z"
   },
   {
-    "id": "lib-oz7fpqzs",
+    "id": "lib-bmazf4ss",
     "titulo": "El mono que contó el cuento",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/el-mono-que-conto-el-cuento.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/El-mono-que-conto-el-cuento.jpg",
     "autor": "Karina Novillo Ramírez",
     "anio": 2014,
-    "fechaExtraccion": "2026-05-07T19:02:42.283Z"
+    "fechaExtraccion": "2026-05-07T23:13:34.777Z"
   },
   {
-    "id": "lib-dnhri7h9",
+    "id": "lib-i4vllz57",
     "titulo": "El secreto de la gota de agua",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/el-secreto-de-la-gota-de-agua.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/El-secreto-de-la-gota-de-agua.jpg",
     "autor": "Karina Novillo Ramírez",
     "anio": 2013,
-    "fechaExtraccion": "2026-05-07T19:02:46.877Z"
+    "fechaExtraccion": "2026-05-07T23:13:37.830Z"
   },
   {
-    "id": "lib-mlgbc2h2",
-    "titulo": "Suo y Papuga, una historia de pelos y plumas",
-    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/suo-y-papuga.pdf",
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Suo-y-Papuga-una-historia-de-pelos-y-plumas.jpg",
-    "autor": "Karina Novillo Ramírez",
-    "anio": 2012,
-    "fechaExtraccion": "2026-05-07T19:02:56.083Z"
-  },
-  {
-    "id": "lib-k1w9a003",
-    "titulo": "Un extraterrestre de verdad",
-    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/un-extraterrestre.pdf",
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Un-extraterrestre-de-verdad.jpg",
-    "autor": "Karina Novillo Ramírez",
-    "anio": 2016,
-    "fechaExtraccion": "2026-05-07T19:03:00.546Z"
-  },
-  {
-    "id": "lib-hercules01",
+    "id": "lib-u27oia8z",
     "titulo": "Las doce pruebas de Hércules: un cuento sobre un cauquén colorado",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/las-doce-pruebas-de-hercules.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/las-doce-pruebas-de-hercules.jpg",
     "autor": "Olguita Estela Albarenga",
     "anio": 2022,
-    "fechaExtraccion": "2026-05-07T19:10:00.000Z"
+    "fechaExtraccion": "2026-05-07T23:13:41.053Z"
+  },
+  {
+    "id": "lib-3g9ypwo5",
+    "titulo": "Suo y Papuga, una historia de pelos y plumas",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/suo-y-papuga.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Suo-y-Papuga-una-historia-de-pelos-y-plumas.jpg",
+    "autor": "Karina Novillo Ramírez",
+    "anio": 2012,
+    "fechaExtraccion": "2026-05-07T23:13:44.228Z"
+  },
+  {
+    "id": "lib-wdxobbn4",
+    "titulo": "Un extraterrestre de verdad",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/un-extraterrestre.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Un-extraterrestre-de-verdad.jpg",
+    "autor": "Karina Novillo Ramírez",
+    "anio": 2016,
+    "fechaExtraccion": "2026-05-07T23:13:48.542Z"
   }
 ]
