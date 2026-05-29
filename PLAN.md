@@ -1,6 +1,6 @@
 # PLAN.md - API Azara
 
-> **Última actualización:** 07/05/2026
+> **Última actualización:** 29/05/2026
 
 ## 📌 Resumen del Proyecto
 
@@ -8,21 +8,23 @@
 
 **Dominio:** Fundación Azara — ciencias biológicas, geológicas, paleontológicas y antropológicas de Buenos Aires.
 
-**Frontend:** Bot de Discord con comandos (`/buscar`, `/libro`, `/categorias`)
+**Frontend:** Bot de Discord con comandos slash (`/buscar`, `/libro`, `/categorias`) + componentes interactivos (botones, Select Menu).
 
 ## 🗂️ Estado Actual
 
 - ✅ Estructura mono-repo (backend + discord-bot)
-- ✅ Express.js con API Routes
+- ✅ Express.js con API Routes (backend en puerto 3000)
 - ✅ API dinámica (lee JSONs individuales por categoría)
 - ✅ **13/13 categorías scrapeadas** — 267 libros total
 - ✅ 190 libros con PDF descargable (71.2%)
 - ✅ Scraper Playwright (navegador real, evita CloudFlare)
 - ✅ Scraper Cheerio retirado → `scraper-cheerio-old.js` (guardado para estudio)
 - ✅ Schema simplificado (sin `descripcion` ni `paginas`)
-- ✅ Scraper optimizado en branch `optimization` (CLI args, guardado incremental, fallback título)
-- 🔲 Bot de Discord
-- 🔲 Merge de `optimization` a `master`
+- ✅ Scraper optimizado (CLI args, guardado incremental, fallback título) — mergeado a `develop`
+- ✅ **Discord Bot funcionando** — Express + HTTP Interactions (sin discord.js)
+- ✅ Paginación con botones en `/buscar`
+- ✅ **Select Menu** de categorías con paginación + botón "Volver"
+- ✅ IDs de libros visibles en resultados
 - 🔲 Deploy en Railway
 - 🔲 Migración a PostgreSQL
 
@@ -31,11 +33,16 @@
 | Decisión | Detalle |
 |----------|---------|
 | API Backend | Express.js (estándar industria) |
-| Frontend | Bot de Discord (interfaz pública) |
+| Frontend | Bot de Discord (interfaz pública, HTTP Interactions) |
 | Scraper | **Playwright** (CloudFlare bloquea Axios/Cheerio) |
 | DB Inicial | JSON por categoría (`data/libros-*.json`) |
 | DB Final | PostgreSQL (migración posterior) |
-| Hosting | Railway (API + DB) |
+| Bot Architecture | Express standalone (puerto 3001), HTTP Interactions Endpoint |
+| Auth Bot | **tweetnacl** (verificación Ed25519, sin discord.js) |
+| Comandos | Slash commands vía Discord API (registro con register.js) |
+| Paginación | Botones interactivos (Message Components) |
+| Navegación cat. | Select Menu (dropdown) + botón "Volver" |
+| Hosting | Railway (API + Bot) |
 | Cronjob | cron-job.org (gratis, llama endpoint) |
 
 ## 📦 Estructura de Datos (JSON Individual por Categoría)
@@ -91,7 +98,7 @@ data/
 | `anio` | number/null | Año de publicación |
 | `fechaExtraccion` | string | Cuándo fue extraído (ISO 8601) |
 
-> ⚠️ **Nota:** Auspiciados (52 libros) y Paleontología (2 libros) no tienen PDF descargable.
+> ⚠️ **Nota:** Auspiciados (52 libros) no tienen PDF descargable.
 
 ### URLs corregidas
 
@@ -101,6 +108,45 @@ Dos categorías tenían URLs incorrectas originalmente, corregidas durante el sc
 |-----------|--------------------|--------------|
 | Exploraciones, historia de la ciencia y biografías | `/libros/libros-de-historia-de-la-ciencia/` | `/libros-de-exploraciones-historia-de-la-ciencia-y-biografias/` |
 | Historia y patrimonio cultural | `/libros/libros-de-patrimonio-cultural/` | `/libros-de-historia-y-patrimonio-cultural/` |
+
+## 🤖 Discord Bot — Arquitectura
+
+```
+┌──────────────┐     POST /interactions     ┌──────────────────┐
+│   Usuario    │ ◄──────────────────────►   │  Discord Bot     │
+│   Discord    │     (HTTP Interactions)     │  localhost:3001   │
+└──────────────┘                             └────────┬─────────┘
+                                                      │ HTTP (fetch)
+                                                      ▼
+                                               ┌──────────────┐
+                                               │   Backend     │
+                                               │  localhost:3000│
+                                               └──────────────┘
+```
+
+- **Servidor Express standalone** (puerto 3001)
+- **Sin discord.js** — usa HTTP Interactions Endpoint + verificación Ed25519 con `tweetnacl`
+- **Commands registration**: `register.js` (una sola vez por guild)
+- **NGROK** para desarrollo local (apunta al puerto 3001)
+
+### Comandos e interacciones
+
+| Comando / Interacción | Qué hace |
+|-----------------------|----------|
+| `/buscar [termino]` | Busca libros por título, muestra 5 por página con botones ◀/▶ |
+| `/libro [id]` | Muestra detalle de un libro específico |
+| `/categorias` | Lista categorías + **Select Menu** dropdown |
+| → Select Menu | Muestra libros de esa categoría con botones ◀/▶ + 🔙 Volver |
+| → ◀ / ▶ | Paginación (navega entre páginas de resultados) |
+| → 🔙 Volver | Vuelve al listado general de categorías |
+
+### Detalles de implementación
+
+- **Botones**: `Message Components` type 2, con `custom_id` en JSON con el comando y estado (`{"cmd":"buscar","q":"mamiferos","p":1}`)
+- **Select Menu**: `Message Components` type 3, envía el valor seleccionado en `interaction.data.values[0]`
+- **Paginación**: Usa `DEFERRED_UPDATE_MESSAGE` (type 6) + PATCH al mensaje original via webhook
+- **IDs en resultados**: Cada libro muestra `🆔 \`lib-abc123\`` para poder usar `/libro`
+- **Una sola ActionRow**: Todos los botones en una fila para evitar errores de PATCH
 
 ## 🔄 Plan de Escalabilidad (JSON → PostgreSQL)
 
@@ -137,24 +183,30 @@ API lee JSON        →   API lee PostgreSQL
 - [x] 267 libros extraídos (190 con PDF)
 - [x] URLs corregidas para 2 categorías
 - [x] Schema simplificado (sin descripcion/paginas)
-- [x] Scraper optimizado en branch `optimization`:
+- [x] Scraper optimizado:
   - [x] Argumentos CLI (`--categoria=X`, `--todas`)
   - [x] Guardado incremental cada 5 libros
   - [x] Fallback para títulos sin `<h4>`
   - [x] `npm run scrape-todas`
 
-### Fase 4: Discord Bot
-- [ ] Crear discord-bot/
-- [ ] Comandos: /buscar, /libro, /categorias
-- [ ] Conectar con API
+### Fase 4: Discord Bot ✅
+- [x] Servidor Express standalone (puerto 3001)
+- [x] Verificación Ed25519 con tweetnacl
+- [x] Comando `/buscar` con paginación por botones
+- [x] Comando `/libro`
+- [x] Comando `/categorias` con Select Menu
+- [x] Paginación por categoría con botones ◀/▶
+- [x] Botón "Volver" a lista de categorías
+- [x] IDs de libros visibles en resultados
+- [x] Registro de comandos slash (register.js)
 
-### Fase 5: PostgreSQL (futuro)
+### Fase 5: PostgreSQL (futuro) 🔲
 - [ ] Crear cuenta Railway + PostgreSQL
 - [ ] Definir schema SQL
 - [ ] Migrar datos de JSON
 - [ ] Actualizar API para usar DB
 
-### Fase 6: Deploy
+### Fase 6: Deploy 🔲
 - [ ] Deploy Express en Railway
 - [ ] Deploy Discord Bot
 - [ ] Configurar cron-job.org
@@ -165,7 +217,7 @@ API lee JSON        →   API lee PostgreSQL
 azara/
 ├── backend/
 │   ├── src/
-│   │   ├── index.js             ← entry point Express
+│   │   ├── index.js             ← entry point Express (puerto 3000)
 │   │   ├── routes/
 │   │   │   ├── libros.js        ← endpoints /api/libros
 │   │   │   └── categorias.js    ← endpoint /api/categorias
@@ -179,12 +231,18 @@ azara/
 │   │   └── combinarLibros.js       ← combina en archivo de categoría
 │   └── package.json
 │
-├── discord-bot/                  ← (pendiente)
-│   └── ...
+├── discord-bot/
+│   ├── src/
+│   │   ├── index.js             ← Express Interactions Endpoint (puerto 3001)
+│   │   └── register.js          ← registro único de comandos slash
+│   ├── .env.example
+│   └── package.json
 │
 ├── AGENTS.md                    ← contexto para la IA
+├── CLAUDE.md                    ← referencia a AGENTS.md
 ├── PLAN.md
 ├── README.md
+├── SESSION.md                   ← notas históricas de desarrollo
 └── .env.example
 ```
 
@@ -199,11 +257,13 @@ azara/
 ## 💡 Notas Técnicas
 
 - El scraper detecta libros nuevos/eliminados automáticamente
-- Bot de Discord requiere "bot token" del Discord Developer Portal
-- API de producción necesita URL pública (Railway proporciona)
-- Variables de entorno: `DATABASE_URL`, `DISCORD_TOKEN`, `API_URL`
+- Bot de Discord requiere **3 variables** en `.env`: `DISCORD_PUBLIC_KEY`, `DISCORD_TOKEN`, `DISCORD_CLIENT_ID`
+- NGROK debe apuntar al bot (puerto 3001), no al backend (puerto 3000)
+- La verificación de firma usa `tweetnacl` con las cabeceras `X-Signature-Ed25519` y `X-Signature-Timestamp`
+- El raw body debe capturarse ANTES de `express.json()` para poder verificar la firma
 - Playwright necesita Chromium: `npx playwright install chromium`
 - El sitio usa CloudFlare → solo Playwright (navegador real) funciona
+- Variables de entorno: `PORT`, `API_URL`, `DISCORD_PUBLIC_KEY`, `DISCORD_TOKEN`, `DISCORD_CLIENT_ID`
 
 ---
 

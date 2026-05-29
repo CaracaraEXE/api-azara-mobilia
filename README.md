@@ -9,19 +9,22 @@ La **Fundación Azara** es una organización enfocada en la investigación sobre
 Este proyecto permite:
 1. **Extraer** libros y archivos PDF del sitio web de la Fundación Azara
 2. **Catalogarlos** por categoría y otros datos disponibles
-3. **Acceder** a través de una API REST o un bot de Discord con comandos simples
+3. **Acceder** a través de una API REST o un bot de Discord con comandos slash interactivos
 
 ## 🛠️ Stack Tecnológico
 
 | Tecnología | Propósito |
 |------------|-----------|
-| **Express.js** | API REST (backend) |
+| **Express.js** | API REST (backend, puerto 3000) |
+| **Express.js** | Discord HTTP Interactions Endpoint (bot, puerto 3001) |
 | **Archivo JSON** | Storage inicial (uno por categoría) |
 | **Playwright** | Scraping con navegador real (evita CloudFlare) |
+| **tweetnacl** | Verificación de firma Ed25519 (discord-bot) |
 | **PostgreSQL** | Base de datos (futuro) |
-| **Discord.js** | Bot de Discord |
-| **Railway** | Hosting de API y DB |
+| **Railway** | Hosting de API y Bot |
 | **cron-job.org** | Actualizaciones automatizadas |
+
+> **Nota:** El bot de Discord NO usa discord.js — implementa HTTP Interactions Endpoint directamente con Express + tweetnacl.
 
 ## 📚 Categorías de la Fundación Azara
 
@@ -96,8 +99,8 @@ Los libros están organizados en **13 categorías**. Actualmente **267 libros sc
 │  Soporta: --categoria=slug, --todas, guardado incremental     │
 └────────────────────────────┬───────────────────────────────────┘
                              │
-          ┌──────────────────┴──────────────────┐
-          ▼                                     ▼
+           ┌──────────────────┴──────────────────┐
+           ▼                                     ▼
 ┌─────────────────────┐             ┌─────────────────────┐
 │   JSON (Fase 1)     │  ──────→   │  PostgreSQL (Fase 2) │
 │  data/libros-*.json │             │      Railway         │
@@ -119,11 +122,18 @@ Los libros están organizados en **13 categorías**. Actualmente **267 libros sc
                              ▼
 ┌────────────────────────────────────────────────────────────────┐
 │                       DISCORD BOT                               │
-│                  Bot con comandos slash                         │
+│               Express + HTTP Interactions                       │
+│               localhost:3001 (via NGROK)                        │
 │                                                                │
-│  /buscar paleontología   → busca y muestra resultados          │
-│  /libro abc123          → muestra un libro específico          │
-│  /categorias            → lista categorías disponibles         │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  /buscar mamiferos   → 5 res. + botones ◀ 1/3 ▶       │   │
+│  │                       Cada libro muestra 🆔 id         │   │
+│  ├─────────────────────────────────────────────────────────┤   │
+│  │  /libro lib-abc123  → detalle del libro                │   │
+│  ├─────────────────────────────────────────────────────────┤   │
+│  │  /categorias        → lista + Select Menu ▼            │   │
+│  │    └─→ seleccionás  → libros + ◀/▶ + 🔙 Volver        │   │
+│  └─────────────────────────────────────────────────────────┘   │
 └────────────────────────────────────────────────────────────────┘
 ```
 
@@ -131,26 +141,14 @@ Los libros están organizados en **13 categorías**. Actualmente **267 libros sc
 
 ```
 azara/
-├── backend/                      ← API Express.js
+├── backend/                      ← API Express.js (puerto 3000)
 │   ├── src/
-│   │   ├── index.js             ← entry point (puerto 3000)
+│   │   ├── index.js             ← entry point
 │   │   ├── routes/
 │   │   │   ├── libros.js        ← endpoints /api/libros
 │   │   │   └── categorias.js    ← endpoint /api/categorias
 │   │   └── data/
-│   │       ├── libros-institucionales.json
-│   │       ├── libros-paleontologia.json
-│   │       ├── libros-astronomia-y-geologia.json
-│   │       ├── libros-evolucion-genetica-ecologia-y-etologia.json
-│   │       ├── libros-divulgacion-cientifica.json
-│   │       ├── libros-historia-de-la-ciencia.json
-│   │       ├── libros-ambiente.json
-│   │       ├── libros-antropologia.json
-│   │       ├── libros-flora-y-fauna.json
-│   │       ├── libros-areas-naturales.json
-│   │       ├── libros-patrimonio-cultural.json
-│   │       ├── libros-infantiles.json
-│   │       └── libros-auspiciados.json
+│   │       ├── libros-*.json    ← 13 archivos (uno por categoría)
 │   ├── scripts/
 │   │   ├── scraper-playwright.js   ← scraper activo
 │   │   ├── scraper-cheerio-old.js  ← scraper retirado (referencia)
@@ -158,12 +156,18 @@ azara/
 │   │   └── combinarLibros.js       ← combina datos
 │   └── package.json
 │
-├── discord-bot/                  ← (pendiente)
-│   └── ...
+├── discord-bot/                  ← Bot de Discord (puerto 3001)
+│   ├── src/
+│   │   ├── index.js             ← Interactions Endpoint + comandos
+│   │   └── register.js          ← registro único de comandos slash
+│   ├── .env.example
+│   └── package.json
 │
 ├── AGENTS.md                    ← contexto para IA
+├── CLAUDE.md                    ← referencia a AGENTS.md
 ├── PLAN.md                      ← roadmap y decisiones
 ├── README.md
+├── SESSION.md                   ← notas históricas de desarrollo
 └── .env.example
 ```
 
@@ -180,18 +184,25 @@ azara/
 
 | Parámetro | Ejemplo | Descripción |
 |-----------|---------|-------------|
-| `busqueda` | `?busqueda=dinosaurio` | Busca en título |
+| `busqueda` | `?busqueda=dinosaurio` | Busca en título y autor |
 | `categoria` | `?categoria=paleontologia` | Filtrar por categoría |
 | `pagina` | `?pagina=2` | Número de página |
 | `limite` | `?limite=20` | Resultados por página |
 
-## 🤖 Comandos del Bot de Discord (pendiente)
+## 🤖 Comandos del Bot de Discord
 
 | Comando | Ejemplo | Descripción |
 |---------|---------|-------------|
-| `/buscar` | `/buscar paleontología` | Busca libros por término |
-| `/libro` | `/libro lib-abc123` | Muestra un libro específico |
-| `/categorias` | `/categorias` | Lista categorías disponibles |
+| `/buscar` | `/buscar paleontología` | Busca libros. Muestra 5 por página con botones ◀/▶ |
+| `/libro` | `/libro lib-abc123` | Muestra detalle de un libro específico |
+| `/categorias` | `/categorias` | Lista categorías con Select Menu. Al seleccionar una, muestra sus libros con paginación |
+
+### Características interactivas
+
+- **Botones ◀ / ▶**: Navegación entre páginas de resultados (tanto en `/buscar` como en categorías)
+- **Select Menu ▼**: Menú desplegable con las 13 categorías al usar `/categorias`
+- **🔙 Volver**: Vuelve al listado general de categorías
+- **🆔 ID visible**: Cada libro muestra su ID para poder usarlo con `/libro`
 
 ## ✅ Roadmap de Desarrollo
 
@@ -212,12 +223,13 @@ azara/
 - [x] Schema simplificado
 - [x] Scraper optimizado (CLI, guardado incremental, fallback título)
 
-### Fase 4: Discord Bot 🔲
-- [ ] Crear bot en Discord Developer Portal
-- [ ] Setup discord-bot/
-- [ ] Comando /buscar
-- [ ] Comando /libro
-- [ ] Comando /categorias
+### Fase 4: Discord Bot ✅
+- [x] Servidor Express standalone (HTTP Interactions, sin discord.js)
+- [x] Verificación Ed25519 con tweetnacl
+- [x] Comando `/buscar` con paginación por botones
+- [x] Comando `/libro`
+- [x] Comando `/categorias` con Select Menu + paginación + Volver
+- [x] IDs de libros visibles en resultados
 
 ### Fase 5: PostgreSQL (futuro) 🔲
 - [ ] Crear cuenta Railway + PostgreSQL
@@ -232,7 +244,7 @@ azara/
 
 ## 🚀 Cómo Ejecutar
 
-### Backend
+### Backend (API)
 
 ```bash
 cd backend
@@ -240,15 +252,12 @@ cd backend
 # Instalar dependencias
 npm install
 
-# Instalar Chromium para Playwright (si no está)
+# Instalar Chromium para Playwright (para scraping)
 npx playwright install chromium
-
-# Ejecutar en desarrollo
-npm run dev
 
 # ─── SCRAPING ─────────────────────────────────────
 
-# Scrapear categoría por defecto (configurada en scraper)
+# Scrapear categoría por defecto
 npm run scrape-pw
 
 # Scrapear una categoría específica
@@ -259,13 +268,14 @@ npm run scrape-todas
 
 # ─── API ───────────────────────────────────────────
 
-# Iniciar servidor
+# Iniciar servidor (producción)
 npm start
-# o
+
+# Iniciar servidor (desarrollo con auto-reload)
 npm run dev
 ```
 
-### Discord Bot (pendiente)
+### Discord Bot
 
 ```bash
 cd discord-bot
@@ -273,27 +283,54 @@ cd discord-bot
 # Instalar dependencias
 npm install
 
-# Configurar bot token en .env
-# (obtener de Discord Developer Portal)
+# Configurar .env (ver .env.example)
+# Necesitas: DISCORD_PUBLIC_KEY, DISCORD_TOKEN, DISCORD_CLIENT_ID
 
-# Ejecutar
+# Registrar comandos slash (UNA SOLA VEZ por servidor)
+npm run register
+
+# Iniciar bot (desarrollo con auto-reload)
+npm run dev
+
+# Iniciar bot (producción)
 npm start
 ```
 
-### Variables de Entorno
+### Ejecutar todo localmente (desarrollo)
+
+Necesitás **3 terminales**:
+
+| Terminal | Comando | Puerto |
+|----------|---------|--------|
+| 1️⃣ Backend | `cd backend && npm run dev` | 3000 |
+| 2️⃣ Discord Bot | `cd discord-bot && npm run dev` | 3001 |
+| 3️⃣ NGROK | `ngrok http 3001` | — |
+
+> NGROK debe apuntar al **discord-bot** (puerto 3001), no al backend. La URL de NGROK se configura en el Discord Developer Portal como **Interactions Endpoint URL** (ej: `https://xxxx.ngrok-free.app/interactions`).
+
+## 🔐 Variables de Entorno
+
+### Backend (`backend/.env`)
 
 ```env
-# Backend (.env)
 PORT=3000
 API_URL=http://localhost:3000
 DATA_DIR=./src/data
 # Para Fase 5:
 # DATABASE_URL=postgres://user:pass@host:5432/azara
-
-# Discord Bot (.env)
-DISCORD_TOKEN=tu_bot_token_aqui
-API_URL=http://localhost:3000
 ```
+
+### Discord Bot (`discord-bot/.env`)
+
+```env
+PORT=3001
+API_URL=http://localhost:3000
+DISCORD_PUBLIC_KEY=tu_public_key_aqui
+DISCORD_TOKEN=tu_bot_token_aqui
+DISCORD_CLIENT_ID=tu_client_id_aqui
+```
+
+> La `DISCORD_PUBLIC_KEY` se obtiene de la sección "General Information" de tu app en Discord Developer Portal.
 
 ## 📝 Notas de Desarrollo
 
@@ -302,7 +339,8 @@ API_URL=http://localhost:3000
 - **Guardado incremental**: Si el scraper se corta en una categoría grande, el progreso se guarda en `libros-[slug].temp.json`. Al re-ejecutar, retoma desde donde quedó.
 - **Datos iniciales**: 267 libros extraídos, 190 con PDF descargable (71.2%).
 - **Enfoque incremental**: JSON primero → PostgreSQL después.
-- **Discord como frontend**: Más accesible que una web para el usuario final.
+- **Bot sin discord.js**: Usa Express + HTTP Interactions + tweetnacl para verificar firmas. Más liviano y didáctico.
+- **Paginación**: Los resultados usan `DEFERRED_UPDATE_MESSAGE` (type 6) + PATCH vía webhook de Discord.
 
 ---
 
