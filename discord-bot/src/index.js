@@ -175,8 +175,8 @@ function construirMensajeBusqueda(termino, libros, pagina, total) {
   const fields = libros.map(libro => ({
     name: libro.titulo.substring(0, 256),
     value: libro.linkPdf
-      ? `📁 ${libro.categoria}\n📄 [Descargar PDF](${libro.linkPdf})`
-      : `📁 ${libro.categoria}\n❌ Sin PDF disponible`
+      ? `📁 ${libro.categoria} · 🆔 \`${libro.id}\`\n📄 [Descargar PDF](${libro.linkPdf})`
+      : `📁 ${libro.categoria} · 🆔 \`${libro.id}\`\n❌ Sin PDF disponible`
   }));
 
   // Botones de navegación (solo si hay más de una página)
@@ -349,8 +349,8 @@ function construirMensajeCategoriaLibros(categoria, libros, pagina, total) {
   const fields = libros.map(libro => ({
     name: libro.titulo.substring(0, 256),
     value: libro.linkPdf
-      ? `📄 [Descargar PDF](${libro.linkPdf})`
-      : '❌ Sin PDF disponible'
+      ? `🆔 \`${libro.id}\`\n📄 [Descargar PDF](${libro.linkPdf})`
+      : `🆔 \`${libro.id}\`\n❌ Sin PDF disponible`
   }));
 
   // Una sola ActionRow con todos los botones
