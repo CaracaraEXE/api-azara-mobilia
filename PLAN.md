@@ -1,6 +1,6 @@
 # PLAN.md - API Azara
 
-> **Última actualización:** 29/05/2026
+> **Última actualización:** 03/06/2026
 
 ## 📌 Resumen del Proyecto
 
@@ -25,7 +25,7 @@
 - ✅ Paginación con botones en `/buscar`
 - ✅ **Select Menu** de categorías con paginación + botón "Volver"
 - ✅ IDs de libros visibles en resultados
-- 🔲 Deploy en Railway
+- 🔲 Deploy en la nube (pendiente)
 - 🔲 Migración a PostgreSQL
 
 ## 📝 Decisiones Tomadas
@@ -42,8 +42,7 @@
 | Comandos | Slash commands vía Discord API (registro con register.js) |
 | Paginación | Botones interactivos (Message Components) |
 | Navegación cat. | Select Menu (dropdown) + botón "Volver" |
-| Hosting | Railway (API + Bot) |
-| Cronjob | cron-job.org (gratis, llama endpoint) |
+| Hosting | Pendiente (Fly.io evaluado) |
 
 ## 📦 Estructura de Datos (JSON Individual por Categoría)
 
@@ -201,15 +200,14 @@ API lee JSON        →   API lee PostgreSQL
 - [x] Registro de comandos slash (register.js)
 
 ### Fase 5: PostgreSQL (futuro) 🔲
-- [ ] Crear cuenta Railway + PostgreSQL
+- [ ] Configurar base de datos PostgreSQL
 - [ ] Definir schema SQL
 - [ ] Migrar datos de JSON
 - [ ] Actualizar API para usar DB
 
-### Fase 6: Deploy 🔲
-- [ ] Deploy Express en Railway
+### Fase 6: Deploy (pendiente) 🔲
+- [ ] Deploy backend en la nube (Fly.io evaluado)
 - [ ] Deploy Discord Bot
-- [ ] Configurar cron-job.org
 
 ## 📁 Estructura del Proyecto
 
@@ -250,8 +248,6 @@ azara/
 
 - Sitio web: https://fundacionazara.org.ar
 - Catálogo libros: https://fundacionazara.org.ar/libros/
-- Railway: https://railway.app
-- Cron-job.org: https://cron-job.org
 - Discord Developer Portal: https://discord.com/developers
 
 ## 💡 Notas Técnicas

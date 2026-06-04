@@ -20,9 +20,7 @@ Este proyecto permite:
 | **Archivo JSON** | Storage inicial (uno por categoría) |
 | **Playwright** | Scraping con navegador real (evita CloudFlare) |
 | **tweetnacl** | Verificación de firma Ed25519 (discord-bot) |
-| **PostgreSQL** | Base de datos (futuro) |
-| **Railway** | Hosting de API y Bot |
-| **cron-job.org** | Actualizaciones automatizadas |
+| **PostgreSQL** | Base de datos (futuro/to-do) |
 
 > **Nota:** El bot de Discord NO usa discord.js — implementa HTTP Interactions Endpoint directamente con Express + tweetnacl.
 
@@ -99,15 +97,15 @@ Los libros están organizados en **13 categorías**. Actualmente **267 libros sc
 │  Soporta: --categoria=slug, --todas, guardado incremental     │
 └────────────────────────────┬───────────────────────────────────┘
                              │
-           ┌──────────────────┴──────────────────┐
-           ▼                                     ▼
-┌─────────────────────┐             ┌─────────────────────┐
-│   JSON (Fase 1)     │  ──────→   │  PostgreSQL (Fase 2) │
-│  data/libros-*.json │             │      Railway         │
-└─────────────────────┘             └─────────────────────┘
-          │                                     │
-          └─────────────────┬───────────────────┘
-                            ▼
+                             ▼
+┌────────────────────────────────────────────────────────────────┐
+│                      JSON (Fase 1)                             │
+│                    data/libros-*.json                          │
+│                                                                │
+│                ──────→  PostgreSQL (Fase 2, futuro)            │
+└────────────────────────────────────────────────────────────────┘
+                             │
+                             ▼
 ┌────────────────────────────────────────────────────────────────┐
 │                       EXPRESS.JS API                            │
 │             localhost:3000/api/libros                           │
@@ -156,7 +154,7 @@ azara/
 │   │   └── combinarLibros.js       ← combina datos
 │   └── package.json
 │
-├── discord-bot/                  ← Bot de Discord (puerto 3001)
+├── discord-bot/                  ← Bot de Discord / Frontend del proyecto (puerto 3001)
 │   ├── src/
 │   │   ├── index.js             ← Interactions Endpoint + comandos
 │   │   └── register.js          ← registro único de comandos slash
@@ -164,11 +162,10 @@ azara/
 │   └── package.json
 │
 ├── AGENTS.md                    ← contexto para IA
-├── CLAUDE.md                    ← referencia a AGENTS.md
 ├── PLAN.md                      ← roadmap y decisiones
 ├── README.md
 ├── SESSION.md                   ← notas históricas de desarrollo
-└── .env.example
+└── .gitignore
 ```
 
 ## 🔗 Endpoints de la API
@@ -232,15 +229,14 @@ azara/
 - [x] IDs de libros visibles en resultados
 
 ### Fase 5: PostgreSQL (futuro) 🔲
-- [ ] Crear cuenta Railway + PostgreSQL
+- [ ] Configurar base de datos PostgreSQL
 - [ ] Definir schema SQL
 - [ ] Migrar datos de JSON
 - [ ] Actualizar API
 
-### Fase 6: Deploy 🔲
-- [ ] Deploy backend en Railway
+### Fase 6: Deploy (pendiente) 🔲
+- [ ] Deploy backend en la nube (Fly.io evaluado)
 - [ ] Deploy Discord Bot
-- [ ] Configurar cron-job.org
 
 ## 🚀 Cómo Ejecutar
 
