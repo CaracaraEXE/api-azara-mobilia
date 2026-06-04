@@ -1,0 +1,470 @@
+[
+  {
+    "id": "lib-eecw04zg",
+    "titulo": "Antártida. Descubriendo el último continente",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Antartida-Descubriendo-el-ultimo-continente.jpg",
+    "autor": "Vázquez Mazzini Editores | Sebastián Arrebola y Shoshanah Jacobs",
+    "anio": 2011,
+    "fechaExtraccion": "2026-05-07T19:03:26.313Z"
+  },
+  {
+    "id": "lib-jknkl7ho",
+    "titulo": "Árboles de la ciudad de Buenos Aires",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/arboles-de-la-ciudad-de-Buenos-Aires.jpg",
+    "autor": "Vázquez Mazzini Editores | Graciela Barreiro",
+    "anio": 2007,
+    "fechaExtraccion": "2026-05-07T19:03:31.364Z"
+  },
+  {
+    "id": "lib-d2muofzs",
+    "titulo": "Arqueología de Cañada Honda y Río Areco, Baradero, provincia de Buenos Aires",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Arqueolog%C3%ADa-de-Ca%C3%B1ada-Honda-y-R%C3%ADo-Areco-Baradero.jpg",
+    "autor": "Fondo Editorial Mercedes | Laura Migale y José Bonaparte",
+    "anio": 2008,
+    "fechaExtraccion": "2026-05-07T19:03:38.830Z"
+  },
+  {
+    "id": "lib-ov9mpv5r",
+    "titulo": "Aves de Iguazú",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/01/Aves-de-Iguazu.jpg",
+    "autor": "Mariano Masariche, Roberto Güller y Oscar Iriani",
+    "anio": 2018,
+    "fechaExtraccion": "2026-05-07T19:03:43.423Z"
+  },
+  {
+    "id": "lib-l3zj6uee",
+    "titulo": "Aves de la ciudad de Buenos Aires",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Aves-de-la-ciudad-de-Buenos-Aires.jpg",
+    "autor": "Vázquez Mazzini Editores | Tito Narosky, Christian Henschke, José Leiberman y Darío Yzurieta",
+    "anio": 2005,
+    "fechaExtraccion": "2026-05-07T19:03:48.442Z"
+  },
+  {
+    "id": "lib-n0vgoy0a",
+    "titulo": "Aves de Mar Chiquita",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/06/Aves-de-Mar-Chiquita.jpg",
+    "autor": "Javier Canevari, Enrique Chiurla, Hugo Gribman, Miguel Hoyuelos, Jorge Iriberri, Miguel Monserrat, Alejandro Sánchez, Fabiana Sicco y María José Solís",
+    "anio": 2014,
+    "fechaExtraccion": "2026-05-07T19:03:53.356Z"
+  },
+  {
+    "id": "lib-1o1qf83f",
+    "titulo": "Aves de Patagonia",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Aves-de-Patagonia.jpg",
+    "autor": "Fundación Unidos por Naturaleza | Nicolás Tizio y Tito Narosky",
+    "anio": 2022,
+    "fechaExtraccion": "2026-05-07T19:03:58.362Z"
+  },
+  {
+    "id": "lib-ddl8ch8d",
+    "titulo": "Aves, desde los dinosaurios a la actualidad",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Aves-desde-los-dinosaurios-a-la-actualidad.jpg",
+    "autor": "De Quodam | Carlos Papolio",
+    "anio": 2010,
+    "fechaExtraccion": "2026-05-07T19:04:03.243Z"
+  },
+  {
+    "id": "lib-jrgi4m0j",
+    "titulo": "Bestiario fósil del partido de La Costa, Pinamar y Villa Gesell",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Bestiario-fosil-del-partido-de-La-Costa-Pinamar-y-Villa-Gesell.jpg",
+    "autor": "Vázquez Mazzini Editores | Diego Héctor Gambetta",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T19:04:08.177Z"
+  },
+  {
+    "id": "lib-0ivb57uo",
+    "titulo": "Casas de Tigre, patrimonio arquitectónico",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/casas-de-tigre-550-300x258.jpg",
+    "autor": "Fernando Giesso, Estela Kliauga, Lydia Michelena Crook y Nora Roncal",
+    "anio": 2014,
+    "fechaExtraccion": "2026-05-07T19:04:12.051Z"
+  },
+  {
+    "id": "lib-hkbc9h8w",
+    "titulo": "Cien mamíferos argentinos",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Cien-mam%C3%ADferos-argentinos.jpg",
+    "autor": "Editorial Albatros | Carlos Fernández Balboa y Marcelo Canevari",
+    "anio": 2003,
+    "fechaExtraccion": "2026-05-07T19:04:16.757Z"
+  },
+  {
+    "id": "lib-2lyathri",
+    "titulo": "Cien peces argentinos",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Cien-peces-argentinos.jpg",
+    "autor": "Editorial Albatros | Gustavo Aparicio y Hernán Laita",
+    "anio": 2005,
+    "fechaExtraccion": "2026-05-07T19:04:21.246Z"
+  },
+  {
+    "id": "lib-osmijs7i",
+    "titulo": "Curiosidades del desierto",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/07/Curiosidades-del-desierto.jpg",
+    "autor": "Vázquez Mazzini Editores | Paula Andrea Taraborelli",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T19:04:25.590Z"
+  },
+  {
+    "id": "lib-bvotk3vm",
+    "titulo": "Curiosidades del mar y la playa",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Curiosidades-del-mar-y-la-playa.jpg",
+    "autor": "Vázquez Mazzini Editores | Paula Andrea Taraborelli",
+    "anio": 2022,
+    "fechaExtraccion": "2026-05-07T19:04:30.014Z"
+  },
+  {
+    "id": "lib-cvard7hw",
+    "titulo": "Descubriendo la estructura del ADN",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Descubriendo-la-estructura-del-ADN.jpg",
+    "autor": "Vázquez Mazzini Editores | Juan A. Schnack",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T19:04:36.979Z"
+  },
+  {
+    "id": "lib-hojj53ht",
+    "titulo": "Diseño de espacios verdes sustentables con plantas nativas",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/06/Diseno-de-espacios-verdes-sustentables-con-plantas-nativas.jpg",
+    "autor": "Editorial Albatros | Gabriel Burgueños y Claudia Nardini",
+    "anio": 2017,
+    "fechaExtraccion": "2026-05-07T19:04:41.602Z"
+  },
+  {
+    "id": "lib-rbigt2bh",
+    "titulo": "Elementos de diseño y planificación con plantas nativas. Introducción al paisaje natural. Parte I",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/01/Elementos-de-diseno-planificacion-con-plantas-nativas.jpg",
+    "autor": "Orientación | Gabriel Burgueños y Claudia Nardini",
+    "anio": 2018,
+    "fechaExtraccion": "2026-05-07T19:04:45.877Z"
+  },
+  {
+    "id": "lib-elof61kx",
+    "titulo": "Enciclopedia de los Dinosaurios Argentinos",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/10/enciclopedia-de-los-dinosaurios-argentinos-300x258.jpg",
+    "autor": "Editorial Albatros | Federico Agnolin",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T19:04:50.358Z"
+  },
+  {
+    "id": "lib-via19fcr",
+    "titulo": "Esteros del Iberá. Recorrido fotográfico por las aguas brillantes",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Esteros-del-Ibera-Recorrido-fotogr%C3%A1fico-por-las-aguas-brillantes.jpg",
+    "autor": "Vázquez Mazzini Editores | Belén Etchegaray",
+    "anio": 2011,
+    "fechaExtraccion": "2026-05-07T19:04:54.925Z"
+  },
+  {
+    "id": "lib-6npjisay",
+    "titulo": "Fauna argentina",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Fauna-argentina.jpg",
+    "autor": "Fundación Unidos por Naturaleza | Nicolás Tizio",
+    "anio": 2022,
+    "fechaExtraccion": "2026-05-07T19:04:59.631Z"
+  },
+  {
+    "id": "lib-sfdhweyu",
+    "titulo": "Flores y picaflores de Argentina",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Flores-y-picaflores-de-Argentina.jpg",
+    "autor": "Vázquez Mazzini Editores | Valeria De Marzi",
+    "anio": 2022,
+    "fechaExtraccion": "2026-05-07T19:05:04.538Z"
+  },
+  {
+    "id": "lib-ro1hd8zu",
+    "titulo": "Guía básica de identificación de aves de Argentina y Uruguay",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/04/guia-basica-de-identificacion-de-aves-de-argentina-y-uruguay.jpg",
+    "autor": "Vázquez Mazzini Editores | Tito Narosky",
+    "anio": 2017,
+    "fechaExtraccion": "2026-05-07T19:05:09.056Z"
+  },
+  {
+    "id": "lib-oin4b46i",
+    "titulo": "Guía de aves de Argentina y Uruguay",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Guia-de-aves-de-Argentina-y-Uruguay.jpg",
+    "autor": "Vázquez Mazzini Editores | Guía de identificación: Tito Narosky y Darío Yzurieta, checklist: Tito Narosky y Horacio Matarasso, cantos de aves: Bernabe Lopez-Lanus",
+    "anio": 2010,
+    "fechaExtraccion": "2026-05-07T19:05:13.270Z"
+  },
+  {
+    "id": "lib-8iez5x60",
+    "titulo": "Guía para la identificación de las aves de Iguazú",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Guia-para-la-identificacion-de-las-aves-de-Iguazu.jpg",
+    "autor": "Vázquez Mazzini Editores | Tito Narosky, Juan Carlos Chebez y Darío Yzurieta, edición especial",
+    "anio": 2006,
+    "fechaExtraccion": "2026-05-07T19:05:16.823Z"
+  },
+  {
+    "id": "lib-6lzumt6y",
+    "titulo": "Huellas en la Luna. El Programa Lunar Apolo: descubriendo historias y derribando mitos",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/04/huellas-en-la-luna-el-programa-lunar-apolo-descubriendo-historias-y-derribando-mitos.jpg",
+    "autor": "Vázquez Mazzini Editores | Diego Córdoba",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T19:05:21.356Z"
+  },
+  {
+    "id": "lib-hssjclrg",
+    "titulo": "La costa de Buenos Aires: las leyes del mar",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/La-costa-de-Buenos-Aires.jpg",
+    "autor": "Contacto silvestre | Santiago de la Vega",
+    "anio": 2005,
+    "fechaExtraccion": "2026-05-07T19:05:25.370Z"
+  },
+  {
+    "id": "lib-1u3ihlve",
+    "titulo": "Lagartos del centro de la Argentina",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Lagartos-del-centro-de-la-Argentina.jpg",
+    "autor": "Universidad Nacional de Córdoba | Mario Cabrera",
+    "anio": 2009,
+    "fechaExtraccion": "2026-05-07T19:05:29.616Z"
+  },
+  {
+    "id": "lib-d32ympet",
+    "titulo": "Lomas Negras de Serrezuela, construcción de un paisaje rupestre entre las sierras de Córdoba, las Salinas Grandes y los llanos de La Rioja",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Lomas-Negras-de-Serrezuela.jpg",
+    "autor": "Quire-Quire | Sebastián Pastor",
+    "anio": 2014,
+    "fechaExtraccion": "2026-05-07T19:05:34.021Z"
+  },
+  {
+    "id": "lib-5iwd89mo",
+    "titulo": "Los picaflores más australes del mundo. Regiones neotropical y subantártica de la Argentina",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/12/los-picaflores-mas-australes-del-mundo.jpg",
+    "autor": "Ecoval Ediciones | Jorge Veiga y Roberto Güller",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T19:05:40.025Z"
+  },
+  {
+    "id": "lib-rnapej0c",
+    "titulo": "Mamíferos marinos de la Patagonia y Antártida",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Mamiferos-marinos-de-la-Patagonia-Argentina.jpg",
+    "autor": "Vázquez Mazzini Editores | Ricardo Bastida y Diego Rodríguez, segunda edición",
+    "anio": 2009,
+    "fechaExtraccion": "2026-05-07T19:05:44.481Z"
+  },
+  {
+    "id": "lib-bxc5x2bj",
+    "titulo": "Mariposas de la ciudad de Buenos Aires y alrededores",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Mariposas-de-la-ciudad-de-Buenos-Aires-y-alrededores.jpg",
+    "autor": "Vázquez Mazzini Editores | Ezequiel Nuñez Bustos",
+    "anio": 2011,
+    "fechaExtraccion": "2026-05-07T19:05:48.807Z"
+  },
+  {
+    "id": "lib-j54ixlyn",
+    "titulo": "Mariposas serranas de Argentina Central I",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Mariposas-serranas-de-Argentina-central.jpg",
+    "autor": "Luis Volkmann y Ezequiel Núñez Bustos",
+    "anio": 2010,
+    "fechaExtraccion": "2026-05-07T19:05:53.175Z"
+  },
+  {
+    "id": "lib-1n79wlpd",
+    "titulo": "Mariposas serranas de Argentina Central II",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Mariposas-serranas-de-Argentina.jpg",
+    "autor": "Luis Volkmann y Ezequiel Núñez Bustos",
+    "anio": 2014,
+    "fechaExtraccion": "2026-05-07T19:05:57.703Z"
+  },
+  {
+    "id": "lib-44rddd4l",
+    "titulo": "Misiones – Aves",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Misiones-Aves.jpg",
+    "autor": "De Golden Company | Juan Carlos Chebez y Roberto Güller",
+    "anio": 2009,
+    "fechaExtraccion": "2026-05-07T19:06:02.223Z"
+  },
+  {
+    "id": "lib-96z79nli",
+    "titulo": "Peces de la Argentina – Aguas continentales",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/peces-de-la-argentina-aguas-continentales-300x258.jpg",
+    "autor": "Vázquez Mazzini Editores | María Berta Cousseau y Juan José Rosso",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T19:06:06.496Z"
+  },
+  {
+    "id": "lib-cjisems6",
+    "titulo": "Peces de la Argentina – Aguas marinas",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/01/Peces-Argentina-550-300x258.jpg",
+    "autor": "Vázquez Mazzini Editores | María Berta Cousseau y Juan José Rosso",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T19:06:10.914Z"
+  },
+  {
+    "id": "lib-2u57bf94",
+    "titulo": "Pingüino de Magallanes, embajador de la Patagonia",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Ping%C3%BCino-de-Magallanes-embajador-de-la-Patagonia.jpg",
+    "autor": "Vázquez Mazzini Editores | Marcelo Bertellotti",
+    "anio": 2013,
+    "fechaExtraccion": "2026-05-07T19:06:15.630Z"
+  },
+  {
+    "id": "lib-fizbb0m6",
+    "titulo": "Plantas de la Patagonia",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Plantas-de-la-Patagonia.jpg",
+    "autor": "Vázquez Mazzini Editores | Daniel Barthelemy, Cecilia Brion y Javier Puntieri",
+    "anio": 2008,
+    "fechaExtraccion": "2026-05-07T19:06:20.499Z"
+  },
+  {
+    "id": "lib-rq0t6quk",
+    "titulo": "Plantas invasoras del Cono Sur",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Plantas-invasoras-del-Cono-Sur.jpg",
+    "autor": "Orientación | Gabriel Burgueños y Gabriel Rodríguez",
+    "anio": 2022,
+    "fechaExtraccion": "2026-05-07T19:06:25.658Z"
+  },
+  {
+    "id": "lib-chjopei0",
+    "titulo": "Plantas nativas rioplatenses para el diseño de espacios verdes. Introducción al paisaje natural. Parte II",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/01/Plantas-nativas-rioplatenses-para-el-dise%C3%B1o-de-espacios-verdes.jpg",
+    "autor": "Orientación | Gabriel Burgueños y Claudia Nardini",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T19:06:30.684Z"
+  },
+  {
+    "id": "lib-7waga930",
+    "titulo": "Plantas tintóreas nativas. Colores rioplatenses y de más allá",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/12/Plantas-tintoreas-nativas.jpg",
+    "autor": "Ecoval Ediciones | Belén Luvini y Luciana Cristaldo",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T19:06:37.272Z"
+  },
+  {
+    "id": "lib-njh8xuhl",
+    "titulo": "Reptiles de los parques nacionales de la Argentina",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Reptiles-de-los-parques-nacionales-de-la-Argentina-550-300x258.jpg",
+    "autor": "Literature of Latin America (L.O.L.A.) | Juan Carlos Chebez, Nicolás Rey y Jorge Williams",
+    "anio": 2005,
+    "fechaExtraccion": "2026-05-07T19:06:41.806Z"
+  },
+  {
+    "id": "lib-go9i072b",
+    "titulo": "Restauración del paisaje metropolitano",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Restauraci%C3%B3n-del-paisaje-metropolitano.jpg",
+    "autor": "Orientación | Gabriel Burgueños",
+    "anio": 2014,
+    "fechaExtraccion": "2026-05-07T19:06:46.098Z"
+  },
+  {
+    "id": "lib-9rsiqo05",
+    "titulo": "Rutas de los parques chaqueños. Guía turística de las reservas naturales",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/04/rutas-de-los-parques-chaqueno-300x258.jpg",
+    "autor": "Editorial Albatros | Bárbara Gasparri y Mariano Masariche",
+    "anio": 2025,
+    "fechaExtraccion": "2026-05-07T19:06:49.828Z"
+  },
+  {
+    "id": "lib-vuujjlnk",
+    "titulo": "Rutas de los parques. Litoral. Guía turística de las reservas naturales",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/04/rutas-de-los-parques-litoral-300x258.jpg",
+    "autor": "Editorial Albatros | Bárbara Gasparri y Mariano Masariche",
+    "anio": 2025,
+    "fechaExtraccion": "2026-05-07T19:06:53.466Z"
+  },
+  {
+    "id": "lib-s88myc0b",
+    "titulo": "Rutas de los parques. Noroeste y Cuyo. Guía turística de las reservas naturales",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/07/rutas-de-los-parques-noroeste-y-cuyo-300x258.jpg",
+    "autor": "Editorial Albatros | Bárbara Gasparri y Mariano Masariche",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T19:06:58.010Z"
+  },
+  {
+    "id": "lib-zj2mtpi4",
+    "titulo": "Rutas de los parques. Patagonia. Guía turística de las reservas naturales",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/10/Rutas-de-los-parques-Patagonia-300x258.jpg",
+    "autor": "Editorial Albatros | Bárbara Gasparri y Mariano Masariche",
+    "anio": 2023,
+    "fechaExtraccion": "2026-05-07T19:07:02.528Z"
+  },
+  {
+    "id": "lib-upn9qodp",
+    "titulo": "Rutas de los parques. Ruta 40. Guía turística de las reservas naturales",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/07/rutas-de-los-parques-ruta-40-300x258.jpg",
+    "autor": "Editorial Albatros | Bárbara Gasparri y Mariano Masariche",
+    "anio": 2024,
+    "fechaExtraccion": "2026-05-07T19:07:06.414Z"
+  },
+  {
+    "id": "lib-fvt4hvxm",
+    "titulo": "Trazos nativos. Diseño iconográfico de las sierras de Córdoba (serie infantil para colorear)",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/05/Trazos-nativos-06.jpg",
+    "autor": "Ecoval Ediciones | Gabriela Giordanengo, Andrea Recalde y Sebastián Pastor",
+    "anio": 2019,
+    "fechaExtraccion": "2026-05-07T19:07:11.527Z"
+  },
+  {
+    "id": "lib-3hyluzea",
+    "titulo": "Vivir en la Patagonia, una historia antigua. Arqueología de las primeras poblaciones del sur del continente",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Vivir-en-la-Patagonia-una-historia-antigua.jpg",
+    "autor": "Enrique Terranova",
+    "anio": 2015,
+    "fechaExtraccion": "2026-05-07T19:07:15.763Z"
+  },
+  {
+    "id": "lib-j299b47m",
+    "titulo": "Volando a orillas del mar. El viaje épico de un ave playera que une continentes",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/04/volando-a-orillas-del-mar-el-viaje-epico-de-un-ave-playera-que-une-continentes.jpg",
+    "autor": "Vázquez Mazzini Editores | Deborah Cramer",
+    "anio": 2018,
+    "fechaExtraccion": "2026-05-07T19:07:19.581Z"
+  },
+  {
+    "id": "lib-akw8xjxy",
+    "titulo": "¿Cómo se relacionan las especies autóctonas de animales y plantas en la Argentina?",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/12/Especies-Autoctonas-550-300x258.jpg",
+    "autor": "María Alejandra Gusmán Heras",
+    "anio": 2020,
+    "fechaExtraccion": "2026-05-07T19:07:24.028Z"
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "lib-81s239g8",
+    "titulo": "Análisis multivariado para datos biológicos.Teoría y su aplicación utilizando el lenguaje R",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/analisis-multivariado-para-datos-biologicos/analisis-multivariado-para-datos-biologicos.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/05/analisis-multivariado-para-datos-biologicos.jpg",
+    "autor": "Facundo X. Palacio, María José Apodaca y Jorge V. Crisci",
+    "anio": 2020,
+    "fechaExtraccion": "2026-05-07T18:28:19.882Z"
+  },
+  {
+    "id": "lib-1ewpi2ip",
+    "titulo": "Genética: desde la herencia a la manipulación de los genes",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/genetica.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Genetica-desde-la-herencia-a-la-manipulacion-de-los-genes.jpg",
+    "autor": "Silvia B. Copelli",
+    "anio": 2010,
+    "fechaExtraccion": "2026-05-07T18:28:24.556Z"
+  },
+  {
+    "id": "lib-ke38ytll",
+    "titulo": "Inteligencia y cultura de los animales",
+    "linkPdf": "https://www.fundacionazara.org.ar/img/libros/inteligencia-y-cultura-de-los-animales.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/06/inteligencia-y-cultura-de-los-animales.jpg",
+    "autor": "Roberto Ares",
+    "anio": 2021,
+    "fechaExtraccion": "2026-05-07T18:28:29.208Z"
+  },
+  {
+    "id": "lib-0yiu6qd9",
+    "titulo": "Modelos matemáticos en las ciencias",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/modelos-matematicos.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Modelos-matem%C3%A1ticos-en-las-ciencias.jpg",
+    "autor": "Mónica de Torres Curth",
+    "anio": 2015,
+    "fechaExtraccion": "2026-05-07T18:28:34.264Z"
+  },
+  {
+    "id": "lib-re3pvqnv",
+    "titulo": "Vida en evolución. La historia natural vista desde Sudamérica",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/vida-en-evolucion-la-historia-natural-vista-desde-sudamerica.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Vida-en-evolucion-La-historia-natural-vista-desde-Sudamerica.jpg",
+    "autor": "Vázquez Mazzini Editores | Sebastián Apesteguía y Roberto Ares",
+    "anio": 2010,
+    "fechaExtraccion": "2026-05-07T18:28:38.498Z"
+  }
+]

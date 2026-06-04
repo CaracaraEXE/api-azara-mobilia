@@ -1,0 +1,83 @@
+[
+  {
+    "id": "lib-mndahepu",
+    "titulo": "Asteroides cercanos a la Tierra ¿cuál es el verdadero riesgo?",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/asteroides.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Asteroides-cercanos-a-la-Tierra.jpg",
+    "autor": "Rogelio Daniel Acevedo, Maximiliano C. L. Rocca, Juan Federico Ponce, Jorge Rabassa y Hugo Corbella",
+    "anio": 2015,
+    "fechaExtraccion": "2026-04-23T21:05:27.830Z"
+  },
+  {
+    "id": "lib-vns3g6bt",
+    "titulo": "El agua en el norte de la Península Antártica",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/el-agua-en-el-norte-de-la-peninsula-antartica.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/El-agua-en-el-norte-de-la-Peninsula-Antartica.jpg",
+    "autor": "Adrián Ángel Silva Busso (compilador)",
+    "anio": 2009,
+    "fechaExtraccion": "2026-04-23T21:05:32.252Z"
+  },
+  {
+    "id": "lib-9xbib58l",
+    "titulo": "Elementos de geología general",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/elementos-de-geologia-general.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Elementos-de-geologia-general.jpg",
+    "autor": "Juan Pedro Spikermann",
+    "anio": 2010,
+    "fechaExtraccion": "2026-04-23T21:05:37.346Z"
+  },
+  {
+    "id": "lib-dtnpe9hy",
+    "titulo": "Guía terminológica de la geocriología sudamericana",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Guia-terminologica-de-la-geocriologia-sudamericana.jpg",
+    "autor": "Dario F. Trombotto, Pablo Wainstein y Lukas U. Arenson, en coedición con Vázquez Mazzini Editores",
+    "anio": 2014,
+    "fechaExtraccion": "2026-04-23T21:05:44.161Z"
+  },
+  {
+    "id": "lib-5xolrbg8",
+    "titulo": "La pequeña edad de hielo. El tren del cambio climático",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/la-pequena-edad-de-hielo.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/La-peque%C3%B1a-edad-de-hielo.jpg",
+    "autor": "Carlos Quintana, en coedición con Vázquez Mazzini Editores",
+    "anio": 2013,
+    "fechaExtraccion": "2026-04-23T21:05:49.304Z"
+  },
+  {
+    "id": "lib-r749wv0m",
+    "titulo": "Manual de astroturismo",
+    "linkPdf": "https://www.fundacionazara.org.ar/img/libros/Manual-de-Astroturismo-2017.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/10/Manual-de-astroturismo.jpg",
+    "autor": "Claudio Miguel José Martínez",
+    "anio": 2017,
+    "fechaExtraccion": "2026-04-23T21:05:54.343Z"
+  },
+  {
+    "id": "lib-epv6f8p3",
+    "titulo": "Meteoritos, restos rocosos del Sistema Solar primitivo",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Meteoritos-restos-rocosos-del-sistema-solar-primitivo.jpg",
+    "autor": "María Eugenia Varela, en coedición con Vázquez Mazzini Editores",
+    "anio": 2015,
+    "fechaExtraccion": "2026-04-23T21:05:59.525Z"
+  },
+  {
+    "id": "lib-3n3ayhuf",
+    "titulo": "Una historia de la Península de Valdés, Chubut, Patagonia Argentina",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/una-historia-de-la-peninsula-de-valdes.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/03/una-historia-de-la-peninsula-de-valdes-300x258.jpg",
+    "autor": "Sebastián Apesteguía",
+    "anio": 2025,
+    "fechaExtraccion": "2026-04-23T21:06:04.122Z"
+  },
+  {
+    "id": "lib-9fjjk47n",
+    "titulo": "Volcanes",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Volcanes.jpg",
+    "autor": "Eduardo Jorge Llambías, en coedición con Vázquez Mazzini Editores",
+    "anio": 2009,
+    "fechaExtraccion": "2026-04-23T21:06:09.208Z"
+  }
+]
