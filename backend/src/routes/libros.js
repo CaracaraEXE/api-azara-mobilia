@@ -171,7 +171,7 @@ router.get('/stats/general', (req, res) => {
     
     const totalLibros = categorias.reduce((acc, cat) => acc + cat.libros.length, 0);
     const librosConPdf = categorias.reduce((acc, cat) => 
-      acc + cat.libros.filter(l => l.pdfLink).length, 0
+      acc + cat.libros.filter(l => l.linkPdf).length, 0
     );
     const librosConAutor = categorias.reduce((acc, cat) => 
       acc + cat.libros.filter(l => l.autor).length, 0
