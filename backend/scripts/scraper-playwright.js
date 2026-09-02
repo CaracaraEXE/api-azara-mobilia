@@ -132,7 +132,7 @@ async function obtenerDatosLibro(page, url) {
   }
   
   // --- PDF ---
-  const pdfLink = await page.$eval('a[href$=".pdf"]', el => el.href).catch(() => null);
+  const linkPdf = await page.$eval('a[href$=".pdf"]', el => el.href).catch(() => null);
   
   // --- Imagen de portada (excluir logo/banner/svg) ---
   const imagenPortada = await page.$$eval('img', imgs => {
@@ -145,7 +145,7 @@ async function obtenerDatosLibro(page, url) {
     return null;
   });
   
-  return { titulo, autor, anio, pdfLink, imagenPortada };
+  return { titulo, autor, anio, linkPdf, imagenPortada };
 }
 
 /**
@@ -194,7 +194,7 @@ async function scrapearCategoria(browser, categoria) {
           libros.push({
             id: generarId(),
             titulo: datos.titulo,
-            linkPdf: datos.pdfLink,
+            linkPdf: datos.linkPdf,
             imagenPortada: datos.imagenPortada,
             autor: datos.autor,
             anio: datos.anio,
