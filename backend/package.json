@@ -8,7 +8,8 @@
     "dev": "node --watch src/index.js",
     "scrape": "node scripts/scraper.js",
     "scrape-pw": "node scripts/scraper-playwright.js",
-    "scrape-todas": "node scripts/scraper-playwright.js --todas"
+    "scrape-todas": "node scripts/scraper-playwright.js --todas",
+    "validar:data": "node scripts/validar-data.js"
   },
   "keywords": [
     "api",

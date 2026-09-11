@@ -30,7 +30,7 @@
     "id": "lib-4ny6uusi",
     "titulo": "Arnaldo Winkelried Bertoni – primer zoólogo paraguayo",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/arnaldo-winkelried-bertoni-primer-zoologo-paraguayo.pdf",
-    "imagenPortada": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/04/arnaldo-winkelried-bertoni-primer-zoologo-paraguayo.jpg",
     "autor": "Julio Rafael Contreras Roqué",
     "anio": 2019,
     "fechaExtraccion": "2026-05-07T18:40:06.755Z"
@@ -39,7 +39,7 @@
     "id": "lib-137jgvlc",
     "titulo": "Aventuras y desventuras de un biólogo latinoamericano",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/aventuras-desventuras-biologo-latinoamericano.pdf",
-    "imagenPortada": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Aventuras-y-desventuras-de-un-bi%C3%B3logo-latinoamericano.jpg",
     "autor": "Eduardo H. Rapoport",
     "anio": 2015,
     "fechaExtraccion": "2026-05-07T18:40:11.107Z"
@@ -245,7 +245,7 @@
   {
     "id": "lib-fym7jqgi",
     "titulo": "Mikrokosmos, Christofredo Jakob y el inicio de la neurociencia argentina",
-    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Alfredo-Castellanos.pdf",
+    "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/10/Mikrokosmos-Christofredo-Jakob-300x258.jpg",
     "autor": "Alejandra Molina",
     "anio": 2024,

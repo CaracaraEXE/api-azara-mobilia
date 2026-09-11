@@ -57,17 +57,23 @@ function obtenerCategoriasYLibros() {
 }
 
 /**
- * Obtener todos los libros (flatten)
+ * Obtener todos los libros (flatten) con deduplicación por ID.
+ * 
+ * PLANV2 §10: un libro publicado en 2 categorías comparte UN id
+ * (el scraper reutiliza el id ya registrado). Sin dedup, la búsqueda
+ * global y los stats contarían el mismo libro 2 veces.
  */
 function obtenerTodosLosLibros() {
   const categorias = obtenerCategoriasYLibros();
-  let todosLosLibros = [];
+  const mapa = new Map();
   
   categorias.forEach(cat => {
-    todosLosLibros = todosLosLibros.concat(cat.libros);
+    cat.libros.forEach(libro => {
+      if (!mapa.has(libro.id)) mapa.set(libro.id, libro);
+    });
   });
   
-  return todosLosLibros;
+  return [...mapa.values()];
 }
 
 // GET /api/libros - Lista todos los libros
@@ -164,21 +170,16 @@ router.get('/categorias/lista', (req, res) => {
   }
 });
 
-// GET /api/libros/stats - Estadísticas generales
+// GET /api/libros/stats - Estadísticas generales (deduplicadas por id, PLANV2 §10)
 router.get('/stats/general', (req, res) => {
   try {
     const categorias = obtenerCategoriasYLibros();
+    const todos = obtenerTodosLosLibros();
     
-    const totalLibros = categorias.reduce((acc, cat) => acc + cat.libros.length, 0);
-    const librosConPdf = categorias.reduce((acc, cat) => 
-      acc + cat.libros.filter(l => l.linkPdf).length, 0
-    );
-    const librosConAutor = categorias.reduce((acc, cat) => 
-      acc + cat.libros.filter(l => l.autor).length, 0
-    );
-    const librosConAnio = categorias.reduce((acc, cat) => 
-      acc + cat.libros.filter(l => l.anio).length, 0
-    );
+    const totalLibros = todos.length;
+    const librosConPdf = todos.filter(l => l.linkPdf).length;
+    const librosConAutor = todos.filter(l => l.autor).length;
+    const librosConAnio = todos.filter(l => l.anio).length;
     
     res.json({
       success: true,

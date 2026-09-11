@@ -1,12 +1,12 @@
 [
   {
-    "id": "lib-wccgyrxa",
+    "id": "lib-5nkhguk9",
     "titulo": "Arqueología y paleontología de la provincia de Catamarca",
     "autor": "Rita del Valle Rodríguez y Mónica Alejandra López (editoras)",
     "anio": 2015,
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/catamarca.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/catamarca-300x258.jpg",
-    "fechaExtraccion": "2026-04-17T03:25:05.211Z"
+    "fechaExtraccion": "2026-05-07T18:45:07.563Z"
   },
   {
     "id": "lib-ip3svccx",
@@ -32,7 +32,7 @@
     "autor": "Editorial Albatros | Colección: Sudamérica prehistórica. José F. Bonaparte",
     "anio": 2007,
     "linkPdf": null,
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Dinosaurios-y-pterosaurios-de-America-del-Sur.jpg",    
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/Dinosaurios-y-pterosaurios-de-America-del-Sur.jpg",
     "fechaExtraccion": "2026-04-17T03:25:08.526Z"
   },
   {
@@ -41,7 +41,7 @@
     "autor": "Sebastián Apesteguía y Matías Soto",
     "anio": 2023,
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/el-uruguay-de-los-dinosaurios.pdf",
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/el-uruguay-de-los-dinosaurios.jpg",        
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/el-uruguay-de-los-dinosaurios.jpg",
     "fechaExtraccion": "2026-04-17T03:25:10.805Z"
   },
   {
@@ -60,8 +60,6 @@
     "anio": 2026,
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/historia-natural-de-los-gliptodontes.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/03/historia-natural-de-los-gliptodontes-300x258.jpg",
-    
-    
     "fechaExtraccion": "2026-04-17T03:25:12.969Z"
   },
   {
@@ -98,8 +96,6 @@
     "anio": 2015,
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/protomamiferos-y-mamiferos-mesozoicos.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/protomamiferos-y-mamiferos-mesozoicos-550-300x258.jpg",
-    
-    
     "fechaExtraccion": "2026-04-17T03:25:17.558Z"
   },
   {
@@ -148,12 +144,12 @@
     "fechaExtraccion": "2026-04-17T03:25:23.035Z"
   },
   {
-    "id": "lib-qa9z1xsh",
+    "id": "lib-3n3ayhuf",
     "titulo": "Una historia de la Península de Valdés, Chubut, Patagonia Argentina",
     "autor": "Sebastián Apesteguía",
     "anio": 2025,
     "linkPdf": "https://fundacionazara.org.ar/img/libros/una-historia-de-la-peninsula-de-valdes.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/03/una-historia-de-la-peninsula-de-valdes-300x258.jpg",
-    "fechaExtraccion": "2026-04-17T03:25:24.115Z"
+    "fechaExtraccion": "2026-04-23T21:06:04.122Z"
   }
 ]
