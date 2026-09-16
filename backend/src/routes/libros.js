@@ -57,23 +57,40 @@ function obtenerCategoriasYLibros() {
 }
 
 /**
- * Obtener todos los libros (flatten) con deduplicación por ID.
- * 
- * PLANV2 §10: un libro publicado en 2 categorías comparte UN id
- * (el scraper reutiliza el id ya registrado). Sin dedup, la búsqueda
- * global y los stats contarían el mismo libro 2 veces.
+ * Obtener todos los libros (flatten) con deduplicación por ID y categorías.
+ *
+ * PLANV2 §10: un libro publicado en 2 categorías comparte UN id (el scraper
+ * reutiliza el id ya registrado). El dedup evita inflar la búsqueda global y
+ * los stats, PERO el filtro por categoría debe usar `categorias` (todas donde
+ * figura el libro) y no `categoria` (la principal). Sin esto, un libro
+ * multi-categoría desaparece de la navegación de las categorías no-principales.
  */
 function obtenerTodosLosLibros() {
-  const categorias = obtenerCategoriasYLibros();
-  const mapa = new Map();
-  
-  categorias.forEach(cat => {
-    cat.libros.forEach(libro => {
-      if (!mapa.has(libro.id)) mapa.set(libro.id, libro);
-    });
-  });
-  
-  return [...mapa.values()];
+  const archivos = fs.readdirSync(DATA_DIR)
+    .filter(archivo => archivo.startsWith('libros-') && archivo.endsWith('.json') && archivo !== 'libros.json');
+  const porId = new Map();
+
+  for (const archivo of archivos) {
+    try {
+      const slug = archivo.replace('libros-', '').replace('.json', '');
+      const librosArr = JSON.parse(fs.readFileSync(path.join(DATA_DIR, archivo), 'utf8'));
+      const nombre = librosArr.length > 0 && librosArr[0].categoria
+        ? librosArr[0].categoria
+        : slug.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      for (const libro of librosArr) {
+        if (!libro || !libro.id) continue;
+        const existente = porId.get(libro.id);
+        if (existente) {
+          if (!existente.categorias.includes(nombre)) existente.categorias.push(nombre);
+        } else {
+          porId.set(libro.id, { ...libro, categoria: nombre, categorias: [nombre] });
+        }
+      }
+    } catch (error) {
+      console.error(`Error al leer ${archivo}:`, error.message);
+    }
+  }
+  return [...porId.values()];
 }
 
 // GET /api/libros - Lista todos los libros
@@ -83,13 +100,14 @@ router.get('/', (req, res) => {
     
     let libros = obtenerTodosLosLibros();
     
-    // Filtrar por categoría
+    // Filtrar por categoría (usa TODAS las categorías del libro: un libro
+    // multi-categoría figura en cada una, sin repetir el registro)
     if (categoria) {
       const catLower = categoria.toLowerCase();
-      libros = libros.filter(l => 
-        l.categoria.toLowerCase() === catLower ||
-        l.categoria.toLowerCase().includes(catLower)
-      );
+      libros = libros.filter(l => {
+        const cats = (l.categorias && l.categorias.length) ? l.categorias : [l.categoria];
+        return cats.some(c => c.toLowerCase() === catLower || c.toLowerCase().includes(catLower));
+      });
     }
     
     // Filtrar por búsqueda (título, autor)
