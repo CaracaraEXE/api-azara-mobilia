@@ -93,6 +93,21 @@ function obtenerTodosLosLibros() {
   return [...porId.values()];
 }
 
+/**
+ * Normalizar texto para búsquedas laxas: quita ACENTOS (áéíóúü) y pasa a
+ * minúsculas, pero CONSERVA la ñ (carácter propio del español, no un acento):
+ * NFD → eliminar combining marks (menos U+0303, el de la ñ) → NFC → lowercase.
+ * Así "felix" encuentra "Félix" y "diaz" encuentra "Díaz"; "nandu" NO
+ * encuentra "ñandú" (eso sería cambiar la fonética, no normalizar tildes).
+ */
+function normalizarBusqueda(s) {
+  return (s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, c => (c === '\u0303' ? '\u0303' : ''))
+    .normalize('NFC')
+    .toLowerCase();
+}
+
 // GET /api/libros - Lista todos los libros
 router.get('/', (req, res) => {
   try {
@@ -110,12 +125,12 @@ router.get('/', (req, res) => {
       });
     }
     
-    // Filtrar por búsqueda (título, autor)
+    // Filtrar por búsqueda (título, autor) — sin acentos ni mayúsculas
     if (busqueda) {
-      const termino = busqueda.toLowerCase();
+      const termino = normalizarBusqueda(busqueda);
       libros = libros.filter(l => 
-        l.titulo.toLowerCase().includes(termino) ||
-        (l.autor && l.autor.toLowerCase().includes(termino))
+        normalizarBusqueda(l.titulo).includes(termino) ||
+        (l.autor && normalizarBusqueda(l.autor).includes(termino))
       );
     }
     
