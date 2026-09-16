@@ -6,7 +6,7 @@
     "autor": "José Athor (editor)",
     "anio": 2012,
     "id": "lib-voy50whg",
-    "fechaExtraccion": "2026-09-16T04:26:13.636Z"
+    "fechaExtraccion": "2026-09-16T23:17:55.437Z"
   },
   {
     "titulo": "Chuanisin indómita",
@@ -15,7 +15,7 @@
     "autor": "Claudio Campagna",
     "anio": 2022,
     "id": "lib-mowcsf9e",
-    "fechaExtraccion": "2026-09-16T04:26:16.868Z"
+    "fechaExtraccion": "2026-09-16T23:17:59.014Z"
   },
   {
     "titulo": "Ecología e historia natural de la Patagonia Andina, un cuarto de siglo de investigación en biogeografía, ecología y conservación",
@@ -24,7 +24,7 @@
     "autor": "Estela Raffaele, Mónica de Torres Curth, Carolina L. Morales y Thomas Kitzberger (editores)",
     "anio": 2014,
     "id": "lib-940ra0o1",
-    "fechaExtraccion": "2026-09-16T04:26:20.687Z"
+    "fechaExtraccion": "2026-09-16T23:18:02.543Z"
   },
   {
     "titulo": "El delta bonaerense, naturaleza, conservación y patrimonio cultural",
@@ -33,7 +33,7 @@
     "autor": "José Athor (editor)",
     "anio": 2014,
     "id": "lib-ng0gkmn0",
-    "fechaExtraccion": "2026-09-16T04:26:23.692Z"
+    "fechaExtraccion": "2026-09-16T23:18:06.095Z"
   },
   {
     "titulo": "El Impenetrable del Chaco y sus secretos. Un panorama cultural y natural",
@@ -42,7 +42,7 @@
     "autor": "Claudio Bertonatti",
     "anio": 2021,
     "id": "lib-1dc6pg0x",
-    "fechaExtraccion": "2026-09-16T04:26:27.252Z"
+    "fechaExtraccion": "2026-09-16T23:18:09.906Z"
   },
   {
     "titulo": "El patrimonio natural y cultural en el área de influencia del embalse de Yacyretá, Argentina",
@@ -51,7 +51,7 @@
     "autor": "Valeria Bauni, Marina Homberg y Virginia Capmourteres (editoras)",
     "anio": 2015,
     "id": "lib-plq04kz2",
-    "fechaExtraccion": "2026-09-16T04:26:30.642Z"
+    "fechaExtraccion": "2026-09-16T23:18:13.446Z"
   },
   {
     "titulo": "Estudios bioecológicos sobre los humedales del Ñeembucú: desarrollo urbano y antropización creciente del medio natural en el departamento del Ñeembucú al sur del río Tebicuary",
@@ -60,61 +60,61 @@
     "autor": "Julio Contreras, Andrés Contreras y Miguel Ángel Aguayo",
     "anio": 2007,
     "id": "lib-2sm5t2dg",
-    "fechaExtraccion": "2026-09-16T04:26:34.411Z"
-  },
-  {
-    "id": "lib-5k2vrisr",
-    "titulo": "Tomo 01",
-    "linkPdf": null,
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-02-550-232x200.jpg",
-    "autor": "Juan Carlos Chebez",
-    "anio": null,
-    "coleccion": "Guía de las reservas naturales de la Argentina",
-    "fechaExtraccion": "2026-09-16T04:26:39.182Z",
-    "revisionPendiente": true
-  },
-  {
-    "id": "lib-gmwqdckj",
-    "titulo": "Tomo 02",
-    "linkPdf": null,
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-03-550-232x200.jpg",
-    "autor": "Juan Carlos Chebez",
-    "anio": null,
-    "coleccion": "Guía de las reservas naturales de la Argentina",
-    "fechaExtraccion": "2026-09-16T04:26:39.182Z",
-    "revisionPendiente": true
-  },
-  {
-    "id": "lib-b545kyw3",
-    "titulo": "Tomo 03",
-    "linkPdf": null,
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-04-550-232x200.jpg",
-    "autor": "Juan Carlos Chebez",
-    "anio": null,
-    "coleccion": "Guía de las reservas naturales de la Argentina",
-    "fechaExtraccion": "2026-09-16T04:26:39.182Z",
-    "revisionPendiente": true
-  },
-  {
-    "id": "lib-ze4ue2lc",
-    "titulo": "Tomo 04",
-    "linkPdf": null,
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-05-550-232x200.jpg",
-    "autor": "Juan Carlos Chebez",
-    "anio": null,
-    "coleccion": "Guía de las reservas naturales de la Argentina",
-    "fechaExtraccion": "2026-09-16T04:26:39.182Z",
-    "revisionPendiente": true
+    "fechaExtraccion": "2026-09-16T23:18:17.037Z"
   },
   {
     "id": "lib-l48j7yzk",
-    "titulo": "Tomo 05",
+    "titulo": "Guía de las reservas naturales de la Argentina – Tomo 01",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-01-550-232x200.jpg",
     "autor": "Juan Carlos Chebez",
     "anio": null,
     "coleccion": "Guía de las reservas naturales de la Argentina",
-    "fechaExtraccion": "2026-09-16T04:26:39.182Z",
+    "fechaExtraccion": "2026-09-16T23:18:20.400Z",
+    "revisionPendiente": true
+  },
+  {
+    "id": "lib-5k2vrisr",
+    "titulo": "Tomo 02",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-02-550-232x200.jpg",
+    "autor": "Juan Carlos Chebez",
+    "anio": null,
+    "coleccion": "Guía de las reservas naturales de la Argentina",
+    "fechaExtraccion": "2026-09-16T23:18:20.400Z",
+    "revisionPendiente": true
+  },
+  {
+    "id": "lib-gmwqdckj",
+    "titulo": "Tomo 03",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-03-550-232x200.jpg",
+    "autor": "Juan Carlos Chebez",
+    "anio": null,
+    "coleccion": "Guía de las reservas naturales de la Argentina",
+    "fechaExtraccion": "2026-09-16T23:18:20.400Z",
+    "revisionPendiente": true
+  },
+  {
+    "id": "lib-b545kyw3",
+    "titulo": "Tomo 04",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-04-550-232x200.jpg",
+    "autor": "Juan Carlos Chebez",
+    "anio": null,
+    "coleccion": "Guía de las reservas naturales de la Argentina",
+    "fechaExtraccion": "2026-09-16T23:18:20.400Z",
+    "revisionPendiente": true
+  },
+  {
+    "id": "lib-ze4ue2lc",
+    "titulo": "Tomo 05",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-05-550-232x200.jpg",
+    "autor": "Juan Carlos Chebez",
+    "anio": null,
+    "coleccion": "Guía de las reservas naturales de la Argentina",
+    "fechaExtraccion": "2026-09-16T23:18:20.400Z",
     "revisionPendiente": true
   },
   {
@@ -124,7 +124,7 @@
     "autor": "José Athor y Cintia Celsi (editores)",
     "anio": 2017,
     "id": "lib-xkri1zqu",
-    "fechaExtraccion": "2026-09-16T04:26:43.725Z"
+    "fechaExtraccion": "2026-09-16T23:18:23.573Z"
   },
   {
     "titulo": "Las áreas naturales protegidas municipales de la provincia de Buenos Aires",
@@ -133,7 +133,7 @@
     "autor": "Bárbara Gasparri",
     "anio": 2023,
     "id": "lib-bjdeol73",
-    "fechaExtraccion": "2026-09-16T04:26:47.518Z"
+    "fechaExtraccion": "2026-09-16T23:18:26.942Z"
   },
   {
     "titulo": "Parque Costero del Sur, naturaleza, conservación y patrimonio cultural",
@@ -142,7 +142,7 @@
     "autor": "José Athor (editor)",
     "anio": 2009,
     "id": "lib-zprrhz0c",
-    "fechaExtraccion": "2026-09-16T04:26:52.007Z"
+    "fechaExtraccion": "2026-09-16T23:18:30.203Z"
   },
   {
     "titulo": "Parque Costero del Sur, nuevos temas sobre naturaleza, conservación y patrimonio cultural",
@@ -151,7 +151,7 @@
     "autor": "José Athor y Diego Albareda (editores)",
     "anio": 2023,
     "id": "lib-7xsyvxtl",
-    "fechaExtraccion": "2026-09-16T04:26:56.475Z"
+    "fechaExtraccion": "2026-09-16T23:18:33.574Z"
   },
   {
     "titulo": "Programa de investigación y monitoreo del Golfo San Jorge",
@@ -160,7 +160,7 @@
     "autor": "Silvana Dans, Adrián Cefarelli, David Galván, María Eva Gongora, Patricia Martos y Martín Varisco (editores)",
     "anio": 2020,
     "id": "lib-vd3zo9o5",
-    "fechaExtraccion": "2026-09-16T04:27:00.209Z"
+    "fechaExtraccion": "2026-09-16T23:18:37.210Z"
   },
   {
     "titulo": "Reflejos en las aguas del Moconá",
@@ -169,7 +169,7 @@
     "autor": "Leonardo Rangel Olivera",
     "anio": 2015,
     "id": "lib-k9na1du6",
-    "fechaExtraccion": "2026-09-16T04:27:04.672Z"
+    "fechaExtraccion": "2026-09-16T23:18:40.796Z"
   },
   {
     "titulo": "Reserva Faunística Provincial Punta Bermeja, Río Negro, Argentina",
@@ -178,7 +178,7 @@
     "autor": null,
     "anio": null,
     "id": "lib-6to3svda",
-    "fechaExtraccion": "2026-09-16T04:27:09.023Z"
+    "fechaExtraccion": "2026-09-16T23:18:44.440Z"
   },
   {
     "titulo": "Reserva Natural 25 de Mayo, Santa Cruz, Argentina",
@@ -187,7 +187,7 @@
     "autor": "Sergio Bogan, Flavia Zorzi y Julián Fores",
     "anio": 2011,
     "id": "lib-9sgkzb41",
-    "fechaExtraccion": "2026-09-16T04:27:14.952Z"
+    "fechaExtraccion": "2026-09-16T23:18:50.237Z"
   },
   {
     "titulo": "Reserva Natural Arroyo Balta",
@@ -196,7 +196,7 @@
     "autor": "José F. Bonaparte, Stella González, Laura Migale y Héctor Arzani",
     "anio": 2011,
     "id": "lib-n09z30hj",
-    "fechaExtraccion": "2026-09-16T04:27:19.784Z"
+    "fechaExtraccion": "2026-09-16T23:18:53.739Z"
   },
   {
     "titulo": "Reserva natural Campo San Juan, Misiones, Argentina",
@@ -205,7 +205,7 @@
     "autor": "Valeria Bauni y Marina Homberg (editoras)",
     "anio": 2015,
     "id": "lib-zv8gurry",
-    "fechaExtraccion": "2026-09-16T04:27:24.054Z"
+    "fechaExtraccion": "2026-09-16T23:18:57.375Z"
   },
   {
     "titulo": "Talares bonaerenses y su conservación",
@@ -214,7 +214,7 @@
     "autor": "Emilse Mérida y José Athor (editores)",
     "anio": 2006,
     "id": "lib-v02gaerj",
-    "fechaExtraccion": "2026-09-16T04:27:27.843Z"
+    "fechaExtraccion": "2026-09-16T23:19:01.120Z"
   },
   {
     "titulo": "Terraplén costero – paisaje protegido. Monte ribereño y humedal de Berisso, crónica anual de un viaje por su flora y su fauna",
@@ -223,7 +223,7 @@
     "autor": "Juan Francisco Klimaitis, Cristian L. Klimaitis y Daniel A. Luciano",
     "anio": 2024,
     "id": "lib-4aldf7et",
-    "fechaExtraccion": "2026-09-16T04:27:31.365Z"
+    "fechaExtraccion": "2026-09-16T23:19:04.605Z"
   },
   {
     "titulo": "Un parque nacional para la historia, donde fue el Cruce de Los Andes",
@@ -232,7 +232,7 @@
     "autor": "Claudio Bertonatti y Carlos Fernández Balboa, con la colaboración de Hernán Casañas y Edwin Harvey",
     "anio": 2021,
     "id": "lib-0estzgil",
-    "fechaExtraccion": "2026-09-16T04:27:34.957Z"
+    "fechaExtraccion": "2026-09-16T23:19:08.179Z"
   },
   {
     "titulo": "Una reserva natural para cada ciudad",
@@ -241,6 +241,6 @@
     "autor": "Claudio Bertonatti",
     "anio": 2021,
     "id": "lib-z2bt70zr",
-    "fechaExtraccion": "2026-09-16T04:27:38.270Z"
+    "fechaExtraccion": "2026-09-16T23:19:11.694Z"
   }
 ]

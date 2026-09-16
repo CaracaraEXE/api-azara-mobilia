@@ -466,22 +466,45 @@ async function extraerImagenesSueltas(page, coleccion) {
 
   const libros = [];
   info.srcs.forEach((src, i) => {
-    // Título provisorio SIEMPRE por posición (i+1): los numerales del filename colisionan
-    // cuando una portada sin número comparte dígito con otra (Trazos: portada→05, 2019→07).
-    const numero = String(i + 1).padStart(2, '0');
+    // Tomo desde el numeral del filename (criterio de la fundación: guia-…-01 = Tomo 1,
+    // Trazos-nativos-02.jpg = Tomo 2). GOTCHA ACTUALIZADO (2026-09-16): el DOM muestra las
+    // láminas BARAJADAS (Guía: 02,03,04,05,01; Trazos: 06,07,08,02,base,03,disenos,04,05)
+    // → la POSICIÓN (i+1) está mal. El gotcha viejo ("2019→07") queda cubierto porque el
+    // patrón exige EXACTAMENTE 2 dígitos (un año de 4 dígitos no matchea → fallback posición).
+    // Sin numeral: "Trazos-nativos.jpg" (base) → 1; "disenos-iconograficos" (cierre) → 9.
+    const numero = String(tomoDesdeFilename(src) ?? (i + 1)).padStart(2, '0');
     const sub = info.subPorSrc[src] || null;
     // GOTCHA: el H4 puede YA incluir el prefijo de la colección ("Fauna argentina
     // amenazada: Los que se van") → no volver a concatenarlo.
     const col = sub ? (sub.startsWith(coleccion.coleccion) ? sub : `${coleccion.coleccion}: ${sub}`) : coleccion.coleccion;
-    libros.push(nuevoLibroExtraido({
+    libros.push({ ...nuevoLibroExtraido({
       titulo: sub ? `${sub.trim()} ${numero}` : `Tomo ${numero}`,
       imagenPortada: src,
       autor,
       anio: null,
       revisionPendiente: true
-    }, col));
+    }, col), _ordenTomo: parseInt(numero, 10) });
   });
+  // El DOM baraja las láminas → reordeno por tomo para que el listado salga 01..N.
+  // La API no aplica sort: respeta el orden del array.
+  libros.sort((a, b) => a._ordenTomo - b._ordenTomo);
+  libros.forEach((l) => delete l._ordenTomo);
   return libros;
+}
+
+/**
+ * Tomo de una lámina de colección "imagenes-sueltas" a partir del numeral del filename.
+ * NaN/null → el caller usa la posición como fallback. Ver nota en extraerImagenesSueltas.
+ */
+function tomoDesdeFilename(f) {
+  const d = decodeURIComponent((f || '').split('/').pop());
+  let m = d.match(/-(\d{2})-550-232x200\.jpe?g$/i);        // guía: "-02-550-232x200.jpg"
+  if (m) return parseInt(m[1], 10);
+  m = d.match(/-(\d{2})\.jpe?g$/i);                        // trazos: "Trazos-nativos-02.jpg"
+  if (m) return parseInt(m[1], 10);
+  if (/^trazos-nativos\.jpe?g$/i.test(d)) return 1;        // archivo base → Tomo 1
+  if (/disenos-iconograficos/.test(d)) return 9;           // lámina de la colección completa → Tomo 9
+  return null;
 }
 
 /**
@@ -575,6 +598,11 @@ function buscarDuplicado(indiceGlobal, datos) {
  */
 const OVERRIDES = {
   'lib-fym7jqgi': { linkPdf: null }, // Mikrokosmos, Christofredo Jakob y el inicio de la neurociencia argentina
+  // Títulos madre de las series "imagenes-sueltas": el desglose genera "Tomo 01" y perdería
+  // el nombre real del libro/colección. Restaurados 2026-09-16 (backup pre-re-scrape).
+  'lib-l48j7yzk': { titulo: 'Guía de las reservas naturales de la Argentina – Tomo 01' },
+  'lib-46v47u68': { titulo: 'Trazos nativos. Diseño iconográfico de las sierras de Córdoba (serie infantil para colorear) – Tomo 01' },
+  'lib-zqtj2wgi': { titulo: 'Fauna argentina amenazada: Los que se van – Tomo 01' },
 };
 
 /** Aplicar decisiones humanas sobre datos re-extraídos (se llama en cada registro) */
