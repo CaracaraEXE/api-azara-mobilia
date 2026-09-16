@@ -1,11 +1,32 @@
 [
   {
     "id": "lib-rilzfpkt",
-    "titulo": "Colección: Ciencia para todos",
+    "titulo": "Calentamiento global. Un cambio climático anunciado",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Calentamiento-global.jpg",
-    "autor": "Ediciones Continente",
+    "autor": "Tristán Simanauskas",
     "anio": 2008,
-    "fechaExtraccion": "2026-05-07T18:29:10.715Z"
+    "coleccion": "Ciencia para todos",
+    "fechaExtraccion": "2026-09-16T04:16:56.998Z"
+  },
+  {
+    "id": "lib-y0ugkxnn",
+    "titulo": "Biodiversidad. La diversidad de la vida, las grandes extinciones y la actual crisis ecológica",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Biodiversidad.jpg",
+    "autor": "Daniel L. Melendi, Laura Scafati y Wolfgang Volkheimer",
+    "anio": 2008,
+    "coleccion": "Ciencia para todos",
+    "fechaExtraccion": "2026-09-16T04:16:56.998Z"
+  },
+  {
+    "id": "lib-8pjjvvvt",
+    "titulo": "El universo. Del principio al fin",
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/El-universo.jpg",
+    "autor": "Tristán Simanauskas",
+    "anio": 2009,
+    "coleccion": "Ciencia para todos",
+    "fechaExtraccion": "2026-09-16T04:16:56.998Z"
   }
 ]

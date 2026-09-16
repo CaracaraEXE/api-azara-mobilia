@@ -156,10 +156,14 @@ async function obtenerDatosLibro(page, url) {
   const linkPdf = linkPdfRaw ? limpiarUrlPdf(linkPdfRaw) : null;
   
   // --- Imagen de portada (excluir logo/banner/svg) ---
+  // GOTCHA (2026-09-16): el viejo filtro `!src.includes('logo')` excluía portadas
+  // cuyo filename contiene "logo" como subcadena ("zooLOGO", "bioLOGO") → Arnaldo
+  // Winkelried Bertoni (primer zoologo) y Aventuras de un biólogo quedaban sin
+  // portada. El logo del sitio es SIEMPRE "logo-azara-*" y el banner "banner-azara-*".
   const imagenPortada = await page.$$eval('img', imgs => {
     for (const img of imgs) {
-      const src = img.src || '';
-      if (!src.includes('logo') && !src.includes('banner') && !src.endsWith('.svg')) {
+      const src = img.src || img.getAttribute('data-src') || '';
+      if (src && !/logo-azara|banner-azara/.test(src) && !src.endsWith('.svg')) {
         return src;
       }
     }
@@ -194,12 +198,19 @@ function normalizarImg(url) {
  * portada > PDF > título normalizado. Prioridad por fiabilidad discriminante:
  * la portada identifica al libro real; el PDF puede estar mal puesto en la web
  * (caso Mikrokosmos→Alfredo-Castellanos) y el título puede repetirse.
+ *
+ * GOTCHA (2026-09-16): los esqueletos de colecciones "imagenes-sueltas" usan
+ * títulos placeholder "Tomo NN" por POSICIÓN (i+1) → son IDÉNTICOS entre
+ * colecciones (guía/flora/trazos) → la clave título los fusionaba en un id
+ * con data distinta. El título placeholder NO es discriminatorio: se excluye.
  */
+const TITULO_PLACEHOLDER = /^tomo\s+(\d+|[ivxlcdm]+)$/i;
+
 function clavesDeLibro({ imagenPortada, linkPdf, titulo }) {
   const claves = [];
   if (imagenPortada) claves.push('img:' + normalizarImg(imagenPortada));
   if (linkPdf) claves.push('pdf:' + linkPdf.trim());
-  if (titulo) claves.push('titulo:' + normalizarTexto(titulo));
+  if (titulo && !TITULO_PLACEHOLDER.test(titulo.trim())) claves.push('titulo:' + normalizarTexto(titulo));
   return claves;
 }
 
@@ -415,7 +426,7 @@ async function extraerImagenesSueltas(page, coleccion) {
     // Imágenes de contenido únicas (dedup por src: clones owl comparten src)
     const srcs = [...new Set([...document.querySelectorAll('img')]
       .map(i => i.src || '')
-      .filter(s => s.includes('uploads') && !s.includes('logo') && !s.includes('banner') && !s.endsWith('.svg')))];
+      .filter(s => s.includes('uploads') && s && !/logo-azara|banner-azara/.test(s) && !s.endsWith('.svg')))];
 
     // Párrafo de la serie (autor): el p con "|" o mención a editorial (fix B5)
     let pSerie = '';
@@ -485,7 +496,7 @@ async function extraerPdfsRomanos(page, coleccion) {
       pdfs: [...document.querySelectorAll('a[href$=".pdf"]')].map(a => a.href),
       imgs: [...new Set([...document.querySelectorAll('img')]
         .map(i => i.src || '')
-        .filter(s => s.includes('uploads') && !s.includes('logo') && !s.includes('banner') && !s.endsWith('.svg')))]
+        .filter(s => s.includes('uploads') && s && !/logo-azara|banner-azara/.test(s) && !s.endsWith('.svg')))]
     };
   });
 
@@ -556,13 +567,35 @@ function buscarDuplicado(indiceGlobal, datos) {
   return null;
 }
 
-/** Reutilizar la entrada ya registrada (mismo id) o crear una nueva */
+/**
+ * Overrides de datos (PLANV2 §10): decisiones humanas que el re-scrape NO debe revertir.
+ * El sitio tiene el PDF "Alfredo-Castellanos.pdf" mal puesto en la página de
+ * Mikrokosmos (es el PDF de OTRO libro; verificado 2026). Decisión: no exponerlo.
+ * Si algún día la web lo corrige, se quita esta entrada.
+ */
+const OVERRIDES = {
+  'lib-fym7jqgi': { linkPdf: null }, // Mikrokosmos, Christofredo Jakob y el inicio de la neurociencia argentina
+};
+
+/** Aplicar decisiones humanas sobre datos re-extraídos (se llama en cada registro) */
+function aplicarOverrides(libro) {
+  if (libro && OVERRIDES[libro.id]) {
+    Object.assign(libro, OVERRIDES[libro.id]);
+  }
+  return libro;
+}
+
+/**
+ * Reutilizar la entrada ya registrada (mismo id) o crear una nueva.
+ * Cuando ya existe, se toma la data NUEVA del sitio (los parsers arreglados
+ * refrescan los datos) conservando el id estable: { ...datos, id: dup.id }.
+ */
 function registrarOConsolidar(indiceGlobal, datos) {
   const dup = buscarDuplicado(indiceGlobal, datos);
   if (dup) {
-    return { ...dup.libro, fechaExtraccion: new Date().toISOString(), _duplicadoDe: { id: dup.id, categoria: dup.categoria } };
+    return { ...datos, id: dup.id, fechaExtraccion: new Date().toISOString(), _duplicadoDe: { id: dup.id, categoria: dup.categoria } };
   }
-  return { id: generarId(), ...datos, fechaExtraccion: new Date().toISOString() };
+  return aplicarOverrides({ id: generarId(), ...datos, fechaExtraccion: new Date().toISOString() });
 }
 
 /**
@@ -620,12 +653,12 @@ async function scrapearCategoria(browser, categoria) {
           if (librosColeccion.length >= 1) {
             const consolidados = librosColeccion.map(l => {
               const { _duplicadoDe, ...limpio } = registrarOConsolidar(indiceGlobal, l);
-              return { limpio, reutilizado: Boolean(_duplicadoDe) };
+              return { limpio: aplicarOverrides(limpio), reutilizado: Boolean(_duplicadoDe) };
             });
             libros.push(...consolidados.map(c => c.limpio));
             const reutilizados = consolidados.filter(c => c.reutilizado).length;
             console.log(`      🗂️ ${coleccion.coleccion}: ${consolidados.length} libros desglosados` + (reutilizados ? ` (${reutilizados} compartían id)` : ''));
-          } else {
+} else {
             // Degradación segura (§4.1): el patrón no matcheó → ruta original
             console.log(`      ⚠️ Sin desglose para "${coleccion.coleccion}" (patrón ${coleccion.patron}) — ruta original`);
             const datos = await obtenerDatosLibro(page, url);
@@ -637,7 +670,7 @@ async function scrapearCategoria(browser, categoria) {
                 autor: datos.autor,
                 anio: datos.anio
               });
-              libros.push(libro);
+              libros.push(aplicarOverrides(libro));
               if (_duplicadoDe) console.log(`      🔗 Combinado: ${_duplicadoDe.id} (ya estaba en ${_duplicadoDe.categoria})`);
               else console.log(`      ✅ ${datos.titulo.substring(0, 50)}...`);
             } else {
@@ -655,7 +688,7 @@ async function scrapearCategoria(browser, categoria) {
               autor: datos.autor,
               anio: datos.anio
             });
-            libros.push(libro);
+            libros.push(aplicarOverrides(libro));
             if (_duplicadoDe) console.log(`      🔗 Combinado: ${_duplicadoDe.id} (ya estaba en ${_duplicadoDe.categoria})`);
             else console.log(`      ✅ ${datos.titulo.substring(0, 50)}...`);
           } else {
@@ -668,7 +701,7 @@ async function scrapearCategoria(browser, categoria) {
             const pdfs = document.querySelectorAll('a[href*=".pdf"]').length;
             const imgs = new Set([...document.querySelectorAll('img')]
               .map(i => i.src || '')
-              .filter(s => s.includes('uploads') && !s.includes('logo') && !s.includes('banner') && !s.endsWith('.svg'))).size;
+              .filter(s => s.includes('uploads') && s && !/logo-azara|banner-azara/.test(s) && !s.endsWith('.svg'))).size;
             const h4ConImg = [...document.querySelectorAll('h4')]
               .filter(h => h.querySelector('img[src*="uploads"]')).length;
             return { pdfs, imgs, h4ConImg };

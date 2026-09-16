@@ -1,74 +1,185 @@
 [
   {
-    "id": "lib-3cj31je3",
     "titulo": "Aprender a volar",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/aprender-a-volar.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Aprender-a-volar.jpg",
     "autor": "Karina Novillo Ramírez",
     "anio": 2014,
-    "fechaExtraccion": "2026-05-07T23:13:24.750Z"
+    "id": "lib-3cj31je3",
+    "fechaExtraccion": "2026-09-16T04:28:10.894Z"
   },
   {
     "id": "lib-85naa24x",
-    "titulo": "Colección: Voces ancestrales de los Valles Calchaquíes",
+    "titulo": "Katrén illám ananái. Las serpientes del principio",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-001.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales.jpg",
     "autor": null,
     "anio": null,
-    "fechaExtraccion": "2026-05-07T23:13:28.325Z"
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
   },
   {
-    "id": "lib-penzihiz",
+    "id": "lib-bccmtfmq",
+    "titulo": "Ñaun(á)u selék. El regalodel tejido",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-002.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales-002.jpg",
+    "autor": null,
+    "anio": null,
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
+  },
+  {
+    "id": "lib-hajykvn2",
+    "titulo": "Tílkare. Los gigantes delos cerros",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-003.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales-003.jpg",
+    "autor": null,
+    "anio": null,
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
+  },
+  {
+    "id": "lib-kdn9c50u",
+    "titulo": "Kútur(u) Aháo ni ánni. Cóndor, entre la tierra y el cielo",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-004.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales-004.jpg",
+    "autor": null,
+    "anio": null,
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
+  },
+  {
+    "id": "lib-taz9xtwm",
+    "titulo": "Katí:ba: keé nálo. Nuestragran travesía",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-005.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales-005.jpg",
+    "autor": null,
+    "anio": null,
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
+  },
+  {
+    "id": "lib-xc2xxg4d",
+    "titulo": "Tíri anháa Kaá. Todo retorna a la vida",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-006.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales-006.jpg",
+    "autor": null,
+    "anio": null,
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
+  },
+  {
+    "id": "lib-ww5zamnx",
+    "titulo": "Éu íngu kutúr(u). Las plumas del cóndor",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-007.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales-007.jpg",
+    "autor": null,
+    "anio": null,
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
+  },
+  {
+    "id": "lib-nvpi71iv",
+    "titulo": "Nérwek. El guerrero tigre",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-008.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales-008.jpg",
+    "autor": null,
+    "anio": null,
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
+  },
+  {
+    "id": "lib-2vwvk4nf",
+    "titulo": "Shméwa aháo. El tiempo de los pájaros",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-009.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales-009.jpg",
+    "autor": null,
+    "anio": null,
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
+  },
+  {
+    "id": "lib-o9r1lmpp",
+    "titulo": "Naksaá Jasíka. Movimientoanimal",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-010.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales-010.jpg",
+    "autor": null,
+    "anio": null,
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
+  },
+  {
+    "id": "lib-27z1n5ji",
+    "titulo": "Sigú shméwa. El cantar de los pájaros",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-011.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales-011.jpg",
+    "autor": null,
+    "anio": null,
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
+  },
+  {
+    "id": "lib-q5ep3qtk",
+    "titulo": "Runrún tésinak. Colibrí, quien porta el arcoíris",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/voces-ancestrales-012.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/voces-ancentrales-012.jpg",
+    "autor": null,
+    "anio": null,
+    "coleccion": "Voces ancestrales de los Valles Calchaquíes",
+    "fechaExtraccion": "2026-09-16T04:28:15.633Z"
+  },
+  {
     "titulo": "Dinommumy",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Dinommumy.jpg",
     "autor": "Phillip Lars Manning, edición en español con Albatros",
     "anio": 2008,
-    "fechaExtraccion": "2026-05-07T23:13:31.438Z"
+    "id": "lib-penzihiz",
+    "fechaExtraccion": "2026-09-16T04:28:19.976Z"
   },
   {
-    "id": "lib-bmazf4ss",
     "titulo": "El mono que contó el cuento",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/el-mono-que-conto-el-cuento.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/El-mono-que-conto-el-cuento.jpg",
     "autor": "Karina Novillo Ramírez",
     "anio": 2014,
-    "fechaExtraccion": "2026-05-07T23:13:34.777Z"
+    "id": "lib-bmazf4ss",
+    "fechaExtraccion": "2026-09-16T04:28:23.867Z"
   },
   {
-    "id": "lib-i4vllz57",
     "titulo": "El secreto de la gota de agua",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/el-secreto-de-la-gota-de-agua.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/El-secreto-de-la-gota-de-agua.jpg",
     "autor": "Karina Novillo Ramírez",
     "anio": 2013,
-    "fechaExtraccion": "2026-05-07T23:13:37.830Z"
+    "id": "lib-i4vllz57",
+    "fechaExtraccion": "2026-09-16T04:28:28.060Z"
   },
   {
-    "id": "lib-u27oia8z",
     "titulo": "Las doce pruebas de Hércules: un cuento sobre un cauquén colorado",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/las-doce-pruebas-de-hercules.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/las-doce-pruebas-de-hercules.jpg",
     "autor": "Olguita Estela Albarenga",
     "anio": 2022,
-    "fechaExtraccion": "2026-05-07T23:13:41.053Z"
+    "id": "lib-u27oia8z",
+    "fechaExtraccion": "2026-09-16T04:28:32.422Z"
   },
   {
-    "id": "lib-3g9ypwo5",
     "titulo": "Suo y Papuga, una historia de pelos y plumas",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/suo-y-papuga.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Suo-y-Papuga-una-historia-de-pelos-y-plumas.jpg",
     "autor": "Karina Novillo Ramírez",
     "anio": 2012,
-    "fechaExtraccion": "2026-05-07T23:13:44.228Z"
+    "id": "lib-3g9ypwo5",
+    "fechaExtraccion": "2026-09-16T04:28:37.004Z"
   },
   {
-    "id": "lib-wdxobbn4",
     "titulo": "Un extraterrestre de verdad",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/un-extraterrestre.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/Un-extraterrestre-de-verdad.jpg",
     "autor": "Karina Novillo Ramírez",
     "anio": 2016,
-    "fechaExtraccion": "2026-05-07T23:13:48.542Z"
+    "id": "lib-wdxobbn4",
+    "fechaExtraccion": "2026-09-16T04:28:40.642Z"
   }
 ]
