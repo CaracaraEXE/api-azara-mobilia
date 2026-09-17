@@ -174,9 +174,11 @@ function construirMensajeBusqueda(termino, libros, pagina, total) {
 
   const fields = libros.map(libro => ({
     name: libro.titulo.substring(0, 256),
-    value: libro.linkPdf
+    value: (libro.linkPdf
       ? `📁 ${libro.categoria} · 🆔 \`${libro.id}\`\n📄 [Descargar PDF](${libro.linkPdf})`
-      : `📁 ${libro.categoria} · 🆔 \`${libro.id}\`\n❌ Sin PDF disponible`
+      : `📁 ${libro.categoria} · 🆔 \`${libro.id}\`\n❌ Sin PDF disponible`)
+      // Colección (PLANV2 §2): desambigua títulos genéricos de serie ("Tomo 02")
+      + (libro.coleccion ? `\n🗂️ ${libro.coleccion}` : '')
   }));
 
   // Botones de navegación (solo si hay más de una página)
@@ -284,6 +286,11 @@ async function comandoLibro(options) {
       { name: '📅 Año', value: libro.anio ? libro.anio.toString() : 'Desconocido', inline: true }
     ];
 
+    // Colección (PLANV2 §2): presente en series/desgloses; distingue "Tomo 02" de qué serie es.
+    if (libro.coleccion) {
+      fields.push({ name: '🗂️ Colección', value: libro.coleccion, inline: false });
+    }
+
     if (libro.linkPdf) {
       fields.push({ name: '📄 PDF', value: `[Descargar](${libro.linkPdf})`, inline: false });
     }
@@ -348,9 +355,11 @@ function construirMensajeCategoriaLibros(categoria, libros, pagina, total) {
 
   const fields = libros.map(libro => ({
     name: libro.titulo.substring(0, 256),
-    value: libro.linkPdf
+    value: (libro.linkPdf
       ? `🆔 \`${libro.id}\`\n📄 [Descargar PDF](${libro.linkPdf})`
-      : `🆔 \`${libro.id}\`\n❌ Sin PDF disponible`
+      : `🆔 \`${libro.id}\`\n❌ Sin PDF disponible`)
+      // Colección (PLANV2 §2): en series, el título suele ser solo "Tomo NN"
+      + (libro.coleccion ? `\n🗂️ ${libro.coleccion}` : '')
   }));
 
   // Una sola ActionRow con todos los botones

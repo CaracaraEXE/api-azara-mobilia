@@ -94,6 +94,29 @@ function obtenerTodosLosLibros() {
 }
 
 /**
+ * Agrupar libros por `coleccion` (series/desgloses). Un consumidor cualquiera
+ * (web, CLI, bot) puede navegar las series sin conocer el scraper.
+ */
+function obtenerColecciones() {
+  const mapa = new Map();
+  for (const libro of obtenerTodosLosLibros()) {
+    if (!libro.coleccion) continue;
+    let c = mapa.get(libro.coleccion);
+    if (!c) {
+      c = { nombre: libro.coleccion, cantidad: 0, conPdf: 0, categorias: new Set() };
+      mapa.set(libro.coleccion, c);
+    }
+    c.cantidad++;
+    if (libro.linkPdf) c.conPdf++;
+    (libro.categorias && libro.categorias.length ? libro.categorias : [libro.categoria])
+      .forEach(n => c.categorias.add(n));
+  }
+  return [...mapa.values()]
+    .map(c => ({ nombre: c.nombre, cantidad: c.cantidad, conPdf: c.conPdf, categorias: [...c.categorias] }))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+}
+
+/**
  * Normalizar texto para búsquedas laxas: quita ACENTOS (áéíóúü) y pasa a
  * minúsculas, pero CONSERVA la ñ (carácter propio del español, no un acento):
  * NFD → eliminar combining marks (menos U+0303, el de la ñ) → NFC → lowercase.
@@ -108,21 +131,44 @@ function normalizarBusqueda(s) {
     .toLowerCase();
 }
 
+/**
+ * Normalizar nombre/slug de categoría a una MISMA forma canónica para comparar.
+ * "Areas Naturales" y "areas-naturales" → "areas-naturales"; "Evolución, Genética,
+ * Ecología y Etología" → "evolucion-genetica-ecologia-y-etologia" (coincide con el slug
+ * del archivo). Así el filtro acepta nombre O slug, con o sin tildes/comas.
+ */
+function normalizarCategoria(s) {
+  return normalizarBusqueda(s)
+    .replace(/[^a-z0-9ñ]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 // GET /api/libros - Lista todos los libros
 router.get('/', (req, res) => {
   try {
-    const { categoria, busqueda, pagina = 1, limite = 20 } = req.query;
+    const { categoria, coleccion, busqueda, pagina = 1, limite = 20 } = req.query;
     
     let libros = obtenerTodosLosLibros();
     
-    // Filtrar por categoría (usa TODAS las categorías del libro: un libro
-    // multi-categoría figura en cada una, sin repetir el registro)
+    // Filtrar por categoría: acepta NOMBRE ("Areas Naturales") o SLUG ("areas-naturales"),
+    // con o sin tildes — la comparación se hace en forma canónica. Usa TODAS las categorías
+    // del libro (un libro multi-categoría figura en cada una, sin repetir el registro).
     if (categoria) {
-      const catLower = categoria.toLowerCase();
+      const objetivo = normalizarCategoria(categoria);
       libros = libros.filter(l => {
         const cats = (l.categorias && l.categorias.length) ? l.categorias : [l.categoria];
-        return cats.some(c => c.toLowerCase() === catLower || c.toLowerCase().includes(catLower));
+        return cats.some(c => {
+          const nc = normalizarCategoria(c);
+          return nc === objetivo || nc.includes(objetivo);
+        });
       });
+    }
+
+    // Filtrar por colección: acepta el nombre exacto o parcial, en forma canónica
+    // (sin tildes/mayúsculas). `?coleccion=trazos` → toda la serie Trazos nativos.
+    if (coleccion) {
+      const objetivo = normalizarCategoria(coleccion);
+      libros = libros.filter(l => l.coleccion && normalizarCategoria(l.coleccion).includes(objetivo));
     }
     
     // Filtrar por búsqueda (título, autor) — sin acentos ni mayúsculas
@@ -174,6 +220,24 @@ router.get('/:id', (req, res) => {
     }
   } catch (error) {
     console.error('Error en GET /api/libros/:id:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// GET /api/libros/colecciones/lista - Lista las colecciones/series (metadata, sin libros)
+router.get('/colecciones/lista', (req, res) => {
+  try {
+    const colecciones = obtenerColecciones();
+
+    res.json({
+      success: true,
+      data: colecciones,
+      meta: {
+        total: colecciones.length
+      }
+    });
+  } catch (error) {
+    console.error('Error en GET /api/libros/colecciones/lista:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
