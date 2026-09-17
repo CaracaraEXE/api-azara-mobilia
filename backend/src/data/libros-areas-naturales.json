@@ -64,58 +64,53 @@
   },
   {
     "id": "lib-l48j7yzk",
-    "titulo": "Guía de las reservas naturales de la Argentina – Tomo 01",
+    "titulo": "Guía de las reservas naturales de la Argentina – Patagonia",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-01-550-232x200.jpg",
     "autor": "Juan Carlos Chebez",
-    "anio": null,
+    "anio": 2005,
     "coleccion": "Guía de las reservas naturales de la Argentina",
-    "fechaExtraccion": "2026-09-16T23:18:20.400Z",
-    "revisionPendiente": true
+    "fechaExtraccion": "2026-09-16T23:18:20.400Z"
   },
   {
     "id": "lib-5k2vrisr",
-    "titulo": "Tomo 02",
+    "titulo": "Guía de las reservas naturales de la Argentina – Patagonia Austral",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-02-550-232x200.jpg",
     "autor": "Juan Carlos Chebez",
-    "anio": null,
+    "anio": 2005,
     "coleccion": "Guía de las reservas naturales de la Argentina",
-    "fechaExtraccion": "2026-09-16T23:18:20.400Z",
-    "revisionPendiente": true
+    "fechaExtraccion": "2026-09-16T23:18:20.400Z"
   },
   {
     "id": "lib-gmwqdckj",
-    "titulo": "Tomo 03",
+    "titulo": "Guía de las reservas naturales de la Argentina – Nordeste",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-03-550-232x200.jpg",
     "autor": "Juan Carlos Chebez",
-    "anio": null,
+    "anio": 2005,
     "coleccion": "Guía de las reservas naturales de la Argentina",
-    "fechaExtraccion": "2026-09-16T23:18:20.400Z",
-    "revisionPendiente": true
+    "fechaExtraccion": "2026-09-16T23:18:20.400Z"
   },
   {
     "id": "lib-b545kyw3",
-    "titulo": "Tomo 04",
+    "titulo": "Guía de las reservas naturales de la Argentina – Noroeste",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-04-550-232x200.jpg",
     "autor": "Juan Carlos Chebez",
-    "anio": null,
+    "anio": 2005,
     "coleccion": "Guía de las reservas naturales de la Argentina",
-    "fechaExtraccion": "2026-09-16T23:18:20.400Z",
-    "revisionPendiente": true
+    "fechaExtraccion": "2026-09-16T23:18:20.400Z"
   },
   {
     "id": "lib-ze4ue2lc",
-    "titulo": "Tomo 05",
+    "titulo": "Guía de las reservas naturales de la Argentina – Zona Centro",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/09/guia-de-las-reservas-naturales-de-la-Argentina-05-550-232x200.jpg",
     "autor": "Juan Carlos Chebez",
     "anio": null,
     "coleccion": "Guía de las reservas naturales de la Argentina",
-    "fechaExtraccion": "2026-09-16T23:18:20.400Z",
-    "revisionPendiente": true
+    "fechaExtraccion": "2026-09-16T23:18:20.400Z"
   },
   {
     "titulo": "La costa atlántica de Buenos Aires",

@@ -244,47 +244,43 @@
   },
   {
     "id": "lib-zqtj2wgi",
-    "titulo": "Fauna argentina amenazada: Los que se van – Tomo 01",
+    "titulo": "Fauna argentina amenazada - Los que se van 1: Problematica ambiental, Anfibios y Reptiles",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/los-que-se-van-001.jpg",
     "autor": "Juan Carlos Chebez",
-    "anio": null,
+    "anio": 2008,
     "coleccion": "Fauna argentina amenazada",
-    "fechaExtraccion": "2026-09-16T04:23:55.394Z",
-    "revisionPendiente": true
+    "fechaExtraccion": "2026-09-16T04:23:55.394Z"
   },
   {
     "id": "lib-6654iuav",
-    "titulo": "Tomo 02",
+    "titulo": "Fauna argentina amenazada - Los que se van 2: Aves",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/los-que-se-van-002.jpg",
     "autor": "Juan Carlos Chebez",
-    "anio": null,
+    "anio": 2008,
     "coleccion": "Fauna argentina amenazada",
-    "fechaExtraccion": "2026-09-16T04:23:55.394Z",
-    "revisionPendiente": true
+    "fechaExtraccion": "2026-09-16T04:23:55.394Z"
   },
   {
     "id": "lib-d4rlqnmo",
-    "titulo": "Tomo 03",
+    "titulo": "Fauna argentina amenazada - Los que se van 3: Mamíferos",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/los-que-se-van-003.jpg",
     "autor": "Juan Carlos Chebez",
-    "anio": null,
+    "anio": 2008,
     "coleccion": "Fauna argentina amenazada",
-    "fechaExtraccion": "2026-09-16T04:23:55.394Z",
-    "revisionPendiente": true
+    "fechaExtraccion": "2026-09-16T04:23:55.394Z"
   },
   {
     "id": "lib-z2nx6nqb",
-    "titulo": "Tomo 04",
+    "titulo": "Fauna argentina amenazada - Otros que se van",
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/otros-que-se-van-portada.jpg",
     "autor": "Juan Carlos Chebez",
     "anio": null,
     "coleccion": "Fauna argentina amenazada",
-    "fechaExtraccion": "2026-09-16T04:23:55.394Z",
-    "revisionPendiente": true
+    "fechaExtraccion": "2026-09-16T04:23:55.394Z"
   },
   {
     "titulo": "Guía de huellas de los mamíferos de la Reserva Natural San Sebastián de la Selva y su área de influencia. Misiones, Argentina",

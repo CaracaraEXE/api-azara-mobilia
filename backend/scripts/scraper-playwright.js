@@ -466,12 +466,13 @@ async function extraerImagenesSueltas(page, coleccion) {
 
   const libros = [];
   info.srcs.forEach((src, i) => {
+    if (esImagenNoLibro(src)) return; // no es una lámina de tomo (ver IMAGENES_NO_LIBRO)
     // Tomo desde el numeral del filename (criterio de la fundación: guia-…-01 = Tomo 1,
     // Trazos-nativos-02.jpg = Tomo 2). GOTCHA ACTUALIZADO (2026-09-16): el DOM muestra las
     // láminas BARAJADAS (Guía: 02,03,04,05,01; Trazos: 06,07,08,02,base,03,disenos,04,05)
     // → la POSICIÓN (i+1) está mal. El gotcha viejo ("2019→07") queda cubierto porque el
     // patrón exige EXACTAMENTE 2 dígitos (un año de 4 dígitos no matchea → fallback posición).
-    // Sin numeral: "Trazos-nativos.jpg" (base) → 1; "disenos-iconograficos" (cierre) → 9.
+    // Sin numeral: "Trazos-nativos.jpg" (base) → 1; resto sin numeral → posición (fallback).
     const numero = String(tomoDesdeFilename(src) ?? (i + 1)).padStart(2, '0');
     const sub = info.subPorSrc[src] || null;
     // GOTCHA: el H4 puede YA incluir el prefijo de la colección ("Fauna argentina
@@ -503,7 +504,6 @@ function tomoDesdeFilename(f) {
   m = d.match(/-(\d{2})\.jpe?g$/i);                        // trazos: "Trazos-nativos-02.jpg"
   if (m) return parseInt(m[1], 10);
   if (/^trazos-nativos\.jpe?g$/i.test(d)) return 1;        // archivo base → Tomo 1
-  if (/disenos-iconograficos/.test(d)) return 9;           // lámina de la colección completa → Tomo 9
   return null;
 }
 
@@ -591,19 +591,33 @@ function buscarDuplicado(indiceGlobal, datos) {
 }
 
 /**
- * Overrides de datos (PLANV2 §10): decisiones humanas que el re-scrape NO debe revertir.
- * El sitio tiene el PDF "Alfredo-Castellanos.pdf" mal puesto en la página de
- * Mikrokosmos (es el PDF de OTRO libro; verificado 2026). Decisión: no exponerlo.
- * Si algún día la web lo corrige, se quita esta entrada.
+ * Overrides de datos: decisiones humanas que se aplican SIEMPRE sobre la data extraída.
+ * Con la política "el libro existente gana" (2026-09-16), los overrides de TÍTULO ya no
+ * son necesarios (el humano edita el JSON y el re-scrape lo conserva) y son DAÑINOS
+ * (pisaban los títulos curados a mano, p.ej. "Trazos nativos - Rostros para colorear").
+ * Solo se mantienen decisiones sobre campos que el scrape trae mal y que no se corrigen
+ * en la data: Mikrokosmos → PDF mal puesto en el sitio. Si la web lo corrige, se quita.
  */
 const OVERRIDES = {
   'lib-fym7jqgi': { linkPdf: null }, // Mikrokosmos, Christofredo Jakob y el inicio de la neurociencia argentina
-  // Títulos madre de las series "imagenes-sueltas": el desglose genera "Tomo 01" y perdería
-  // el nombre real del libro/colección. Restaurados 2026-09-16 (backup pre-re-scrape).
-  'lib-l48j7yzk': { titulo: 'Guía de las reservas naturales de la Argentina – Tomo 01' },
-  'lib-46v47u68': { titulo: 'Trazos nativos. Diseño iconográfico de las sierras de Córdoba (serie infantil para colorear) – Tomo 01' },
-  'lib-zqtj2wgi': { titulo: 'Fauna argentina amenazada: Los que se van – Tomo 01' },
 };
+
+/**
+ * Imágenes sueltas que NO representan un libro (decisión humana, verificada 2026-09-16
+ * por el usuario con el ejemplar físico): en Trazos nativos, el archivo
+ * "…-disenos-iconograficos-de-las-sierras-de-cordoba.jpg" es la portada/arte de la
+ * colección COMPLETA — duplicado visual de la portada del Tomo 1 —, NO una lámina de tomo.
+ * El scraper la tomaba como libro aparte (lib-srak0ssa). Se excluye del desglose.
+ */
+const IMAGENES_NO_LIBRO = [
+  'trazos-nativos-disenos-iconograficos-de-sierras-cordoba.jpg',
+  'trazos-nativos-disenos-iconograficos-de-las-sierras-de-cordoba.jpg',
+];
+
+/** ¿Esta imagen suelta representa un libro? (false → no crear libro) */
+function esImagenNoLibro(src) {
+  return IMAGENES_NO_LIBRO.includes(decodeURIComponent((src || '').split('/').pop()).toLowerCase());
+}
 
 /** Aplicar decisiones humanas sobre datos re-extraídos (se llama en cada registro) */
 function aplicarOverrides(libro) {
@@ -615,13 +629,19 @@ function aplicarOverrides(libro) {
 
 /**
  * Reutilizar la entrada ya registrada (mismo id) o crear una nueva.
- * Cuando ya existe, se toma la data NUEVA del sitio (los parsers arreglados
- * refrescan los datos) conservando el id estable: { ...datos, id: dup.id }.
+ * POLÍTICA (2026-09-16): si el libro YA existe, GANAN LOS DATOS EXISTENTES — el re-scrape
+ * NO los pisa. Motivo: los datos pueden haber sido completados/curados a mano (títulos
+ * madre, autores, años, quitar revisionPendiente) y el scrape debe ser idempotente
+ * (no revertir trabajo humano). Se devuelve la entrada EXISTENTE —NO los datos nuevos—
+ * para que el libro siga figurando en ESTA categoría sin perder su contenido (así se
+ * preserva la multi-categoría: el mismo id aparece en cada categoría donde figura).
+ * TRADEOFF aceptado: un cambio en el sitio sobre un libro ya registrado NO se captura
+ * automáticamente (se corrige a mano o vía OVERRIDES). Los libros NUEVOS sí se registran.
  */
 function registrarOConsolidar(indiceGlobal, datos) {
   const dup = buscarDuplicado(indiceGlobal, datos);
   if (dup) {
-    return { ...datos, id: dup.id, fechaExtraccion: new Date().toISOString(), _duplicadoDe: { id: dup.id, categoria: dup.categoria } };
+    return { ...dup.libro, id: dup.id, _duplicadoDe: { id: dup.id, categoria: dup.categoria } };
   }
   return aplicarOverrides({ id: generarId(), ...datos, fechaExtraccion: new Date().toISOString() });
 }
