@@ -5,6 +5,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 ## Current State (Sep 2026)
 
 - ✅ **13/13 categorías scrapeadas** (data/libros/) + **Recursos Educativos** (data/recursos/) — 435 ítems totales (326 libros + 109 RE; 1 esqueleto en revisión: postal Guacamayo Militar)
+- ✅ **PLANV3 V3.6 — Hemeroteca (2026-09-27)**: scraper + API + bot listos para las SECCIONES `periodico-exploracion-y-ciencia` (Periódico Exploración y Ciencia, 🗞️) y `revista-azara` (Revista Azara, 📰). Data pendiente del piloto: `node scripts/scraper-playwright.js --seccion=periodico-exploracion-y-ciencia` (el usuario corre el scraper).
 - ✅ Datos en carpetas por sección: `data/libros/libros-*.json` (13) + `data/recursos/recursos-educativos.json` (1 archivo, campo `coleccion` = subgrupo)
 - ✅ API Express.js funcionando con endpoints GET (respuestas con campo `seccion: 'libros'|'recursos'`)
 - ✅ Scraper con CLI: `--todas` / `--seccion=<slug>` / `--categoria=<slug>` (mutuamente excluyentes)
@@ -32,7 +33,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 |---------|-------------|
 | `/buscar [termino]` | Busca por título, 5 por página, botones ◀/▶ |
 | `/libro [id]` | Muestra detalle de un libro (campos Sección + Categoría real) |
-| `/categorias` | Select de SECCIONES (📚 Libros / 🎓 Recursos educativos) |
+| `/categorias` | Select de SECCIONES (📚 Libros / 🎓 Recursos educativos / 🗞️ Periódico Exploración y Ciencia / 📰 Revista Azara) |
 | → Select sección | Estadísticas + Select de categorías de ESA sección |
 | → Select categoría | Ítems de esa categoría + ◀/▶ + 🔙 Volver (a la misma sección) |
 
@@ -58,13 +59,16 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 // Búsqueda con paginación
 { cmd: 'buscar', q: 'mamiferos', p: 1 }
 
-// Paginación de categoría (sec: 'libros'|'recursos' — define ?categoria= vs ?coleccion=)
+// Paginación de categoría (sec: 'libros'|'recursos'|'periodico-exploracion-y-ciencia'|'revista-azara'
+// — define ?categoria= vs ?coleccion=)
 { cmd: 'cat-page', sec: 'libros', cat: 'Mastozoologia', p: 1 }
 { cmd: 'cat-page', sec: 'recursos', cat: 'Cuadernillos', p: 1 }
+{ cmd: 'cat-page', sec: 'periodico-exploracion-y-ciencia', cat: 'Periódico Exploración y Ciencia', p: 1 }
 
-// Volver a categorías de la MISMA sección
+// Volver a categorías de la MISMA sección (hemeroteca → vuelve al PASO 1, salto directo)
 { cmd: 'cat-back', sec: 'libros' }
 { cmd: 'cat-back', sec: 'recursos' }
+{ cmd: 'cat-back', sec: 'revista-azara' }
 
 // Select de secciones (paso 1; el valor está en interaction.data.values[0])
 { cmd: 'sec-select' }
@@ -89,16 +93,17 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 ### Flujo de Select Menu (2 niveles)
 
 1. Usuario ejecuta `/categorias` → bot responde con type 4 (embed + Select de SECCIONES — `sec-select`)
-2. Usuario elige sección (`libros` | `recursos`) → bot consulta las categorías de ESA sección:
+2. Usuario elige sección (`libros` | `recursos` | `periodico-exploracion-y-ciencia` | `revista-azara`) → bot consulta las categorías de ESA sección:
    - libros → `GET /api/categorias` filtrado por `seccion === 'libros'`
    - recursos → `GET /api/categorias` + `GET /api/libros/colecciones/lista` (las colecciones cuyos `categorias` pertenecen a la sección RE)
-3. Bot hace PATCH con embed de estadísticas + Select de categorías (`cat-select` con `sec`)
-4. Usuario elige categoría → bot consulta `?categoria=` (libros) o `?coleccion=` (recursos) y hace PATCH con ítems + ◀/▶ + 🔙 Volver
-5. Usuario clickea 🔙 → bot vuelve al paso 3 de la MISMA sección (cat-back lleva `sec`)
+   - hemeroteca → `GET /api/categorias` filtrado por su sección: 1 sola categoría (la publicación)
+3. **Salto directo de hemeroteca (PLANV3 V3.6)**: si la sección tiene `categorias.length === 1`, el bot saltea el select de categorías y muestra DIRECTAMENTE las ediciones (`GET /api/libros?categoria=<nombre>` + `construirMensajeCategoriaLibros`) — con ◀/▶ y 🔙 que vuelve al PASO 1 (select de secciones).
+4. Usuario elige categoría → bot consulta `?categoria=` (libros Y hemeroteca) o `?coleccion=` (recursos) y hace PATCH con ítems + ◀/▶ + 🔙 Volver
+5. Usuario clickea 🔙 → bot vuelve al paso 3 (select de categorías) en libros/RE; en hemeroteca vuelve al paso 1 (select de secciones)
 
 ### Convención de etiquetas (formatos.js)
 
-- Emoji de SECCIÓN primero: `📚 Libros` | `🎓 Recursos educativos`
+- Emoji de SECCIÓN primero: `📚 Libros` | `🎓 Recursos educativos` | `🗞️ Periódico Exploración y Ciencia` | `📰 Revista Azara`
 - Emoji de CATEGORÍA segundo: `📁` (la categoría REAL de navegación)
 - En RE la categoría real = `coleccion` (subgrupo: 'Cuadernillos', ...); 'Recursos Educativos' es la SECCIÓN, no una categoría
 - Enlace de PDF SIEMPRE al final del value del campo
@@ -114,6 +119,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 - El scraper espera 800ms entre libros y 2000ms entre categorías
 - `GUARDAR_CADA = 5` en scripts/scraper-playwright.js
 - Algunas páginas no tienen `<h4>` para el título — hay fallback con párrafos
+- **Hemeroteca (PLANV3 V3.6)**: las páginas de periódico/revista son grillas portfolio Qode Bridge (`article.mix`) — extractores dedicados `obtenerUrlsPortafolio`/`obtenerDatosPortafolio`. El PDF de la edición se busca con `a.qodef-qi-button[href$=".pdf"]`; si hay MÁS de 1 PDF (normas/autores) se setea `revisionPendiente` (cortafuegos humano, fase 2 Revista Azara). Secciones: `periodico-exploracion-y-ciencia` (🗞️, piloto 3 eds) y `revista-azara` (📰, fase 2, 14 eds). El scraper lo corre SIEMPRE el usuario: `node scripts/scraper-playwright.js --seccion=<slug>`
 
 ### Discord Bot
 - **NGROK** debe apuntar al bot (puerto 3001), no al backend
@@ -136,12 +142,14 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
   "anio": "number | null",
   "fechaExtraccion": "ISO string",
   "linkPdfEn": "string (opcional — versión en inglés, ítems bilingües)",
-  "revisionPendiente": "bool (opcional — esqueleto curado sin PDF, p.ej. postal con página rota)"
+  "revisionPendiente": "bool (opcional — esqueleto curado sin PDF, p.ej. postal con página rota)",
+  "titulares": ["string", "..." ] (opcional — SOLO hemeroteca, PLANV3 V3.6: titulares de la edición SIN bullet; hacen encontrable el ítem en /buscar y se listan en /libro en el campo 🗞️ Titulares. NO se muestran en listados ni en resultados de búsqueda)"
 }
 ```
 
-Los archivos JSON no tienen campo `categoria` — el backend lo asigna en tiempo real desde el slug del archivo, y agrega `seccion` ('libros' | 'recursos') según la carpeta.
-Los ítems de RE (`data/recursos/recursos-educativos.json`) tienen además `coleccion` (subgrupo: 'Cuadernillos', 'Posters de Biodiversidad', ...) — es la categoría visible de esa sección.
+Los archivos JSON no tienen campo `categoria` — el backend lo asigna en tiempo real desde el slug del archivo, y agrega `seccion` ('libros' | 'recursos' | 'periodico-exploracion-y-ciencia' | 'revista-azara') según la carpeta.
+**EXCEPCIÓN — hemeroteca (PLANV3 V3.6)**: los ítems de `data/periodico-exploracion-y-ciencia/*.json` y `data/revista-azara/*.json` SÍ llevan `categoria` en el archivo (con acentos: "Periódico Exploración y Ciencia") — la API respeta `libros[0].categoria` (libros.js L51-52); el resto de los archivos no la tienen → cero cambio.
+Los ítems de RE (`data/recursos/recursos-educativos.json`) tienen además `coleccion` (subgrupo: 'Cuadernillos', 'Posters de Biodiversidad', ...) — es la categoría visible de esa sección. La hemeroteca NO lleva `coleccion` (la categoría única YA es la publicación).
 Los esqueletos (`linkPdf: null` + `revisionPendiente: true`) quedan listados por `scripts/validar-data.js` en el "Portal de revisión humana" para completar vía PR (política: la cura manual no se re-scrapea).
 
 ## Branches

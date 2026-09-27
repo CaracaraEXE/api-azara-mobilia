@@ -21,6 +21,10 @@ const PORT = process.env.PORT || 3001;
 const API_URL = process.env.API_URL || 'http://localhost:3000';
 const formatos = require('./formatos');
 
+// Orden EXPLÍCITO del dropdown de secciones de /categorias (PLANV3 V3.6):
+// libros y RE primero (compat), después la hemeroteca (Periódico, Revista Azara).
+const ORDEN_SECCIONES = ['libros', 'recursos', 'periodico-exploracion-y-ciencia', 'revista-azara'];
+
 // ──────────────────────────────────────────────
 //  Tipos de interacción de Discord
 // ──────────────────────────────────────────────
@@ -230,6 +234,21 @@ async function comandoLibro(options) {
       fields.push({ name: '🗂️ Colección', value: libro.coleccion, inline: false });
     }
 
+    // Titulares de hemeroteca (PLANV3 V3.6): se listan acá (NO en /buscar —
+    // los titulares solo hacen encontrable el ítem). "• " + titular, truncado a
+    // ~1000 chars + contador (el límite de un field de embed de Discord es 1024).
+    if (Array.isArray(libro.titulares) && libro.titulares.length) {
+      const lineas = libro.titulares.map(t => `• ${t}`);
+      let texto = lineas.join('\n');
+      if (texto.length > 1000) {
+        const recorte = texto.lastIndexOf('\n', 1000);
+        texto = recorte > 100 ? texto.substring(0, recorte) : texto.substring(0, 1000);
+        const visibles = (texto.match(/\n/g) || []).length + 1;
+        texto += `\n*(mostrando ${visibles} de ${lineas.length} titulares)*`;
+      }
+      fields.push({ name: '🗞️ Titulares', value: texto, inline: false });
+    }
+
     if (libro.linkPdf) {
       // Bilingües (linkPdfEn, p.ej. El Shincal): ambos enlaces, ES · EN
       const enlaces = [`[Español](${libro.linkPdf})`];
@@ -269,13 +288,15 @@ async function comandoCategorias() {
     }
 
     // Agrupar por sección (la API entrega categoria.seccion tras la migración
-    // a carpetas por sección). Orden estable: libros primero, RE después.
+    // a carpetas por sección). El nombre sale de formatos (single source of
+    // truth, PLANV3 V3.6) y el orden es EXPLÍCITO (ORDEN_SECCIONES) para que la
+    // hemeroteca aparezca después de libros/RE sin depender del orden de fs.
     const porSeccion = new Map();
     for (const cat of datos.data) {
       const sec = cat.seccion || 'libros'; // compat: categorías sin seccion → libros
       const e = porSeccion.get(sec) || {
         seccion: sec,
-        nombre: sec === 'recursos' ? 'Recursos educativos' : 'Libros',
+        nombre: formatos.SECCIONES_NOMBRES[sec] || sec,
         cantidad: 0,
         categorias: 0
       };
@@ -284,7 +305,11 @@ async function comandoCategorias() {
       porSeccion.set(sec, e);
     }
     const secciones = [...porSeccion.values()]
-      .sort((a, b) => (a.seccion === 'libros' ? 0 : 1) - (b.seccion === 'libros' ? 0 : 1));
+      .sort((a, b) => {
+        const ia = ORDEN_SECCIONES.indexOf(a.seccion);
+        const ib = ORDEN_SECCIONES.indexOf(b.seccion);
+        return (ia === -1 ? ORDEN_SECCIONES.length : ia) - (ib === -1 ? ORDEN_SECCIONES.length : ib);
+      });
     const totalItems = secciones.reduce((s, x) => s + x.cantidad, 0);
 
     return formatos.construirMensajeSecciones(secciones, totalItems);
@@ -379,8 +404,10 @@ async function obtenerCategoriasDeSeccion(sec) {
 
   const respuesta = await fetch(`${API_URL}/api/categorias`);
   const datos = await respuesta.json();
+  // FIX V3.6: el default filtra por la SECCIÓN recibida (antes hardcodeado
+  // 'libros') → cubre la hemeroteca con su categoría única sin rama especial.
   const categorias = (datos.data || [])
-    .filter(c => (c.seccion || 'libros') === 'libros')
+    .filter(c => (c.seccion || 'libros') === sec)
     .map(c => ({ nombre: c.nombre, cantidad: c.cantidad }));
   return { categorias, total: categorias.reduce((s, c) => s + c.cantidad, 0) };
 }
@@ -403,6 +430,23 @@ async function manejarSeleccionSeccion(interaction, res) {
 
   try {
     const { categorias, total } = await obtenerCategoriasDeSeccion(sec);
+
+    // Salto directo (PLANV3 V3.6): secciones con 1 sola categoría (la hemeroteca)
+    // muestran DIRECTAMENTE sus ediciones, sin el select de categorías intermedio.
+    if (categorias.length === 1) {
+      const nombreCategoria = categorias[0].nombre;
+      const respuesta = await fetch(
+        `${API_URL}/api/libros?categoria=${encodeURIComponent(nombreCategoria)}&limite=5&pagina=1`
+      );
+      const datos = await respuesta.json();
+      if (datos.success && datos.data.length > 0) {
+        await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriaLibros(sec, nombreCategoria, datos.data, 0, datos.meta.total));
+      } else {
+        await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriaLibros(sec, nombreCategoria, [], 0, 0));
+      }
+      return;
+    }
+
     await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriasSeccion(sec, categorias, total));
   } catch (error) {
     console.error('Error al seleccionar sección:', error);
@@ -491,6 +535,15 @@ async function manejarVolverCategorias(interaction, res, payload) {
 
   try {
     const { categorias, total } = await obtenerCategoriasDeSeccion(sec);
+
+    // Salto directo (PLANV3 V3.6): si la sección tiene 1 sola categoría, el 🔙
+    // vuelve al PASO 1 (select de secciones), no al select de categorías.
+    if (categorias.length === 1) {
+      const paso1 = await comandoCategorias();
+      await patchMensajeOriginal(interaction, paso1);
+      return;
+    }
+
     await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriasSeccion(sec, categorias, total));
   } catch (error) {
     console.error('Error al volver a categorías:', error);

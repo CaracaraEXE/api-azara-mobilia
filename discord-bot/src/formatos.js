@@ -15,13 +15,24 @@
 
 const SECCIONES_NOMBRES = {
   libros: 'Libros',
-  recursos: 'Recursos educativos'
+  recursos: 'Recursos educativos',
+  // Hemeroteca (PLANV3 V3.6): cada publicación periódica es una SECCIÓN.
+  'periodico-exploracion-y-ciencia': 'Periódico Exploración y Ciencia',
+  'revista-azara': 'Revista Azara'
 };
 
 const SECCIONES_EMOJIS = {
   libros: '📚',
-  recursos: '🎓'
+  recursos: '🎓',
+  'periodico-exploracion-y-ciencia': '🗞️',
+  'revista-azara': '📰'
 };
+
+/**
+ * Secciones de HEMEROTECA (PLANV3 V3.6): sus ítems son "ediciones" (no "libros")
+ * y cada una tiene 1 sola categoría → el bot hace "salto directo" a las ediciones.
+ */
+const SECCIONES_HEMEROTECA = new Set(['periodico-exploracion-y-ciencia', 'revista-azara']);
 
 /**
  * Datos de presentación de un ítem según su sección.
@@ -144,7 +155,7 @@ function construirMensajeSecciones(secciones, totalItems) {
 function construirMensajeCategoriasSeccion(sec, categorias, totalItems) {
   const emoji = SECCIONES_EMOJIS[sec] || '📚';
   const nombre = SECCIONES_NOMBRES[sec] || 'Libros';
-  const unidad = sec === 'recursos' ? 'ítems' : 'libros';
+  const unidad = SECCIONES_HEMEROTECA.has(sec) ? 'ediciones' : (sec === 'recursos' ? 'ítems' : 'libros');
   const options = categorias.map(cat => ({
     label: cat.nombre,
     value: cat.nombre,
@@ -243,6 +254,9 @@ function construirMensajeCategoriaLibros(sec, nombreCategoria, libros, pagina, t
 }
 
 module.exports = {
+  SECCIONES_NOMBRES,
+  SECCIONES_EMOJIS,
+  SECCIONES_HEMEROTECA,
   infoSeccion,
   enlacesPdf,
   construirMensajeBusqueda,

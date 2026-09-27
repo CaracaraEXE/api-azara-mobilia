@@ -5,9 +5,9 @@
  * 
  * Uso:
  *   node scripts/scraper-playwright.js                        (usa SCRAPEAR_CATEGORIA por defecto)
- *   node scripts/scraper-playwright.js --categoria=slug       (UNA categoría puntual de una sección por-categoría, ej. 'paleontologia')
- *   node scripts/scraper-playwright.js --seccion=slug         (UNA sección completa: 'libros' o 'recursos-educativos')
- *   node scripts/scraper-playwright.js --todas                (todas las secciones: libros + recursos educativos)
+ *   node scripts/scraper-playwright.js --categoria=slug       (UNA categoría puntual de una sección por-categoría, ej. 'paleontologia'; SOLO secciones por-categoría = libros)
+ *   node scripts/scraper-playwright.js --seccion=slug         (UNA sección completa: 'libros', 'recursos-educativos', 'periodico-exploracion-y-ciencia' o 'revista-azara')
+ *   node scripts/scraper-playwright.js --todas                (todas las secciones: libros + recursos educativos + hemeroteca)
  *   --seccion y --categoria son mutuamente excluyentes; --todas es prioritario.
  */
 
@@ -56,13 +56,16 @@ const CATEGORIAS_RECURSOS = [
  * SECCIONES unificadas (PLANV3 §5.1 rediseñado 2026-09-27): Libros y Recursos
  * educativos comparten la MISMA estructura — sección → categorías planas → grilla →
  * página individual — y se scrapean con EL MISMO flujo (scrapearSeccion) y EL MISMO
- * extractor (obtenerDatosItem). La ÚNICA diferencia entre secciones es declarativa:
+ * extractor (obtenerDatosItem). La diferencia entre secciones es declarativa:
  *   - prefijoArchivo: base de los nombres de archivo ('libros' → libros-*.json,
- *     'recursos' → recursos-*.json).
- *   - archivoUnico: false (Libros) → 1 archivo por categoría; true (Recursos educativos)
- *     → 1 archivo {prefijo}-{slug}.json con `coleccion` = categoría (opción A, PLANV3 §5).
- * NO hay flujos ni extractores por sección: eso era lo que hacía imposible sumar
- * secciones nuevas sin duplicar código (crítica del usuario 2026-09-27).
+ *     'recursos' → recursos-*.json, 'periodico-exploracion-y-ciencia' → su carpeta).
+ *   - archivoUnico: false (Libros) → 1 archivo por categoría; true (Recursos educativos
+ *     y Hemeroteca) → 1 archivo por sección ({slug}.json, fix V3.6).
+ * HEMEROTECA (PLANV3 V3.6, 2026-09-27): la ÚNICA excepción con extractores propios —
+ * sus grillas son portfolio de Qode Bridge (article.mix en .projects_holder) y la
+ * página individual NO trae h1/h4/portada fiables → obtenerUrlsPortafolio /
+ * obtenerDatosPortafolio / extraerTitularesDeHtml (ver más abajo). El resto del
+ * flujo (persistencia, dedup, temp) es el mismo archivo único de RE.
  */
 const SECCIONES = [
   {
@@ -79,6 +82,35 @@ const SECCIONES = [
     prefijoArchivo: 'recursos',
     archivoUnico: true, // 1 archivo recursos-educativos.json con coleccion = categoría
     categorias: CATEGORIAS_RECURSOS,
+  },
+  // Hemeroteca (PLANV3 V3.6, 2026-09-27): cada publicación periódica es una SECCIÓN
+  // de primer nivel (NO una categoría intermedia — corrección del usuario). tipo
+  // 'hemeroteca' (NO 'publicaciones': choca con las Publicaciones Científicas de la
+  // Fundación, fuera de alcance — decisión del usuario 2026-09-27). archivoUnico con
+  // slug === prefijoArchivo → el archivo final es {slug}.json (fix V3.6). La grilla
+  // es portfolio de Qode Bridge (article.mix en .projects_holder) → extractores
+  // DEDICADOS obtenerUrlsPortafolio/obtenerDatosPortafolio: es la ÚNICA excepción al
+  // flujo unificado (libros/RE comparten extractores; la individual de hemeroteca no
+  // tiene h1/h4/portada fiables — título y portada vienen de la grilla).
+  {
+    tipo: 'hemeroteca',
+    nombre: 'Periódico Exploración y Ciencia',
+    slug: 'periodico-exploracion-y-ciencia',
+    prefijoArchivo: 'periodico-exploracion-y-ciencia',
+    archivoUnico: true,
+    categorias: [
+      { nombre: 'Periódico Exploración y Ciencia', slug: 'periodico-exploracion-y-ciencia', url: 'https://fundacionazara.org.ar/periodico-exploracion-y-ciencia/' },
+    ],
+  },
+  {
+    tipo: 'hemeroteca',
+    nombre: 'Revista Azara',
+    slug: 'revista-azara',
+    prefijoArchivo: 'revista-azara',
+    archivoUnico: true,
+    categorias: [
+      { nombre: 'Revista Azara', slug: 'revista-azara', url: 'https://fundacionazara.org.ar/revista-azara/' },
+    ],
   },
 ];
 
@@ -166,6 +198,49 @@ async function obtenerUrlsLibros(page, urlCategoria) {
   const urlsUnicas = [...new Set(urls)];
   console.log(`   ✅ Encontradas ${urlsUnicas.length} URLs`);
   return urlsUnicas;
+}
+
+/**
+ * Extraer ediciones desde la grilla portfolio de hemeroteca (PLANV3 V3.6):
+ * Qode Bridge arma los ítems como article.mix dentro de .projects_holder. Devuelve
+ * objetos {url, titulo, portada} — la grilla es la FUENTE DE VERDAD del título y la
+ * portada (la página individual NO trae h1/h4 fiables: la edición N14 de Revista
+ * Azara no tiene h1).
+ * Selectores verificados (N3 Periódico / N14 Revista Azara, 2026-09-27):
+ *   - título `.portfolio_title a` POR CLASE (h6 en Periódico, h5 en Revista — NO por
+ *     tag): trae espacio leading → .trim() obligatorio.
+ *   - portada `.image_holder img` (con <span class='image'> intermedio; soporta
+ *     lazy-load con data-src / data-lazy-src).
+ *   - `a.portfolio_link_class` es un ancla VACÍA → el href del ítem sale de
+ *     .portfolio_title a (fallback a[href*="portfolio_page"]).
+ * Nota capitalización: Revista Azara N12-N14 viene en MAYÚSCULAS + EN DASH (U+2013) —
+ * se guarda tal cual (fidelidad a la grilla); la búsqueda es case-insensitive.
+ */
+async function obtenerUrlsPortafolio(page, urlCategoria) {
+  console.log('   🔍 Obteniendo lista de ediciones (grilla portfolio)...');
+
+  await page.goto(urlCategoria, { waitUntil: 'networkidle' });
+  await esperar(1000);
+
+  const items = await page.$$eval('.projects_holder article.mix', arts =>
+    arts.map(a => {
+      const t = a.querySelector('.portfolio_title a');
+      let img = '';
+      for (const im of a.querySelectorAll('img')) {
+        const src = im.src || im.getAttribute('data-src') || im.getAttribute('data-lazy-src') || '';
+        if (src && !/logo-azara|banner-azara/.test(src) && !src.endsWith('.svg')) { img = src; break; }
+      }
+      return {
+        url: (t && t.href) || (a.querySelector('a[href*="portfolio_page"]') || {}).href || '',
+        titulo: t ? t.textContent.replace(/\s+/g, ' ').trim() : '',
+        portada: img
+      };
+    }).filter(p => p.url && p.titulo)
+  );
+
+  const unicos = items.filter((p, i, arr) => arr.findIndex(x => x.url === p.url) === i);
+  console.log(`   ✅ Encontradas ${unicos.length} ediciones`);
+  return unicos;
 }
 
 /**
@@ -299,6 +374,87 @@ async function obtenerDatosItem(page, url) {
 
 // Alias compat: obtenerDatosLibro era el extractor de páginas individuales (libros).
 const obtenerDatosLibro = obtenerDatosItem;
+
+/**
+ * Extraer titulares desde el HTML del contenedor de texto-editor de una edición de
+ * hemeroteca — función PURA exportada (testeable con fixture real, PLANV3 V3.6).
+ * Header "<p><strong>Contenido</strong></p>" se descarta. Los titulares se separan
+ * por <br> Y por <p> (verificado): Periódico usa UN solo <p> con titulares separados
+ * por <br>; Revista Azara usa 1 <p> POR titular. Se quita el bullet inicial "•" —
+ * se guarda SIN bullet (dato puro; el bot pinta el "• " al renderizar, decisión V3.6)
+ * — y se limpian tags/entidades/espacios (usa textContent-equivalente tras quitar
+ * tags: el "•" vive dentro de <span lang="ES-MX">, algunos titulares tienen <em>).
+ */
+function extraerTitularesDeHtml(html) {
+  if (!html) return [];
+  const limpiar = t => t
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&#8211;/g, '–')
+    .replace(/&ndash;|&mdash;/gi, '–')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<p[^>]*>/gi, '')
+    .split('\n')
+    .map(limpiar)
+    .map(t => t.replace(/^[•·∙]\s*/, '').trim())
+    .filter(t => t && !/^contenido$/i.test(t));
+}
+
+/**
+ * Extraer datos de UNA edición de hemeroteca desde su página individual
+ * (PLANV3 V3.6): el título y la portada vienen de la GRULLA (contextoDeGrilla = el
+ * objeto {url, titulo, portada} de obtenerUrlsPortafolio) — la individual solo
+ * aporta PDF de la edición + titulares + año.
+ * PDF: botón qodef "Descargar archivo" (a.qodef-qi-button[href$=".pdf"]) dentro de
+ * .elementor-widget-qi_addons_for_elementor_button — exactamente 1 por edición
+ * (verificado N3 y N14). Guard: la grilla de Revista Azara tiene un PDF de "Normas
+ * para autores" (en la grilla, con botón propio) → excluir hrefs/textos que
+ * matcheen /norma|autores/i; si quedara >1 → linkPdf: null + revisionPendiente
+ * (cortafuegos humano). Titulares vía extraerTitularesDeHtml sobre el contenedor
+ * con header "Contenido". Año = regex \((\d{4})\) del título de la grilla.
+ * NO lleva `coleccion` (decisión V3.6): la única categoría YA es la publicación.
+ */
+async function obtenerDatosPortafolio(page, url, { titulo, portada }) {
+  await page.goto(url, { waitUntil: 'networkidle' });
+  await esperar(500);
+
+  // --- PDF de la edición (botón qodef, 1 solo) ---
+  const botones = await page.$$eval('a.qodef-qi-button[href$=".pdf"]', as =>
+    as.map(a => ({ href: a.href || '', texto: (a.textContent || '').trim() }))
+  ).catch(() => []);
+  const candidatos = botones.filter(b => !/norma|autores/i.test(b.href + ' ' + b.texto));
+  const linkPdf = candidatos.length === 1 ? limpiarUrlPdf(candidatos[0].href) : null;
+  const revisionPendiente = candidatos.length !== 1;
+
+  // --- Titulares: contenedor text-editor con header "Contenido" ---
+  const htmlTitulares = await page.evaluate(() => {
+    for (const cont of document.querySelectorAll('.elementor-widget-text-editor .elementor-widget-container')) {
+      if (/<strong>\s*Contenido\s*<\/strong>/i.test(cont.innerHTML)) return cont.innerHTML;
+    }
+    return null;
+  }).catch(() => null);
+  const titulares = extraerTitularesDeHtml(htmlTitulares);
+
+  // --- Año desde el título de la grilla ("Número 3 (2014)" / "NÚMERO 14 (2025)") ---
+  const m = String(titulo || '').match(/\((\d{4})\)/);
+  const anio = m ? parseInt(m[1], 10) : null;
+
+  const item = {
+    titulo: (titulo || '').trim(),
+    linkPdf,
+    imagenPortada: portada || null,
+    autor: null,
+    anio,
+    titulares,
+  };
+  if (revisionPendiente) item.revisionPendiente = true;
+  return item;
+}
 
 // ============================================================
 // FIXES Y HELPERS (PLANV2.md §4.2, §10)
@@ -710,7 +866,10 @@ function construirIndiceGlobal(librosActuales, categoriaSlug, prefijo = 'libros'
       indice.set(clave, { id: libro.id, libro, categoria });
     }
   };
-  const esDePrefijo = new RegExp(`^${prefijo}-.+\\.json$`);
+  // FIX V3.6: aceptar también la base {prefijo}.json (hemeroteca: archivo único =
+  // {slug}.json con slug === prefijoArchivo; antes `^prefijo-.+\.json$` no lo veía
+  // y el re-scrape rompía el dedup "existente gana").
+  const esDePrefijo = new RegExp(`^${prefijo}(-.+)?\\.json$`);
   const quitarPrefijo = new RegExp(`^${prefijo}-`);
   // Cada sección vive en su propia carpeta (src/data/libros/, src/data/recursos/):
   // el índice escanea SOLO la de la sección en curso.
@@ -817,16 +976,19 @@ async function scrapearSeccion(browser, seccion) {
   
   const page = await browser.newPage();
   const prefijo = seccion.prefijoArchivo;
-  const nombreArchivoBase = seccion.slug.replace(new RegExp('^' + prefijo + '-'), '');
-  // Cada sección vive en su propia carpeta (src/data/libros/, src/data/recursos/);
-  // se crea al arrancar para que la primera corrida no rompa el índice.
+  // Cada sección vive en su propia carpeta (libros/, recursos/, y las de hemeroteca:
+  // periodico-exploracion-y-ciencia/, revista-azara/); se crea al arrancar para que
+  // la primera corrida no rompa el índice.
   const carpetaSeccion = path.join(DATA_DIR, prefijo);
   fs.mkdirSync(carpetaSeccion, { recursive: true });
+  // FIX V3.6: el archivo único es {slug}.json — cuando slug === prefijoArchivo
+  // (hemeroteca) NO duplicar el prefijo (evita 'revista-azara-revista-azara.json').
+  // Recursos queda igual: slug 'recursos-educativos' → 'recursos-educativos.json'.
   const rutaFinal = seccion.archivoUnico
-    ? path.join(carpetaSeccion, `${prefijo}-${nombreArchivoBase}.json`)
+    ? path.join(carpetaSeccion, `${seccion.slug}.json`)
     : null;
   const rutaTemp = seccion.archivoUnico
-    ? path.join(carpetaSeccion, `${prefijo}-${nombreArchivoBase}.temp.json`)
+    ? path.join(carpetaSeccion, `${seccion.slug}.temp.json`)
     : null;
   
   // Progreso previo (modo archivo único): categorías completadas + ítems acumulados
@@ -883,7 +1045,9 @@ async function scrapearSeccion(browser, seccion) {
         }, null, 2));
       };
       
-      const urls = await obtenerUrlsLibros(page, categoria.url);
+      const urls = seccion.tipo === 'hemeroteca'
+        ? await obtenerUrlsPortafolio(page, categoria.url)
+        : await obtenerUrlsLibros(page, categoria.url);
       if (urls.length === 0) {
         console.log('   ⚠️ No se encontraron ítems');
         if (seccion.archivoUnico) {
@@ -900,9 +1064,14 @@ async function scrapearSeccion(browser, seccion) {
           console.log('         ⚠️ Sin título (verificar URL)');
           return;
         }
-        const { _duplicadoDe, ...item } = registrarOConsolidar(indiceGlobal, seccion.archivoUnico
-          ? { ...datos, coleccion: categoria.nombre }
-          : datos);
+        // FIX V3.6: la hemeroteca NO lleva `coleccion` (decisión del usuario) — la
+        // única categoría YA es la publicación; en cambio SÍ lleva `categoria`
+        // (con acentos, "Periódico Exploración y Ciencia") para que la API respete
+        // libros[0].categoria y el nombre visible no sea el slug capitalizado.
+        const contexto = seccion.tipo === 'hemeroteca'
+          ? { ...datos, categoria: seccion.nombre }
+          : (seccion.archivoUnico ? { ...datos, coleccion: categoria.nombre } : datos);
+        const { _duplicadoDe, ...item } = registrarOConsolidar(indiceGlobal, contexto);
         items.push(aplicarOverrides(item));
         console.log(_duplicadoDe
           ? `         🔗 Reutilizado id ${_duplicadoDe.id} (${_duplicadoDe.categoria})`
@@ -911,7 +1080,15 @@ async function scrapearSeccion(browser, seccion) {
       
       // Procesar una URL: desglose de colección catalogada o página individual
       const procesarUrl = async (url) => {
-        const coleccion = COLECCIONES_CONOCIDAS.find(c => c.url === url);
+        const urlReal = typeof url === 'string' ? url : url.url;
+        // Hemeroteca (PLANV3 V3.6): la individual no tiene h1/h4 fiables — los datos
+        // vienen de la grilla (objeto {url, titulo, portada} del loop). Sin detector
+        // de "posible colección": la individual trae exactamente 1 PDF de edición.
+        if (seccion.tipo === 'hemeroteca') {
+          registrarItem(await obtenerDatosPortafolio(page, urlReal, url));
+          return;
+        }
+        const coleccion = COLECCIONES_CONOCIDAS.find(c => c.url === urlReal);
         
         if (coleccion) {
           // Desglose de colección multi-ítem (PLANV2 §4 / PLANV3 §5.2):
@@ -958,8 +1135,9 @@ async function scrapearSeccion(browser, seccion) {
       for (let i = desde; i < urls.length; i++) {
         const url = urls[i];
         procesados++;
+        const nombreUrl = (typeof url === 'string' ? url : url.url).split('/').filter(Boolean).pop() || '';
         console.log(seccion.archivoUnico
-          ? `      📄 [${i + 1}/${urls.length}] ${url.split('/').filter(Boolean).pop() || url}`
+          ? `      📄 [${i + 1}/${urls.length}] ${nombreUrl}`
           : `      📖 [${i + 1}/${urls.length}]`);
         
         try {
@@ -1088,8 +1266,11 @@ module.exports = {
   SECCIONES,
   COLECCIONES_CONOCIDAS,
   obtenerUrlsLibros,
+  obtenerUrlsPortafolio, // grilla portfolio de hemeroteca (PLANV3 V3.6)
   obtenerDatosItem,
   obtenerDatosLibro, // alias de obtenerDatosItem (compat con el nombre histórico)
+  obtenerDatosPortafolio, // individual de edición de hemeroteca (PLANV3 V3.6)
+  extraerTitularesDeHtml, // función pura (testeable con fixture)
   obtenerDatosColeccion,
   scrapearSeccion,
   resolverObjetivo,

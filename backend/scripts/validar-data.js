@@ -16,21 +16,24 @@ const path = require('path');
 const DATA_DIR = path.join(__dirname, '../src/data');
 
 /**
- * Listar archivos de datos de TODAS las secciones (src/data/libros/*.json,
- * src/data/recursos/*.json). La carpeta padre = sección; el nombre del archivo
- * lleva el prefijo de la sección (libros-{slug}.json / recursos-{slug}.json).
+ * Listar archivos de datos de TODAS las secciones (todas las subcarpetas de data/).
+ * Descubrimiento AUTOMÁTICO (PLANV3 V3.6): toda subcarpeta de data/ es una
+ * SECCIÓN; los archivos válidos EMPIEZAN con el nombre de la carpeta
+ * (libros/libros-*.json, recursos/recursos-educativos.json, hemeroteca/{slug}.json).
  * Se devuelven rutas RELATIVAS (libros\libros-paleontologia.json) para que el
  * resto del script siga usando path.join(DATA_DIR, archivo) y basename para la
  * categoría.
  */
 function listarArchivosData() {
   const archivos = [];
-  for (const carpeta of ['libros', 'recursos']) {
-    const dir = path.join(DATA_DIR, carpeta);
-    if (!fs.existsSync(dir)) continue;
+  if (!fs.existsSync(DATA_DIR)) return archivos;
+  for (const carpeta of fs.readdirSync(DATA_DIR, { withFileTypes: true })) {
+    if (!carpeta.isDirectory()) continue;
+    const dir = path.join(DATA_DIR, carpeta.name);
+    const re = new RegExp(`^${carpeta.name}(-.+)?\\.json$`);
     for (const f of fs.readdirSync(dir)) {
-      if (/^(libros|recursos)-.+\.json$/.test(f)) {
-        archivos.push(path.join(carpeta, f));
+      if (re.test(f)) {
+        archivos.push(path.join(carpeta.name, f));
       }
     }
   }
@@ -148,6 +151,16 @@ for (const archivo of archivos) {
     }
     if (typeof libro.fechaExtraccion !== 'string' || Number.isNaN(Date.parse(libro.fechaExtraccion))) {
       problemas.push(`${ref} fechaExtraccion inválida: ${JSON.stringify(libro.fechaExtraccion)}`);
+    }
+
+    // titulares (hemeroteca, PLANV3 V3.6): si está presente, array de strings no vacíos
+    if ('titulares' in libro && (!Array.isArray(libro.titulares) || libro.titulares.some(t => typeof t !== 'string' || !t.trim()))) {
+      problemas.push(`${ref} titulares inválido (array de strings no vacíos): ${JSON.stringify(libro.titulares)}`);
+    }
+    // categoria (hemeroteca, PLANV3 V3.6): si está presente, string no vacío
+    // (los archivos de hemeroteca SÍ llevan categoria; los de libros/RE no)
+    if (libro.categoria != null && (typeof libro.categoria !== 'string' || !libro.categoria.trim())) {
+      problemas.push(`${ref} categoria no es string no vacío: ${JSON.stringify(libro.categoria)}`);
     }
 
     // coleccion: si está presente, debe ser string no vacía

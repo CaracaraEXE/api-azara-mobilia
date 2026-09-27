@@ -259,3 +259,170 @@ NO tocar.
   Documentos e informes, etc. — patrón `coleccion-links` a diseñar cuando llegue su turno.
 - **Idempotencia y cura manual**: se mantiene `registrarOConsolidar` (existente gana) y la
   práctica de backups antes de cada re-scrape (`C:\Users\vicky\AppData\Local\Temp\opencode\`).
+
+  # Plan V3.6 — Hemeroteca: Revista Azara + Periódico Exploración y Ciencia (SECCIONES)
+
+**Corrección de diseño 2026-09-27:** los periódicos y revistas son **SECCIONES de primer nivel** (como
+Libros y RE), NO categorías de una sección intermedia. La convención `carpeta = sección` ya existe
+en la API (`libros.js` L22-34) — se reutiliza tal cual.
+
+## Contexto
+- **Periódico Exploración y Ciencia**: 3 ediciones (N1 **2013**, N2 2013, N3 2014). **PILOTO.**
+- **Revista Azara**: 14 ediciones (N1 2013 → N14 2025). **Fase 2** (después del piloto).
+- Titulares de cada edición **buscables por `/buscar`**; el match lleva al PDF de la edición completa.
+- 1 archivo por publicación: `data/periodico-exploracion-y-ciencia/periodico-exploracion-y-ciencia.json`
+  (seccion `periodico-exploracion-y-ciencia`) + `data/revista-azara/revista-azara.json` (seccion `revista-azara`).
+
+## Decisiones tomadas (usuario)
+1. Cada publicación aparece en el **dropdown de secciones** de `/categorias` (paso 1): 📚 Libros ·
+   🎓 Recursos educativos · 🗞️ **Periódico Exploración y Ciencia** · 📰 **Revista Azara**.
+2. **Salto directo a ediciones**: al elegir una sección con **1 sola categoría** (la hemeroteca)
+   se muestran DIRECTAMENTE las ediciones (listado con ◀/▶ + 🔙 al paso 1), sin select de categorías
+   intermedio. Detección dinámica: `categorias.length === 1` en `manejarSeleccionSeccion`.
+3. `/buscar`: tarjeta NORMAL (título + PDF) — el titular solo hace encontrable el ítem; **NO** se muestra
+   el titular matcheado. Los titulares completos se listan en `/libro` (campo `🗞️ Titulares`).
+4. **Sin `coleccion`** en los ítems de hemeroteca (la categoría única YA es el propio material; evita
+   la línea `🗂️` redundante en el embed). `coleccion` sigue siendo exclusivo de RE.
+5. Middle ground en el scraper: 3 funciones nuevas + 2 dispatch. **Cero copy-paste** de funciones
+   enteras. Cero regresión libros (326) y RE (109). Backups en `Temp\opencode` antes de re-scrapear.
+
+## Estructura verificada (Qode Bridge + Elementor, grillas estáticas, sin AJAX)
+- **Grilla** (ambas): ítems `article.mix` en `.projects_holder`; título `.portfolio_title a`
+  (**por CLASE, no tag**: `h6` en Periódico, `h5` en Revista); portada `.image_holder img`
+  (con `<span class='image'>` intermedio). `a.portfolio_link_class` = ancla vacía (nunca usar).
+  HTML mezcla comillas simples/dobles → selectores por clase.
+- **PDF de edición** (verificado N3 y N14): botón `a.qodef-qi-button[href$=".pdf"]` con texto
+  "Descargar archivo", dentro de `.elementor-widget-qi_addons_for_elementor_button`. **Exactamente
+  1 PDF por individual.** Guard: excluir si href/texto matchea `/norma|autores/i`; si queda >1 →
+  `linkPdf: null` + `revisionPendiente: true`.
+- **El PDF "Normas para autores"** está SOLO en la grilla de Revista Azara (h3 + botón propio, fuera
+  del `.projects_holder`) → `obtenerUrlsPortafolio` (que recorre solo `article.mix`) no lo ve. No interfiere.
+- **Titulares**: `.elementor-widget-text-editor .elementor-widget-container` con `<p><strong>Contenido</strong></p>`
+  de header. Periódico: titulares separados por `<br>` (cada uno `• ...`). Revista Azara: **1 `<p>` por
+  titular** (`•` dentro de `<span lang="ES-MX">`, algunos con `<em>`). Parser unificado: separar por
+  `<br>` Y por `<p>`, descartar el segmento "Contenido", limpiar `•`/`&nbsp;`/tags (usar `textContent`,
+  no `.find('span')`). **Guardar SIN bullet** (dato puro); el bot pinta el `• ` al renderizar.
+- **URLs**: Periódico N3 = `http://www.fundacionazara.org.ar/img/periodico-exporacion-ciencia/...pdf`
+  (http + www + typo "exporacion"). Revista = `https://...img/revista-azara/...-ok.pdf`. →
+  `limpiarUrlPdf` fuerza https y quita www.
+- **Revista N14**: sin `<h1>`, título en `.elementor-widget-text-editor h2`, portada en
+  `.elementor-widget-image img` (alt vacío). El widget `elementor-element-3345f342` se CLONA entre
+  ediciones → jamás seleccionar por `elementor-element-id`.
+- **Título de tarjeta real**: `Periódico Exploración y Ciencia - Número 3 (2014)` (con "Periódico "
+  delante y " - " con espacios; hay espacio leading tras el `<a>` → `.trim()`). La capitalización de
+  Revista Azara es INCONSISTENTE entre ediciones: N1–N11 `Revista Azara - Número N (año)` vs
+  N12–N14 `REVISTA AZARA – NÚMERO N (año)` (MAYÚSCULAS + EN DASH U+2013). Se guarda tal cual de la
+  grilla (fidelidad); la búsqueda ya es case-insensitive vía `normalizarBusqueda`. Si molesta la
+  mayúscula, normalizar título sería decisión aparte (fuera de alcance).
+- Título y portada vienen de la **grilla** (fuente de verdad); la individual solo aporta PDF +
+  titulares (+ `anio` del título).
+
+## Modelo de ítem
+```json
+{
+  "id": "rev-tk0m3x2pa9",
+  "titulo": "Periódico Exploración y Ciencia - Número 3 (2014)",
+  "linkPdf": "https://fundacionazara.org.ar/img/periodico-exporacion-ciencia/exploracion-y-ciencia-numero-3-2014.pdf",
+  "imagenPortada": "<url jpg de la grilla>",
+  "autor": null,
+  "anio": 2014,
+  "categoria": "Periódico Exploración y Ciencia",
+  "titulares": ["George Gaylord Simpson en Argentina", "Un siglo después de las cacerías de ballena sei..."],
+  "fechaExtraccion": "2026-09-27T00:00:00.000Z"
+}
+```
+- `anio` por regex `(\(\d{4}\))` del título (funciona en "Número 3 (2014)" y "NÚMERO 14 (2025)").
+- **SIN `coleccion`** (ver decisión 4). `categoria` con acentos en el archivo: la API ya respeta
+  `libros[0].categoria` (`libros.js` L51-52); los archivos actuales no la tienen → cero cambio.
+- `titulares`: array de strings SIN bullet. Sin PDF → `linkPdf: null` + `revisionPendiente: true`.
+- `fechaExtraccion` en ISO completo (consistencia con los 435 ítems existentes).
+
+## Cambios por capa
+
+### 1. Scraper (`backend/scripts/scraper-playwright.js`)
+- 2 entradas nuevas en `SECCIONES` con `tipo: 'hemeroteca'` + `archivoUnico: true` + 1 sola
+  categoría (URL de grilla). Config (verificado contra L820 y L1035-1037):
+  - Periódico: `slug: 'periodico-exploracion-y-ciencia'`, `prefijoArchivo: 'periodico-exploracion-y-ciencia'`
+  - Revista Azara: `slug: 'revista-azara'`, `prefijoArchivo: 'revista-azara'`
+- Funciones NUEVAS (exportadas):
+  - `obtenerUrlsPortafolio(page, url)` → `[{url, titulo, portada}]` (recorre `article.mix`; NO
+    reutiliza `obtenerUrlsLibros`, su regex `/[a-z0-9-]+\/$/` no matchea `/portfolio_page/...`).
+  - `obtenerDatosPortafolio(page, url, {titulo, portada})` → ítem con PDF (`a.qodef-qi-button`, guard
+    normas), titulares, `anio` (regex del título).
+  - `extraerTitularesDeHtml(html)` — **función pura exportada** (testeable).
+- **2 dispatch puntuales** en `scrapearSeccion`:
+  - Recolección de URLs (L886): `seccion.tipo === 'hemeroteca' ? obtenerUrlsPortafolio(...) : obtenerUrlsLibros(...)`.
+  - Default de `procesarUrl` (L937): `seccion.tipo === 'hemeroteca' ? obtenerDatosPortafolio(page, url, contextoDeGrilla) : obtenerDatosItem(page, url)`.
+  - El loop principal (L957-980) debe pasar el objeto de grilla `{url, titulo, portada}` en modo hemeroteca.
+- Fix **persistencia archivo único** (`scrapearSeccion`, L820-830): el archivo final es `{slug}.json` —
+  cuando slug === prefijoArchivo (hemeroteca) NO duplicar el prefijo (evita `revista-azara-revista-azara.json`).
+  Recursos queda igual (`recursos-educativos.json`).
+- Fix **`construirIndiceGlobal`** (L713): regex `^prefijo(-.+)?\.json$` — con `^prefijo-...$` el índice
+  no vería `revista-azara.json` al re-scrapear y rompería el dedup "existente gana" (L790).
+- **`registrarItem`** (L903-905): en modo archivoUnico NO inyectar `coleccion` si `tipo: 'hemeroteca'`.
+- Dedup: reusa `construirIndiceGlobal`/`registrarOConsolidar` por prefijo de sección (no cruza secciones).
+- `obtenerUrlsLibros`/`obtenerDatosItem`/RE **INTACTOS**.
+- **CLI**: `--seccion=periodico-exploracion-y-ciencia` y `--seccion=revista-azara` (NUNCA
+  `--categoria=...`: `resolverObjetivo` L1035-1037 da ERROR para secciones de archivo único).
+
+### 2. API
+- Generalizar los **3 `listarArchivosData` duplicados** (`backend/src/routes/libros.js` L22,
+  `backend/src/routes/categorias.js` L16, `backend/scripts/validar-data.js` L26): **descubrimiento
+  automático** de subcarpetas de `data/` (carpeta = seccion) matcheando `^<carpeta>(-.+)?\.json$`.
+  - ⚠️ Preservar EXACTA la derivación de slug actual (L48: solo `libros-` hace strip; `recursos-educativos.json`
+    conserva el nombre completo → "Recursos Educativos" no debe romperse). No tocar `categoriaDeArchivo`.
+- Búsqueda (~L191 de `routes/libros.js`): agregar
+  `|| (Array.isArray(l.titulares) && l.titulares.some(t => normalizarBusqueda(t).includes(termino)))`.
+- `validar-data.js`: validar `titulares` (array de strings no vacíos) y `categoria` (string no vacío).
+
+### 3. Bot Discord
+- `discord-bot/src/formatos.js`:
+  - `SECCIONES_NOMBRES`: + `periodico-exploracion-y-ciencia: 'Periódico Exploración y Ciencia'`,
+    + `revista-azara: 'Revista Azara'`.
+  - `SECCIONES_EMOJIS`: + `periodico-exploracion-y-ciencia: '🗞️'`, + `revista-azara: '📰'`.
+  - `construirMensajeCategoriasSeccion` (L147): unidad 'ediciones' para la hemeroteca (hoy
+    `sec === 'recursos' ? 'ítems' : 'libros'`).
+- `discord-bot/src/index.js`:
+  - `comandoCategorias` (L262-295): reemplazar el ternario hardcodeado (L278) y el sort (L286-287)
+    por un mapa/orden explícito de secciones [libros, recursos, periodico-exploracion-y-ciencia, revista-azara].
+  - `obtenerCategoriasDeSeccion` (L362-386): el default debe filtrar `(c.seccion || 'libros') === sec`
+    (hoy está hardcodeado `'libros'` en L383) → las secciones nuevas aparecen solas.
+  - **Salto directo** en `manejarSeleccionSeccion` (L391-411): si `categorias.length === 1` →
+    GET `/api/libros?categoria=<nombre>&limite=5&pagina=1` → `construirMensajeCategoriaLibros` directo.
+  - `manejarVolverCategorias` (L488-499): si la sección tiene 1 sola categoría → volver al **paso 1**
+    (select de secciones), no al select de categorías.
+  - `manejarSeleccionCategoria`/`manejarPaginacionCategoria`: filtro ya es genérico
+    (`sec === 'recursos' ? 'coleccion' : 'categoria'`, L433/L467) → sin cambios para la hemeroteca.
+  - `comandoLibro` (~L221-226): campo `🗞️ Titulares` ("• " + titular, truncado 1024 chars + contador)
+    cuando `libro.titulares` no vacío.
+- Custom_ids/flujos existentes intactos (`cat-page`/`cat-back` llevan `sec`).
+
+### 4. Tests / docs
+- Fixture real de HTML para `extraerTitularesDeHtml` con los 2 modos (Periódico `<br>` y Revista Azara
+  `<p>`) — patrón `Temp\opencode` tipo test-formatos.
+- `test-integracion-bot`: totales 435 → **438** (al existir la data del piloto); **los checks de
+  secciones (L117-118) y el sort explícito del dropdown se actualizan a 4 secciones** (hoy asumen
+  `[0]=libros`, `[1]=recursos`).
+- `validar-data`: a 0 problemas.
+- AGENTS.md: secciones nuevas + `titulares` en data model + nota "la hemeroteca SÍ lleva `categoria`".
+
+## Orden de ejecución
+1. Scraper (SECCIONES hemeroteca + 3 funciones + 2 dispatch + fixes L820/L713/L903).
+2. Backups en `Temp\opencode` → correr **piloto** `node scripts/scraper-playwright.js --seccion=periodico-exploracion-y-ciencia`.
+3. API (3 × listarArchivosData + búsqueda titulares + validación).
+4. Bot (formatos.js + index.js + salto directo).
+5. Tests/docs.
+6. E2E con servicios levantados.
+7. **Fase 2** — Revista Azara (`--seccion=revista-azara`): VERIFICAR estructura en las 14 ediciones
+   ANTES de scraper (las viejas 2013-2022 pueden tener template distinto; el guard normas +
+   `revisionPendiente` las protegen).
+
+## Riesgos
+- Ediciones viejas de Revista Azara con markup distinto (mitigado: guard `/norma|autores/i`,
+  verificación previa antes de la corrida full de Fase 2).
+- Typo en URLs (`exporacion`) → `limpiarUrlPdf` normaliza (https + sin www).
+- Romper slug de RE al generalizar `listarArchivosData` → conservar EXACTA la lógica de derivación
+  (solo `libros-` hace strip).
+- Capitalización inconsistente N12–N14 de Revista Azara (MAYÚSCULAS + EN DASH): título tal cual de la
+  grilla; si molesta visualmente, decisión futura de normalización (fuera de alcance V3.6).
+- El `test-integracion-bot` actual asume 2 secciones (L117-118): actualizar a 4 junto con la data.
