@@ -5,9 +5,10 @@
  * 
  * Uso:
  *   node scripts/scraper-playwright.js                        (usa SCRAPEAR_CATEGORIA por defecto)
- *   node scripts/scraper-playwright.js --categoria=slug       (sección: 'libros' o 'recursos-educativos';
- *                                                              o categoría puntual de libros, ej. 'paleontologia')
+ *   node scripts/scraper-playwright.js --categoria=slug       (UNA categoría puntual de una sección por-categoría, ej. 'paleontologia')
+ *   node scripts/scraper-playwright.js --seccion=slug         (UNA sección completa: 'libros' o 'recursos-educativos')
  *   node scripts/scraper-playwright.js --todas                (todas las secciones: libros + recursos educativos)
+ *   --seccion y --categoria son mutuamente excluyentes; --todas es prioritario.
  */
 
 const { chromium } = require('playwright');
@@ -108,13 +109,27 @@ const SCRAPEAR_CATEGORIA = 'auspiciados';
 
 // --- Parsear argumentos CLI ---
 const args = process.argv.slice(2);
-const CATEGORIA_ARG = args.find(a => a.startsWith('--categoria='));
-const ES_TODAS = args.includes('--todas');
+const ARG_TODAS = args.includes('--todas');
+const ARG_SECCION = args.find(a => a.startsWith('--seccion='));
+const ARG_CATEGORIA = args.find(a => a.startsWith('--categoria='));
 
-const CATEGORIA_SELECTED = ES_TODAS
-  ? 'TODAS'
-  : CATEGORIA_ARG
-    ? CATEGORIA_ARG.split('=')[1]
+// --todas es prioritario (compat con el uso histórico); --seccion y --categoria
+// son mutuamente excluyentes: ambos piden un objetivo puntual DISTINTO.
+if (ARG_TODAS && (ARG_SECCION || ARG_CATEGORIA)) {
+  console.warn('⚠️ --todas gana: se ignora el objetivo puntual indicado.');
+}
+if (ARG_SECCION && ARG_CATEGORIA) {
+  console.error('❌ No se pueden usar --seccion y --categoria juntos. Elegí uno.');
+  process.exit(1);
+}
+
+// MODO: 'todas' | 'seccion' | 'categoria' — el objetivo explícito gana sobre el
+// default histórico (SCRAPEAR_CATEGORIA = una categoría puntual).
+const MODO = ARG_TODAS ? 'todas' : ARG_SECCION ? 'seccion' : 'categoria';
+const OBJETIVO_SLUG = ARG_SECCION
+  ? ARG_SECCION.split('=')[1]
+  : ARG_CATEGORIA
+    ? ARG_CATEGORIA.split('=')[1]
     : SCRAPEAR_CATEGORIA;
 // -----------------------------
 
@@ -994,36 +1009,56 @@ async function scrapearSeccion(browser, seccion) {
 }
 
 /**
- * Función principal. --todas → todas las secciones; --categoria=slug → la sección
- * con ese slug ('libros' = las 13 categorías de libros, 'recursos-educativos' = los
- * 10 subgrupos del usuario, hoy categorías de RE) o, si no matchea ninguna sección, una categoría puntual de
- * libros ('paleontologia', etc.) para compat con el uso original (SCRAPEAR_CATEGORIA).
+ * Resolver el objetivo de scraping a partir del modo CLI (función pura, testeable).
+ * - 'todas'     → todas las secciones.
+ * - 'seccion'   → UNA sección completa por slug ('libros', 'recursos-educativos').
+ * - 'categoria' → UNA categoría puntual, SOLO de secciones por-categoría (libros).
+ *                 Si el slug pertenece a una sección de archivo único (RE), se avisa
+ *                 que use --seccion (una categoría puntual ahí pisaría el archivo
+ *                 final con datos parciales). Si no existe, error con catálogo.
+ */
+function resolverObjetivo(modo, slug) {
+  if (modo === 'todas') {
+    return { objetivo: SECCIONES, mensaje: `Todas las secciones (${SECCIONES.length})` };
+  }
+  if (modo === 'seccion') {
+    const seccion = SECCIONES.find(s => s.slug === slug);
+    if (!seccion) {
+      return { error: `Sección '${slug}' no encontrada. Secciones disponibles: ${SECCIONES.map(s => s.slug).join(', ')}` };
+    }
+    return { objetivo: [seccion], mensaje: `Sección: ${seccion.nombre} (${seccion.categorias.length} categorías)` };
+  }
+  // modo 'categoria'
+  for (const seccion of SECCIONES) {
+    const categoria = seccion.categorias.find(c => c.slug === slug);
+    if (categoria) {
+      if (seccion.archivoUnico) {
+        return { error: `'${slug}' es un subgrupo de la sección '${seccion.slug}', que se scrapea completa en un archivo único. Usá --seccion=${seccion.slug}.` };
+      }
+      return { objetivo: [{ ...seccion, categorias: [categoria] }], mensaje: `Categoría: ${categoria.nombre} (sección ${seccion.nombre})` };
+    }
+  }
+  const catalogo = SECCIONES
+    .filter(s => !s.archivoUnico)
+    .flatMap(s => s.categorias.map(c => `${c.slug} (${s.slug})`));
+  return { error: `Categoría '${slug}' no encontrada en secciones por-categoría. Opciones — secciones: ${SECCIONES.map(s => s.slug).join(', ')} | categorías: ${catalogo.join(', ')}` };
+}
+
+/**
+ * Función principal. El objetivo se resuelve por MODO (--todas / --seccion /
+ * --categoria) con fallback al default histórico SCRAPEAR_CATEGORIA.
  */
 async function run() {
   console.log('═══════════════════════════════════════════════════════════');
   console.log('📚 Scraper Playwright - Fundación Azara');
   console.log('═══════════════════════════════════════════════════════════\n');
-  
-  let objetivo;
-  if (CATEGORIA_SELECTED === 'TODAS') {
-    objetivo = SECCIONES;
-  } else {
-    const seccion = SECCIONES.find(s => s.slug === CATEGORIA_SELECTED);
-    if (seccion) {
-      objetivo = [seccion];
-      console.log(`🎯 Sección: ${seccion.nombre} (${seccion.categorias.length} categorías)\n`);
-    } else {
-      // Compat: --categoria=<slug de categoría de libros> (ej. 'paleontologia')
-      const seccionLibros = SECCIONES.find(s => s.tipo === 'libros');
-      const categoria = seccionLibros.categorias.find(c => c.slug === CATEGORIA_SELECTED);
-      if (!categoria) {
-        console.error(`❌ Sección o categoría '${CATEGORIA_SELECTED}' no encontrada.`);
-        process.exit(1);
-      }
-      objetivo = [{ ...seccionLibros, categorias: [categoria] }];
-      console.log(`🎯 Categoría: ${categoria.nombre}\n`);
-    }
+
+  const { objetivo, mensaje, error } = resolverObjetivo(MODO, OBJETIVO_SLUG);
+  if (error) {
+    console.error(`❌ ${error}`);
+    process.exit(1);
   }
+  console.log(`🎯 ${mensaje}\n`);
   
   // Iniciar navegador
   const browser = await chromium.launch({ headless: true });
@@ -1057,6 +1092,7 @@ module.exports = {
   obtenerDatosLibro, // alias de obtenerDatosItem (compat con el nombre histórico)
   obtenerDatosColeccion,
   scrapearSeccion,
+  resolverObjetivo,
   extraerParesH4Pdf,
   extraerContenedorPorLibro,
   extraerDivTitulosCarrousel,
