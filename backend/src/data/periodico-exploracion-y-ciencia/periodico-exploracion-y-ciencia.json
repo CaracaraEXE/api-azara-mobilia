@@ -1,0 +1,78 @@
+[
+  {
+    "id": "lib-d7la68v5",
+    "titulo": "Periódico Exploración y Ciencia - Número 3 (2014)",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/periodico-exporacion-ciencia/exploracion-y-ciencia-numero-3-2014.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/02/Periodico-Exploracion-y-Ciencia-Numero-3-2014.jpg",
+    "autor": null,
+    "anio": 2014,
+    "titulares": [
+      "Volvieron para quedarse (lobos marinos de un pelo).",
+      "Entrevista: Roberto Salvarezza.",
+      "Aves playeras migratorias.",
+      "Mensajeros del espacio: meteoritos.",
+      "Encuentro entre dos mundos, arqueología en San Martín de los Andes (Neuquén).",
+      "Huella ecológica, ¿crecimiento infinito?",
+      "Tecnópolis 2014.",
+      "Las colecciones de la Fundación Azara: muestras geológicas.",
+      "Parque natural Ribera Norte.",
+      "Reservas privadas: Campo San Juan.",
+      "Especies en peligro: guacamayo rojo.",
+      "Descubrimientos recientes.",
+      "Actividades de la Fundación Azara.",
+      "Novedades editoriales."
+    ],
+    "categoria": "Periódico Exploración y Ciencia",
+    "fechaExtraccion": "2026-09-27T20:41:33.734Z"
+  },
+  {
+    "id": "lib-vxsesaav",
+    "titulo": "Periódico Exploración y Ciencia - Número 2 (2013)",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/periodico-exporacion-ciencia/exploracion-y-ciencia-numero-2-2013.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/02/Periodico-Exploracion-y-Ciencia-Numero-2-2013.jpg",
+    "autor": null,
+    "anio": 2013,
+    "titulares": [
+      "¿De dónde venimos? Una aventura que comenzó en África.",
+      "Entrevista: Ministro Lino Barañao.",
+      "Leonardo Da Vinci.",
+      "Bioarte.",
+      "Los dinosaurios están entre nosotros.",
+      "Tecnópolis 2013.",
+      "Las colecciones de la Fundación Azara: máscaras Chiriguano-Chané.",
+      "Reservas privadas: Estancia 25 de Mayo.",
+      "Descubrimientos recientes.",
+      "Actividades de la Fundación Azara.",
+      "Especies en peligro: loica pampeana.",
+      "Novedades editoriales."
+    ],
+    "categoria": "Periódico Exploración y Ciencia",
+    "fechaExtraccion": "2026-09-27T20:41:38.360Z"
+  },
+  {
+    "id": "lib-q4ju8hnn",
+    "titulo": "Periódico Exploración y Ciencia - Número 1 (2013)",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/periodico-exporacion-ciencia/exploracion-y-ciencia-numero-1-2013.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/02/Periodico-Exploracion-y-Ciencia-Numero-1-2013.jpg",
+    "autor": null,
+    "anio": 2013,
+    "titulares": [
+      "Volcanes: temibles, devastadores e imprevisibles.",
+      "Entrevista: Diego Golombek.",
+      "Climatología: la pequeña edad de hielo.",
+      "Un misterio que desvela a los arqueólogos. Aldeas indígenas de piedra en el NOA.",
+      "Tecnópolis 2012.",
+      "Reservas privadas: El Morejón.",
+      "La resurrección de un gigante: ballena franca austral.",
+      "Las colecciones de la Fundación Azara: África.",
+      "Reflotando el pasado: arqueología marítima en la Patagonia.",
+      "Descubrimientos recientes.",
+      "Actividades de la Fundación Azara.",
+      "Novedades editoriales.",
+      "Doctores honoris causa.",
+      "Opiniones."
+    ],
+    "categoria": "Periódico Exploración y Ciencia",
+    "fechaExtraccion": "2026-09-27T20:41:42.146Z"
+  }
+]
