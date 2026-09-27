@@ -900,16 +900,6 @@
     "fechaExtraccion": "2026-09-27T03:35:25.592Z"
   },
   {
-    "id": "lib-y3i527hr",
-    "titulo": "Mariscos del golfo San Matías y la marea roja",
-    "autor": null,
-    "anio": 2017,
-    "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/Poster-Mariscos-Marea-Roja.pdf",
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Mariscos-del-golfo-San-Matias-y-la-marea-roja-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
-    "fechaExtraccion": "2026-09-27T03:33:30.289Z"
-  },
-  {
     "id": "lib-asjjqzca",
     "titulo": "Tatú carreta. Un gigante del pasado",
     "autor": null,
@@ -947,7 +937,8 @@
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/shincal-quimivil-2015.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/El-Shincal-de-Quimivil-450.jpg",
     "coleccion": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
-    "fechaExtraccion": "2026-09-27T03:35:48.222Z"
+    "fechaExtraccion": "2026-09-27T03:35:48.222Z",
+    "linkPdfEn": "http://www.fundacionazara.org.ar/img/recursos-educativos/shincal-quimivil-english.pdf"
   },
   {
     "id": "lib-kbp9noqi",
@@ -1040,16 +1031,6 @@
     "fechaExtraccion": "2026-09-27T03:36:25.265Z"
   },
   {
-    "id": "lib-hak558qc",
-    "titulo": "Margarita de las dunas",
-    "autor": null,
-    "anio": 2025,
-    "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/postal-margarita-de-las-dunas.pdf",
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/postal-margarita-de-las-dunas.jpg",
-    "coleccion": "Postales",
-    "fechaExtraccion": "2026-09-27T03:36:28.819Z"
-  },
-  {
     "id": "lib-5mye8ppq",
     "titulo": "Mariposa bandera argentina",
     "autor": null,
@@ -1090,16 +1071,6 @@
     "fechaExtraccion": "2026-09-27T03:36:43.083Z"
   },
   {
-    "id": "lib-nipbt1x3",
-    "titulo": "Yaguareté",
-    "autor": null,
-    "anio": 2017,
-    "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/triptico-yaguarete.pdf",
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Yaguarete-450.jpg",
-    "coleccion": "Folletos de Biodiversidad",
-    "fechaExtraccion": "2026-09-27T03:35:36.508Z"
-  },
-  {
     "id": "lib-i1l50v91",
     "titulo": "Zorro-lobo de Malvinas",
     "autor": null,
@@ -1108,5 +1079,15 @@
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/postal-zorro-malvinero-450-ok.jpg",
     "coleccion": "Postales",
     "fechaExtraccion": "2026-09-27T03:36:50.314Z"
+  },
+  {
+    "id": "lib-abb07550",
+    "titulo": "Guacamayo Militar",
+    "autor": null,
+    "anio": 2025,
+    "linkPdf": null,
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/postal-guacamayo-militar-300x199.jpg",
+    "coleccion": "Postales",
+    "fechaExtraccion": "2026-09-27T03:53:17.966Z"
   }
 ]

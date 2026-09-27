@@ -2,16 +2,18 @@
 
 API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionazara.org.ar).
 
-## Current State (May 2026)
+## Current State (Sep 2026)
 
-- ✅ **13/13 categorías scrapeadas** — 267 libros total, 190 con PDF descargable (71.2%)
-- ✅ API Express.js funcionando con endpoints GET
-- ✅ Scraper optimizado: CLI args, guardado incremental, fallback título
+- ✅ **13/13 categorías scrapeadas** (data/libros/) + **Recursos Educativos** (data/recursos/) — 435 ítems totales (326 libros + 109 RE; 1 esqueleto en revisión: postal Guacamayo Militar)
+- ✅ Datos en carpetas por sección: `data/libros/libros-*.json` (13) + `data/recursos/recursos-educativos.json` (1 archivo, campo `coleccion` = subgrupo)
+- ✅ API Express.js funcionando con endpoints GET (respuestas con campo `seccion: 'libros'|'recursos'`)
+- ✅ Scraper con CLI: `--todas` / `--seccion=<slug>` / `--categoria=<slug>` (mutuamente excluyentes)
 - ✅ **Discord Bot funcionando** — Express + HTTP Interactions (sin discord.js)
 - ✅ Botones de paginación ◀/▶ en `/buscar` y categorías
-- ✅ Select Menu dropdown en `/categorias`
-- ✅ Botón "Volver" a lista de categorías
+- ✅ `/categorias` en 2 niveles: Select de SECCIONES → Select de categorías de esa sección
+- ✅ Botón "Volver" a categorías de la MISMA sección
 - ✅ IDs de libros visibles (`🆔 \`lib-abc123\``) en resultados
+- ✅ Presentación del bot separada en `discord-bot/src/formatos.js` (pura, testeable sin servidor)
 
 ## Stack
 
@@ -29,9 +31,10 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 | Comando | Descripción |
 |---------|-------------|
 | `/buscar [termino]` | Busca por título, 5 por página, botones ◀/▶ |
-| `/libro [id]` | Muestra detalle de un libro |
-| `/categorias` | Lista categorías + Select Menu |
-| → Select Menu | Muestra libros de esa categoría + ◀/▶ + 🔙 Volver |
+| `/libro [id]` | Muestra detalle de un libro (campos Sección + Categoría real) |
+| `/categorias` | Select de SECCIONES (📚 Libros / 🎓 Recursos educativos) |
+| → Select sección | Estadísticas + Select de categorías de ESA sección |
+| → Select categoría | Ítems de esa categoría + ◀/▶ + 🔙 Volver (a la misma sección) |
 
 ### Tipos de interacción Discord
 
@@ -55,14 +58,20 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 // Búsqueda con paginación
 { cmd: 'buscar', q: 'mamiferos', p: 1 }
 
-// Paginación de categoría
-{ cmd: 'cat-page', cat: 'Mastozoologia', p: 1 }
+// Paginación de categoría (sec: 'libros'|'recursos' — define ?categoria= vs ?coleccion=)
+{ cmd: 'cat-page', sec: 'libros', cat: 'Mastozoologia', p: 1 }
+{ cmd: 'cat-page', sec: 'recursos', cat: 'Cuadernillos', p: 1 }
 
-// Volver a categorías
-{ cmd: 'cat-back' }
+// Volver a categorías de la MISMA sección
+{ cmd: 'cat-back', sec: 'libros' }
+{ cmd: 'cat-back', sec: 'recursos' }
 
-// Select Menu de categorías (el valor va en interaction.data.values[0])
-{ cmd: 'cat-select' }
+// Select de secciones (paso 1; el valor está en interaction.data.values[0])
+{ cmd: 'sec-select' }
+
+// Select Menu de categorías (paso 2; el valor está en interaction.data.values[0])
+{ cmd: 'cat-select', sec: 'libros' }
+{ cmd: 'cat-select', sec: 'recursos' }
 
 // Botones deshabilitados (nunca se clickean)
 'noop', 'page-indicator', 'cat-page-indicator'
@@ -77,12 +86,24 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 5. Bot hace PATCH al mensaje original via webhook de Discord
 6. Mensaje se actualiza con nuevos resultados y botones
 
-### Flujo de Select Menu
+### Flujo de Select Menu (2 niveles)
 
-1. Usuario ejecuta `/categorias` → bot responde con type 4 (embed + Select Menu)
-2. Usuario selecciona categoría → Discord envía MESSAGE_COMPONENT con `values: ["Nombre"]`
-3. Bot responde type 6, consulta API, hace PATCH con libros + botones ◀/▶ + 🔙 Volver
-4. Usuario clickea 🔙 → bot vuelve a mostrar categorías + Select Menu
+1. Usuario ejecuta `/categorias` → bot responde con type 4 (embed + Select de SECCIONES — `sec-select`)
+2. Usuario elige sección (`libros` | `recursos`) → bot consulta las categorías de ESA sección:
+   - libros → `GET /api/categorias` filtrado por `seccion === 'libros'`
+   - recursos → `GET /api/categorias` + `GET /api/libros/colecciones/lista` (las colecciones cuyos `categorias` pertenecen a la sección RE)
+3. Bot hace PATCH con embed de estadísticas + Select de categorías (`cat-select` con `sec`)
+4. Usuario elige categoría → bot consulta `?categoria=` (libros) o `?coleccion=` (recursos) y hace PATCH con ítems + ◀/▶ + 🔙 Volver
+5. Usuario clickea 🔙 → bot vuelve al paso 3 de la MISMA sección (cat-back lleva `sec`)
+
+### Convención de etiquetas (formatos.js)
+
+- Emoji de SECCIÓN primero: `📚 Libros` | `🎓 Recursos educativos`
+- Emoji de CATEGORÍA segundo: `📁` (la categoría REAL de navegación)
+- En RE la categoría real = `coleccion` (subgrupo: 'Cuadernillos', ...); 'Recursos Educativos' es la SECCIÓN, no una categoría
+- Enlace de PDF SIEMPRE al final del value del campo
+- Ítems bilingües (`linkPdfEn`, p.ej. folleto El Shincal de Quimivil): dos enlaces `📄 [Descargar PDF]` (ES) + `📄 [Descargar PDF (EN)]` — EN siempre como última línea (helper `enlacesPdf` en formatos.js)
+- `🗂️ Colección` como línea extra SOLO en libros (desambigua series "Tomo NN"); en RE ya está en la categoría
 
 ## Gotchas
 
@@ -113,11 +134,15 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
   "imagenPortada": "string",
   "autor": "string | null",
   "anio": "number | null",
-  "fechaExtraccion": "ISO string"
+  "fechaExtraccion": "ISO string",
+  "linkPdfEn": "string (opcional — versión en inglés, ítems bilingües)",
+  "revisionPendiente": "bool (opcional — esqueleto curado sin PDF, p.ej. postal con página rota)"
 }
 ```
 
-Los archivos JSON no tienen campo `categoria` — el backend lo asigna en tiempo real desde el slug del archivo.
+Los archivos JSON no tienen campo `categoria` — el backend lo asigna en tiempo real desde el slug del archivo, y agrega `seccion` ('libros' | 'recursos') según la carpeta.
+Los ítems de RE (`data/recursos/recursos-educativos.json`) tienen además `coleccion` (subgrupo: 'Cuadernillos', 'Posters de Biodiversidad', ...) — es la categoría visible de esa sección.
+Los esqueletos (`linkPdf: null` + `revisionPendiente: true`) quedan listados por `scripts/validar-data.js` en el "Portal de revisión humana" para completar vía PR (política: la cura manual no se re-scrapea).
 
 ## Branches
 

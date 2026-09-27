@@ -19,6 +19,7 @@ const nacl = require('tweetnacl');
 const app = express();
 const PORT = process.env.PORT || 3001;
 const API_URL = process.env.API_URL || 'http://localhost:3000';
+const formatos = require('./formatos');
 
 // ──────────────────────────────────────────────
 //  Tipos de interacción de Discord
@@ -129,12 +130,14 @@ app.post('/interactions', verifyDiscordRequest, async (req, res) => {
 
         if (payload.cmd === 'buscar') {
           await manejarPaginacionBusqueda(interaction, res, payload);
+        } else if (payload.cmd === 'sec-select') {
+          await manejarSeleccionSeccion(interaction, res);
         } else if (payload.cmd === 'cat-select') {
-          await manejarSeleccionCategoria(interaction, res);
+          await manejarSeleccionCategoria(interaction, res, payload);
         } else if (payload.cmd === 'cat-page') {
           await manejarPaginacionCategoria(interaction, res, payload);
         } else if (payload.cmd === 'cat-back') {
-          await manejarVolverCategorias(interaction, res);
+          await manejarVolverCategorias(interaction, res, payload);
         }
       } catch (error) {
         console.error('❌ Error en componente:', error);
@@ -167,75 +170,6 @@ app.get('/', (req, res) => {
 // ──────────────────────────────────────────────
 
 /**
- * Construye un embed + botones de paginación para resultados de búsqueda
- */
-function construirMensajeBusqueda(termino, libros, pagina, total) {
-  const totalPaginas = Math.ceil(total / 5);
-
-  const fields = libros.map(libro => ({
-    name: libro.titulo.substring(0, 256),
-    value: (libro.linkPdf
-      ? `📁 ${libro.categoria} · 🆔 \`${libro.id}\`\n📄 [Descargar PDF](${libro.linkPdf})`
-      : `📁 ${libro.categoria} · 🆔 \`${libro.id}\`\n❌ Sin PDF disponible`)
-      // Colección (PLANV2 §2): desambigua títulos genéricos de serie ("Tomo 02")
-      + (libro.coleccion ? `\n🗂️ ${libro.coleccion}` : '')
-  }));
-
-  // Botones de navegación (solo si hay más de una página)
-  const components = [];
-
-  if (totalPaginas > 1) {
-    const botones = [];
-
-    // ◀ Anterior
-    botones.push({
-      type: 2,
-      style: 1,
-      label: '◀ Anterior',
-      custom_id: pagina > 0
-        ? JSON.stringify({ cmd: 'buscar', q: termino, p: pagina - 1 })
-        : 'noop',
-      disabled: pagina === 0
-    });
-
-    // Indicador de página (deshabilitado, solo muestra posición)
-    botones.push({
-      type: 2,
-      style: 2,
-      label: `${pagina + 1} / ${totalPaginas}`,
-      custom_id: 'page-indicator',
-      disabled: true
-    });
-
-    // Siguiente ▶
-    botones.push({
-      type: 2,
-      style: 1,
-      label: 'Siguiente ▶',
-      custom_id: pagina < totalPaginas - 1
-        ? JSON.stringify({ cmd: 'buscar', q: termino, p: pagina + 1 })
-        : 'noop',
-      disabled: pagina >= totalPaginas - 1
-    });
-
-    components.push({
-      type: 1, // ActionRow
-      components: botones
-    });
-  }
-
-  return {
-    embeds: [{
-      title: `🔍 Resultados para "${termino}"`,
-      color: 0x00AE86,
-      fields,
-      footer: { text: `Página ${pagina + 1} de ${totalPaginas} — ${total} resultados` }
-    }],
-    components: components.length > 0 ? components : undefined
-  };
-}
-
-/**
  * /buscar [termino] — Busca libros por título
  */
 async function comandoBuscar(options) {
@@ -253,7 +187,7 @@ async function comandoBuscar(options) {
       return { content: `No encontré libros para "${termino}".` };
     }
 
-    return construirMensajeBusqueda(termino, datos.data, 0, datos.meta.total);
+    return formatos.construirMensajeBusqueda(termino, datos.data, 0, datos.meta.total);
   } catch (error) {
     console.error('Error en búsqueda:', error);
     return { content: '❌ Error al conectar con la API.' };
@@ -280,19 +214,27 @@ async function comandoLibro(options) {
 
     const libro = datos.data;
 
+    // Sección (emoji) + categoría REAL: en RE la categoría visible es la
+    // colección/subgrupo; 'Recursos Educativos' es la SECCIÓN, no la categoría.
+    const sec = formatos.infoSeccion(libro);
+
     const fields = [
-      { name: '📁 Categoría', value: libro.categoria || 'Desconocida', inline: true },
+      { name: `${sec.emoji} Sección`, value: sec.nombre, inline: true },
+      { name: '📁 Categoría', value: sec.categoriaReal, inline: true },
       { name: '✍️ Autor', value: libro.autor || 'Desconocido', inline: true },
       { name: '📅 Año', value: libro.anio ? libro.anio.toString() : 'Desconocido', inline: true }
     ];
 
-    // Colección (PLANV2 §2): presente en series/desgloses; distingue "Tomo 02" de qué serie es.
-    if (libro.coleccion) {
+    // Colección de LIBROS (PLANV2 §2): series/desgloses ("Tomo 02"); en RE ya está en Categoría.
+    if (!sec.esRecursos && libro.coleccion) {
       fields.push({ name: '🗂️ Colección', value: libro.coleccion, inline: false });
     }
 
     if (libro.linkPdf) {
-      fields.push({ name: '📄 PDF', value: `[Descargar](${libro.linkPdf})`, inline: false });
+      // Bilingües (linkPdfEn, p.ej. El Shincal): ambos enlaces, ES · EN
+      const enlaces = [`[Español](${libro.linkPdf})`];
+      if (libro.linkPdfEn) enlaces.push(`[English](${libro.linkPdfEn})`);
+      fields.push({ name: '📄 PDF', value: enlaces.join(' · '), inline: false });
     }
 
     const embed = {
@@ -313,113 +255,9 @@ async function comandoLibro(options) {
 }
 
 /**
- * Construye el embed + Select Menu para el listado de categorías
- */
-function construirMensajeCategorias(categorias, totalLibros) {
-  const options = categorias.map(cat => ({
-    label: cat.nombre,
-    value: cat.nombre,
-    description: `${cat.cantidad} libros`
-  }));
-
-  return {
-    embeds: [{
-      title: '📚 Categorías de la Fundación Azara',
-      description: `**${categorias.length} categorías** — ${totalLibros} libros en total`,
-      color: 0x00AE86,
-      fields: categorias.map(cat => ({
-        name: cat.nombre,
-        value: `${cat.cantidad} libros`,
-        inline: true
-      }))
-    }],
-    components: [{
-      type: 1,
-      components: [{
-        type: 3,
-        custom_id: JSON.stringify({ cmd: 'cat-select' }),
-        placeholder: 'Seleccioná una categoría para ver sus libros...',
-        min_values: 1,
-        max_values: 1,
-        options
-      }]
-    }]
-  };
-}
-
-/**
- * Construye embed + botones de paginación + volver para libros de una categoría
- */
-function construirMensajeCategoriaLibros(categoria, libros, pagina, total) {
-  const totalPaginas = Math.ceil(total / 5);
-
-  const fields = libros.map(libro => ({
-    name: libro.titulo.substring(0, 256),
-    value: (libro.linkPdf
-      ? `🆔 \`${libro.id}\`\n📄 [Descargar PDF](${libro.linkPdf})`
-      : `🆔 \`${libro.id}\`\n❌ Sin PDF disponible`)
-      // Colección (PLANV2 §2): en series, el título suele ser solo "Tomo NN"
-      + (libro.coleccion ? `\n🗂️ ${libro.coleccion}` : '')
-  }));
-
-  // Una sola ActionRow con todos los botones
-  const botones = [];
-
-  // Botón volver (SIEMPRE primero para mantener orden consistente)
-  botones.push({
-    type: 2,
-    style: 2,
-    label: '🔙 Volver',
-    custom_id: JSON.stringify({ cmd: 'cat-back' })
-  });
-
-  // Botones de paginación (solo si hay más de una página)
-  if (totalPaginas > 1) {
-    botones.push({
-      type: 2,
-      style: 1,
-      label: '◀',
-      custom_id: pagina > 0
-        ? JSON.stringify({ cmd: 'cat-page', cat: categoria, p: pagina - 1 })
-        : 'noop',
-      disabled: pagina === 0
-    });
-
-    botones.push({
-      type: 2,
-      style: 2,
-      label: `${pagina + 1}/${totalPaginas}`,
-      custom_id: 'cat-page-indicator',
-      disabled: true
-    });
-
-    botones.push({
-      type: 2,
-      style: 1,
-      label: '▶',
-      custom_id: pagina < totalPaginas - 1
-        ? JSON.stringify({ cmd: 'cat-page', cat: categoria, p: pagina + 1 })
-        : 'noop',
-      disabled: pagina >= totalPaginas - 1
-    });
-  }
-
-  return {
-    embeds: [{
-      title: `📚 Libros de ${categoria}`,
-      color: 0x00AE86,
-      fields,
-      footer: { text: totalPaginas > 1 ? `Página ${pagina + 1} de ${totalPaginas} — ${total} resultados` : `${total} resultados` }
-    }],
-    components: [{
-      type: 1,
-      components: botones
-    }]
-  };
-}
-
-/**
- * /categorias — Lista las categorías disponibles (con Select Menu)
+ * /categorias — Muestra el Select de SECCIONES (paso 1).
+ * RE ya no aparece mezclado con Libros: primero se elige la sección y después
+ * las categorías de esa sección (ver manejarSeleccionSeccion).
  */
 async function comandoCategorias() {
   try {
@@ -430,8 +268,26 @@ async function comandoCategorias() {
       return { content: 'Error al obtener las categorías.' };
     }
 
-    const totalLibros = datos.data.reduce((s, c) => s + c.cantidad, 0);
-    return construirMensajeCategorias(datos.data, totalLibros);
+    // Agrupar por sección (la API entrega categoria.seccion tras la migración
+    // a carpetas por sección). Orden estable: libros primero, RE después.
+    const porSeccion = new Map();
+    for (const cat of datos.data) {
+      const sec = cat.seccion || 'libros'; // compat: categorías sin seccion → libros
+      const e = porSeccion.get(sec) || {
+        seccion: sec,
+        nombre: sec === 'recursos' ? 'Recursos educativos' : 'Libros',
+        cantidad: 0,
+        categorias: 0
+      };
+      e.cantidad += cat.cantidad;
+      e.categorias += 1;
+      porSeccion.set(sec, e);
+    }
+    const secciones = [...porSeccion.values()]
+      .sort((a, b) => (a.seccion === 'libros' ? 0 : 1) - (b.seccion === 'libros' ? 0 : 1));
+    const totalItems = secciones.reduce((s, x) => s + x.cantidad, 0);
+
+    return formatos.construirMensajeSecciones(secciones, totalItems);
   } catch (error) {
     console.error('Error al obtener categorías:', error);
     return { content: '❌ Error al conectar con la API.' };
@@ -487,7 +343,7 @@ async function manejarPaginacionBusqueda(interaction, res, payload) {
     const datos = await respuesta.json();
 
     if (datos.success) {
-      await patchMensajeOriginal(interaction, construirMensajeBusqueda(payload.q, datos.data, pagina, datos.meta.total));
+      await patchMensajeOriginal(interaction, formatos.construirMensajeBusqueda(payload.q, datos.data, pagina, datos.meta.total));
     } else {
       await patchError(interaction, '❌ Error al obtener resultados.');
     }
@@ -498,13 +354,72 @@ async function manejarPaginacionBusqueda(interaction, res, payload) {
 }
 
 /**
- * Select Menu de categorías — muestra los libros de la categoría seleccionada
+ * Categorías navegables de una sección + total de ítems.
+ * - libros: las categorías de /api/categorias con seccion === 'libros'.
+ * - recursos: las COLECCIONES (subgrupos) del archivo único RE, detectadas por
+ *   pertenecer a las categorías de la sección 'recursos' (hoy 'Recursos Educativos').
  */
-async function manejarSeleccionCategoria(interaction, res) {
+async function obtenerCategoriasDeSeccion(sec) {
+  if (sec === 'recursos') {
+    const [resCat, resCol] = await Promise.all([
+      fetch(`${API_URL}/api/categorias`),
+      fetch(`${API_URL}/api/libros/colecciones/lista`)
+    ]);
+    const datosCat = await resCat.json();
+    const datosCol = await resCol.json();
+    const nombresSeccion = (datosCat.data || [])
+      .filter(c => c.seccion === 'recursos')
+      .map(c => c.nombre);
+    const categorias = (datosCol.data || [])
+      .filter(c => (c.categorias || []).some(n => nombresSeccion.includes(n)))
+      .map(c => ({ nombre: c.nombre, cantidad: c.cantidad }))
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+    return { categorias, total: categorias.reduce((s, c) => s + c.cantidad, 0) };
+  }
+
+  const respuesta = await fetch(`${API_URL}/api/categorias`);
+  const datos = await respuesta.json();
+  const categorias = (datos.data || [])
+    .filter(c => (c.seccion || 'libros') === 'libros')
+    .map(c => ({ nombre: c.nombre, cantidad: c.cantidad }));
+  return { categorias, total: categorias.reduce((s, c) => s + c.cantidad, 0) };
+}
+
+/**
+ * Select Menu de SECCIONES (paso 1 de /categorias) → muestra las categorías de la sección
+ */
+async function manejarSeleccionSeccion(interaction, res) {
+  const sec = interaction.data.values?.[0];
+
+  console.log(`🔍 Select seccion: value="${sec}"`);
+
+  if (!sec) {
+    console.error('❌ Select Menu sin valor de sección');
+    res.json({ type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE, data: { content: '❌ Error: no se pudo obtener la sección seleccionada.', flags: 64 } });
+    return;
+  }
+
+  res.json({ type: InteractionResponseType.DEFERRED_UPDATE_MESSAGE });
+
+  try {
+    const { categorias, total } = await obtenerCategoriasDeSeccion(sec);
+    await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriasSeccion(sec, categorias, total));
+  } catch (error) {
+    console.error('Error al seleccionar sección:', error);
+    await patchError(interaction, '❌ Error al conectar con la API.');
+  }
+}
+
+/**
+ * Select Menu de categorías (paso 2 de /categorias) — muestra los ítems de la categoría.
+ * sec: 'libros' → ?categoria=; 'recursos' → ?coleccion= (la navegación fina de RE).
+ */
+async function manejarSeleccionCategoria(interaction, res, payload) {
   const values = interaction.data.values;
   const categoria = values?.[0];
+  const sec = payload?.sec || 'libros'; // compat: custom_ids viejos sin sec → libros
 
-  console.log(`🔍 Select categoria: values=${JSON.stringify(values)}, categoria="${categoria}"`);
+  console.log(`🔍 Select categoria: values=${JSON.stringify(values)}, categoria="${categoria}", sec="${sec}"`);
 
   if (!categoria) {
     console.error('❌ Select Menu sin valor de categoría');
@@ -515,21 +430,22 @@ async function manejarSeleccionCategoria(interaction, res) {
   res.json({ type: InteractionResponseType.DEFERRED_UPDATE_MESSAGE });
 
   try {
-    const url = `${API_URL}/api/libros?categoria=${encodeURIComponent(categoria)}&limite=5&pagina=1`;
+    const filtro = sec === 'recursos' ? 'coleccion' : 'categoria';
+    const url = `${API_URL}/api/libros?${filtro}=${encodeURIComponent(categoria)}&limite=5&pagina=1`;
     console.log(`🌐 Fetching: ${url}`);
 
     const respuesta = await fetch(url);
     const datos = await respuesta.json();
 
-    console.log(`📦 API respondió: success=${datos.success}, total=${datos.meta?.total}, libros=${datos.data?.length}`);
+    console.log(`📦 API respondió: success=${datos.success}, total=${datos.meta?.total}, items=${datos.data?.length}`);
 
     if (datos.success && datos.data.length > 0) {
-      const mensaje = construirMensajeCategoriaLibros(categoria, datos.data, 0, datos.meta.total);
+      const mensaje = formatos.construirMensajeCategoriaLibros(sec, categoria, datos.data, 0, datos.meta.total);
       console.log(`✉️ PATCH con ${mensaje.components?.length || 0} ActionRows`);
       await patchMensajeOriginal(interaction, mensaje);
     } else {
-      console.log('⚠️ Sin libros en esta categoría');
-      await patchMensajeOriginal(interaction, construirMensajeCategoriaLibros(categoria, [], 0, 0));
+      console.log('⚠️ Sin ítems en esta categoría');
+      await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriaLibros(sec, categoria, [], 0, 0));
     }
   } catch (error) {
     console.error('Error al seleccionar categoría:', error);
@@ -543,17 +459,19 @@ async function manejarSeleccionCategoria(interaction, res) {
 async function manejarPaginacionCategoria(interaction, res, payload) {
   const pagina = payload.p || 0;
   const categoria = payload.cat;
+  const sec = payload?.sec || 'libros'; // compat: custom_ids viejos sin sec → libros
 
   res.json({ type: InteractionResponseType.DEFERRED_UPDATE_MESSAGE });
 
   try {
+    const filtro = sec === 'recursos' ? 'coleccion' : 'categoria';
     const respuesta = await fetch(
-      `${API_URL}/api/libros?categoria=${encodeURIComponent(categoria)}&limite=5&pagina=${pagina + 1}`
+      `${API_URL}/api/libros?${filtro}=${encodeURIComponent(categoria)}&limite=5&pagina=${pagina + 1}`
     );
     const datos = await respuesta.json();
 
     if (datos.success) {
-      await patchMensajeOriginal(interaction, construirMensajeCategoriaLibros(categoria, datos.data, pagina, datos.meta.total));
+      await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriaLibros(sec, categoria, datos.data, pagina, datos.meta.total));
     } else {
       await patchError(interaction, '❌ Error al obtener resultados.');
     }
@@ -564,21 +482,16 @@ async function manejarPaginacionCategoria(interaction, res, payload) {
 }
 
 /**
- * Vuelve al listado general de categorías con el Select Menu
+ * Vuelve al listado de categorías de la SECCIÓN desde la que se vino
+ * (cat-back lleva la sección en el custom_id).
  */
-async function manejarVolverCategorias(interaction, res) {
+async function manejarVolverCategorias(interaction, res, payload) {
+  const sec = payload?.sec || 'libros'; // compat: custom_ids viejos sin sec → libros
   res.json({ type: InteractionResponseType.DEFERRED_UPDATE_MESSAGE });
 
   try {
-    const respuesta = await fetch(`${API_URL}/api/categorias`);
-    const datos = await respuesta.json();
-
-    if (datos.success) {
-      const totalLibros = datos.data.reduce((s, c) => s + c.cantidad, 0);
-      await patchMensajeOriginal(interaction, construirMensajeCategorias(datos.data, totalLibros));
-    } else {
-      await patchError(interaction, '❌ Error al obtener categorías.');
-    }
+    const { categorias, total } = await obtenerCategoriasDeSeccion(sec);
+    await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriasSeccion(sec, categorias, total));
   } catch (error) {
     console.error('Error al volver a categorías:', error);
     await patchError(interaction, '❌ Error al conectar con la API.');
