@@ -15,9 +15,38 @@ const path = require('path');
 
 const DATA_DIR = path.join(__dirname, '../src/data');
 
-const archivos = fs.readdirSync(DATA_DIR)
-  .filter(f => /^(libros|recursos)-.+\.json$/.test(f))
-  .sort();
+/**
+ * Listar archivos de datos de TODAS las secciones (src/data/libros/*.json,
+ * src/data/recursos/*.json). La carpeta padre = sección; el nombre del archivo
+ * lleva el prefijo de la sección (libros-{slug}.json / recursos-{slug}.json).
+ * Se devuelven rutas RELATIVAS (libros\libros-paleontologia.json) para que el
+ * resto del script siga usando path.join(DATA_DIR, archivo) y basename para la
+ * categoría.
+ */
+function listarArchivosData() {
+  const archivos = [];
+  for (const carpeta of ['libros', 'recursos']) {
+    const dir = path.join(DATA_DIR, carpeta);
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir)) {
+      if (/^(libros|recursos)-.+\.json$/.test(f)) {
+        archivos.push(path.join(carpeta, f));
+      }
+    }
+  }
+  return archivos.sort();
+}
+
+/**
+ * Slug de categoría desde el archivo: libros/libros-paleontologia.json →
+ * paleontologia; recursos/recursos-educativos.json → recursos-educativos.
+ */
+function categoriaDeArchivo(archivo) {
+  const nombre = path.basename(archivo);
+  return (nombre.startsWith('libros-') ? nombre.replace('libros-', '') : nombre).replace(/\.json$/, '');
+}
+
+const archivos = listarArchivosData();
 
 const problemas = [];
 const idsGlobales = new Map();      // id → { categoria, libro }
@@ -43,7 +72,7 @@ function leerArchivo(archivo) {
   try {
     return JSON.parse(fs.readFileSync(path.join(DATA_DIR, archivo), 'utf-8'));
   } catch (e) {
-    problemas.push(`[${archivo}] JSON inválido o ilegible: ${e.message}`);
+    problemas.push(`[${path.basename(archivo)}] JSON inválido o ilegible: ${e.message}`);
     return null;
   }
 }
@@ -59,7 +88,7 @@ function normalizarUrlDup(url) {
 }
 
 for (const archivo of archivos) {
-  const categoria = (archivo.startsWith('libros-') ? archivo.replace('libros-', '') : archivo).replace(/\.json$/, '');
+  const categoria = categoriaDeArchivo(archivo);
   const datos = leerArchivo(archivo);
   if (datos === null) continue;
   if (!Array.isArray(datos)) {
@@ -169,7 +198,7 @@ for (const archivo of archivos) {
 console.log('\n🧑‍🔬 Portal de revisión humana (esqueletos por completar vía PR):');
 let hayEsqueletos = false;
 for (const archivo of archivos) {
-  const categoria = (archivo.startsWith('libros-') ? archivo.replace('libros-', '') : archivo).replace(/\.json$/, '');
+  const categoria = categoriaDeArchivo(archivo);
   const datos = leerArchivo(archivo);
   if (!Array.isArray(datos)) continue;
   for (const l of datos) {

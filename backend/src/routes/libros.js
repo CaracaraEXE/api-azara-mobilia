@@ -14,44 +14,61 @@ const path = require('path');
 const DATA_DIR = path.join(__dirname, '../data');
 
 /**
+ * Listar los archivos de datos de TODAS las secciones (src/data/libros/*.json,
+ * src/data/recursos/*.json). La carpeta padre = seccion ('libros' | 'recursos'),
+ * el nombre del archivo lleva el prefijo de la sección: libros-{slug}.json.
+ * Se devuelve la ruta completa + la sección para derivar los campos en runtime.
+ */
+function listarArchivosData() {
+  const archivos = [];
+  for (const carpeta of ['libros', 'recursos']) {
+    const dir = path.join(DATA_DIR, carpeta);
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir)) {
+      if (/^(libros|recursos)-.+\.json$/.test(f)) {
+        archivos.push({ ruta: path.join(dir, f), seccion: carpeta });
+      }
+    }
+  }
+  return archivos;
+}
+
+/**
  * Obtener todas las categorías y sus libros desde archivos individuales
  */
 function obtenerCategoriasYLibros() {
-  const archivos = fs.readdirSync(DATA_DIR);
   const categorias = [];
   
-  // Filtrar solo archivos libros-*.json y recursos-*.json (excluir libros.json centralizado)
-  archivos
-    .filter(archivo => (archivo.startsWith('libros-') || archivo.startsWith('recursos-')) && archivo.endsWith('.json') && archivo !== 'libros.json')
-    .forEach(archivo => {
-      try {
-        const rutaCompleta = path.join(DATA_DIR, archivo);
-        const libros = JSON.parse(fs.readFileSync(rutaCompleta, 'utf8'));
-        
-        // Extraer slug del nombre del archivo: libros-paleontologia.json → paleontologia; recursos-educativos.json → recursos-educativos
-        const slug = (archivo.startsWith('libros-') ? archivo.replace('libros-', '') : archivo).replace('.json', '');
-        
-        // Determinar nombre de la categoría desde el primer libro o el slug
-        const nombre = libros.length > 0 && libros[0].categoria 
-          ? libros[0].categoria 
-          : slug.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
-        
-        // Agregar categoría a cada libro
-        const librosConCategoria = libros.map(libro => ({
-          ...libro,
-          categoria: nombre
-        }));
-        
-        categorias.push({
-          nombre,
-          slug,
-          url: `/libros/libros-de-${slug}/`,
-          libros: librosConCategoria
-        });
-      } catch (error) {
-        console.error(`Error al leer ${archivo}:`, error.message);
-      }
-    });
+  for (const { ruta, seccion } of listarArchivosData()) {
+    try {
+      const libros = JSON.parse(fs.readFileSync(ruta, 'utf8'));
+      
+      // Extraer slug del nombre del archivo: libros-paleontologia.json → paleontologia; recursos-educativos.json → recursos-educativos
+      const nombreArchivo = path.basename(ruta);
+      const slug = (nombreArchivo.startsWith('libros-') ? nombreArchivo.replace('libros-', '') : nombreArchivo).replace('.json', '');
+      
+      // Determinar nombre de la categoría desde el primer libro o el slug
+      const nombre = libros.length > 0 && libros[0].categoria 
+        ? libros[0].categoria 
+        : slug.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      
+      // Agregar categoría a cada libro
+      const librosConCategoria = libros.map(libro => ({
+        ...libro,
+        categoria: nombre
+      }));
+      
+      categorias.push({
+        nombre,
+        slug,
+        seccion,
+        url: `/libros/libros-de-${slug}/`,
+        libros: librosConCategoria
+      });
+    } catch (error) {
+      console.error(`Error al leer ${ruta}:`, error.message);
+    }
+  }
   
   return categorias;
 }
@@ -66,14 +83,13 @@ function obtenerCategoriasYLibros() {
  * multi-categoría desaparece de la navegación de las categorías no-principales.
  */
 function obtenerTodosLosLibros() {
-  const archivos = fs.readdirSync(DATA_DIR)
-    .filter(archivo => (archivo.startsWith('libros-') || archivo.startsWith('recursos-')) && archivo.endsWith('.json') && archivo !== 'libros.json');
   const porId = new Map();
 
-  for (const archivo of archivos) {
+  for (const { ruta, seccion } of listarArchivosData()) {
     try {
-      const slug = (archivo.startsWith('libros-') ? archivo.replace('libros-', '') : archivo).replace('.json', '');
-      const librosArr = JSON.parse(fs.readFileSync(path.join(DATA_DIR, archivo), 'utf8'));
+      const nombreArchivo = path.basename(ruta);
+      const slug = (nombreArchivo.startsWith('libros-') ? nombreArchivo.replace('libros-', '') : nombreArchivo).replace('.json', '');
+      const librosArr = JSON.parse(fs.readFileSync(ruta, 'utf8'));
       const nombre = librosArr.length > 0 && librosArr[0].categoria
         ? librosArr[0].categoria
         : slug.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
@@ -83,11 +99,11 @@ function obtenerTodosLosLibros() {
         if (existente) {
           if (!existente.categorias.includes(nombre)) existente.categorias.push(nombre);
         } else {
-          porId.set(libro.id, { ...libro, categoria: nombre, categorias: [nombre] });
+          porId.set(libro.id, { ...libro, seccion, categoria: nombre, categorias: [nombre] });
         }
       }
     } catch (error) {
-      console.error(`Error al leer ${archivo}:`, error.message);
+      console.error(`Error al leer ${ruta}:`, error.message);
     }
   }
   return [...porId.values()];

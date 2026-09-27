@@ -697,14 +697,19 @@ function construirIndiceGlobal(librosActuales, categoriaSlug, prefijo = 'libros'
   };
   const esDePrefijo = new RegExp(`^${prefijo}-.+\\.json$`);
   const quitarPrefijo = new RegExp(`^${prefijo}-`);
-  for (const f of fs.readdirSync(DATA_DIR)) {
-    if (!esDePrefijo.test(f)) continue;
-    if (f.includes('.temp')) continue; // cualquier .temp (categoría o sección) se indexa vía los arrays en memoria
-    try {
-      const arr = JSON.parse(fs.readFileSync(path.join(DATA_DIR, f), 'utf-8'));
-      const cat = f.replace(quitarPrefijo, '').replace(/\.json$/, '');
-      arr.forEach(l => indexar(l, cat));
-    } catch { /* archivo ilegible: se ignora (el validar:data lo reporta) */ }
+  // Cada sección vive en su propia carpeta (src/data/libros/, src/data/recursos/):
+  // el índice escanea SOLO la de la sección en curso.
+  const dirSeccion = path.join(DATA_DIR, prefijo);
+  if (fs.existsSync(dirSeccion)) {
+    for (const f of fs.readdirSync(dirSeccion)) {
+      if (!esDePrefijo.test(f)) continue;
+      if (f.includes('.temp')) continue; // cualquier .temp (categoría o sección) se indexa vía los arrays en memoria
+      try {
+        const arr = JSON.parse(fs.readFileSync(path.join(dirSeccion, f), 'utf-8'));
+        const cat = f.replace(quitarPrefijo, '').replace(/\.json$/, '');
+        arr.forEach(l => indexar(l, cat));
+      } catch { /* archivo ilegible: se ignora (el validar:data lo reporta) */ }
+    }
   }
   librosActuales.forEach(l => indexar(l, categoriaSlug));
   return indice;
@@ -798,11 +803,15 @@ async function scrapearSeccion(browser, seccion) {
   const page = await browser.newPage();
   const prefijo = seccion.prefijoArchivo;
   const nombreArchivoBase = seccion.slug.replace(new RegExp('^' + prefijo + '-'), '');
+  // Cada sección vive en su propia carpeta (src/data/libros/, src/data/recursos/);
+  // se crea al arrancar para que la primera corrida no rompa el índice.
+  const carpetaSeccion = path.join(DATA_DIR, prefijo);
+  fs.mkdirSync(carpetaSeccion, { recursive: true });
   const rutaFinal = seccion.archivoUnico
-    ? path.join(DATA_DIR, `${prefijo}-${nombreArchivoBase}.json`)
+    ? path.join(carpetaSeccion, `${prefijo}-${nombreArchivoBase}.json`)
     : null;
   const rutaTemp = seccion.archivoUnico
-    ? path.join(DATA_DIR, `${prefijo}-${nombreArchivoBase}.temp.json`)
+    ? path.join(carpetaSeccion, `${prefijo}-${nombreArchivoBase}.temp.json`)
     : null;
   
   // Progreso previo (modo archivo único): categorías completadas + ítems acumulados
@@ -823,10 +832,10 @@ async function scrapearSeccion(browser, seccion) {
     for (const categoria of seccion.categorias) {
       const rutaCategoriaFinal = seccion.archivoUnico
         ? null
-        : path.join(DATA_DIR, `${prefijo}-${categoria.slug}.json`);
+        : path.join(carpetaSeccion, `${prefijo}-${categoria.slug}.json`);
       const rutaCategoriaTemp = seccion.archivoUnico
         ? null
-        : path.join(DATA_DIR, `${prefijo}-${categoria.slug}.temp.json`);
+        : path.join(carpetaSeccion, `${prefijo}-${categoria.slug}.temp.json`);
       
       if (seccion.archivoUnico && categoriasCompletadas.has(categoria.nombre)) {
         console.log(`   ⏭️ ${categoria.nombre}: ya completada (se salta)`);

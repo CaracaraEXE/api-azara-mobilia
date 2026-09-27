@@ -10,35 +10,51 @@ const path = require('path');
 const DATA_DIR = path.join(__dirname, '../data');
 
 /**
+ * Listar los archivos de datos de TODAS las secciones (src/data/libros/*.json,
+ * src/data/recursos/*.json). La carpeta padre = seccion ('libros' | 'recursos').
+ */
+function listarArchivosData() {
+  const archivos = [];
+  for (const carpeta of ['libros', 'recursos']) {
+    const dir = path.join(DATA_DIR, carpeta);
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir)) {
+      if (/^(libros|recursos)-.+\.json$/.test(f)) {
+        archivos.push({ ruta: path.join(dir, f), seccion: carpeta });
+      }
+    }
+  }
+  return archivos;
+}
+
+/**
  * Obtener todas las categorías y sus libros desde archivos individuales
  */
 function obtenerCategoriasYLibros() {
-  const archivos = fs.readdirSync(DATA_DIR);
   const categorias = [];
   
-  archivos
-    .filter(archivo => archivo.startsWith('libros-') && archivo.endsWith('.json') && archivo !== 'libros.json')
-    .forEach(archivo => {
-      try {
-        const rutaCompleta = path.join(DATA_DIR, archivo);
-        const libros = JSON.parse(fs.readFileSync(rutaCompleta, 'utf8'));
-        
-        const slug = archivo.replace('libros-', '').replace('.json', '');
-        
-        const nombre = libros.length > 0 && libros[0].categoria 
-          ? libros[0].categoria 
-          : slug.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
-        
-        categorias.push({
-          nombre,
-          slug,
-          url: `/libros/libros-de-${slug}/`,
-          cantidad: libros.length
-        });
-      } catch (error) {
-        console.error(`Error al leer ${archivo}:`, error.message);
-      }
-    });
+  for (const { ruta, seccion } of listarArchivosData()) {
+    try {
+      const libros = JSON.parse(fs.readFileSync(ruta, 'utf8'));
+      
+      const nombreArchivo = path.basename(ruta);
+      const slug = (nombreArchivo.startsWith('libros-') ? nombreArchivo.replace('libros-', '') : nombreArchivo).replace('.json', '');
+      
+      const nombre = libros.length > 0 && libros[0].categoria 
+        ? libros[0].categoria 
+        : slug.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      
+      categorias.push({
+        nombre,
+        slug,
+        seccion,
+        url: `/libros/libros-de-${slug}/`,
+        cantidad: libros.length
+      });
+    } catch (error) {
+      console.error(`Error al leer ${ruta}:`, error.message);
+    }
+  }
   
   return categorias;
 }
