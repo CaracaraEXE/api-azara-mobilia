@@ -4,8 +4,8 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 
 ## Current State (Sep 2026)
 
-- ✅ **13/13 categorías scrapeadas** (data/libros/) + **Recursos Educativos** (data/recursos/) — 435 ítems totales (326 libros + 109 RE; 1 esqueleto en revisión: postal Guacamayo Militar)
-- ✅ **PLANV3 V3.6 — Hemeroteca (2026-09-27)**: scraper + API + bot listos para las SECCIONES `periodico-exploracion-y-ciencia` (Periódico Exploración y Ciencia, 🗞️) y `revista-azara` (Revista Azara, 📰). Data pendiente del piloto: `node scripts/scraper-playwright.js --seccion=periodico-exploracion-y-ciencia` (el usuario corre el scraper).
+- ✅ **13/13 categorías scrapeadas** (data/libros/) + **Recursos Educativos** (data/recursos/) + **piloto hemeroteca corrido (2026-09-27): 3 ediciones** del Periódico (data/periodico-exploracion-y-ciencia/) — 438 ítems totales (326 libros + 109 RE + 3 ediciones; 1 esqueleto en revisión: postal Guacamayo Militar)
+- ✅ **PLANV3 V3.6 — Hemeroteca (2026-09-27)**: scraper + API + bot listos y EN PRODUCCIÓN para las SECCIONES `periodico-exploracion-y-ciencia` (Periódico Exploración y Ciencia, 🗞️) y `revista-azara` (Revista Azara, 📰). **Piloto + E2E COMPLETO** (validado por el usuario en Discord): búsqueda por titulares con titular coincidente, salto directo a ediciones (sin título duplicado), `/libro` con campo 🗞️ Titulares, regresión libros/RE limpia. Pendiente: **Fase 2 Revista Azara** (`--seccion=revista-azara`, 14 eds) — estructura VERIFICADA 2026-09-27 (N14 2025 + N1 2013): grilla v4 con `h5.portfolio_title` (el selector POR CLASE `.portfolio_title a` cubre h6/h5); PDF único `a.qodef-qi-button[href$=".pdf"]` por edición SIN normas/autores → el cortafuegos `revisionPendiente` NO se dispara en Fase 2 (los PDFs de Normas para Autores viven en la página de SECCIÓN, fuera de `article.mix`); titulares MIXTOS: modernas (N14) 1 `<p>` por titular con `span lang=ES-MX`, viejas (N1) un solo `<p>` con `<br>` — ambos cubiertos por `extraerTitularesDeHtml`. El scraper lo corre SIEMPRE el usuario: `node scripts/scraper-playwright.js --seccion=<slug>`.
 - ✅ Datos en carpetas por sección: `data/libros/libros-*.json` (13) + `data/recursos/recursos-educativos.json` (1 archivo, campo `coleccion` = subgrupo)
 - ✅ API Express.js funcionando con endpoints GET (respuestas con campo `seccion: 'libros'|'recursos'`)
 - ✅ Scraper con CLI: `--todas` / `--seccion=<slug>` / `--categoria=<slug>` (mutuamente excluyentes)
@@ -107,6 +107,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 - Emoji de CATEGORÍA segundo: `📁` (la categoría REAL de navegación)
 - En RE la categoría real = `coleccion` (subgrupo: 'Cuadernillos', ...); 'Recursos Educativos' es la SECCIÓN, no una categoría
 - Enlace de PDF SIEMPRE al final del value del campo
+- En HEMEROTECA el título del embed de ítems de categoría NO repite la categoría (la única categoría ES la publicación): `🗞️ Periódico Exploración y Ciencia` — sin `: Categoría` (fix E2E piloto 2026-09-27; `construirMensajeCategoriaLibros` usa `SECCIONES_HEMEROTECA.has(sec)`)
 - Ítems bilingües (`linkPdfEn`, p.ej. folleto El Shincal de Quimivil): dos enlaces `📄 [Descargar PDF]` (ES) + `📄 [Descargar PDF (EN)]` — EN siempre como última línea (helper `enlacesPdf` en formatos.js)
 - `🗂️ Colección` como línea extra SOLO en libros (desambigua series "Tomo NN"); en RE ya está en la categoría
 
@@ -119,7 +120,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 - El scraper espera 800ms entre libros y 2000ms entre categorías
 - `GUARDAR_CADA = 5` en scripts/scraper-playwright.js
 - Algunas páginas no tienen `<h4>` para el título — hay fallback con párrafos
-- **Hemeroteca (PLANV3 V3.6)**: las páginas de periódico/revista son grillas portfolio Qode Bridge (`article.mix`) — extractores dedicados `obtenerUrlsPortafolio`/`obtenerDatosPortafolio`. El PDF de la edición se busca con `a.qodef-qi-button[href$=".pdf"]`; si hay MÁS de 1 PDF (normas/autores) se setea `revisionPendiente` (cortafuegos humano, fase 2 Revista Azara). Secciones: `periodico-exploracion-y-ciencia` (🗞️, piloto 3 eds) y `revista-azara` (📰, fase 2, 14 eds). El scraper lo corre SIEMPRE el usuario: `node scripts/scraper-playwright.js --seccion=<slug>`
+- **Hemeroteca (PLANV3 V3.6)**: las páginas de periódico/revista son grillas portfolio Qode Bridge (`article.mix`) — extractores dedicados `obtenerUrlsPortafolio`/`obtenerDatosPortafolio`. El título del ítem sale de `.portfolio_title a` POR CLASE (h6 en Periódico, h5 en Revista Azara — NO filtrar por tag) y la portada de `src || data-src || data-lazy-src`. El PDF de la edición se busca con `a.qodef-qi-button[href$=".pdf"]` (el botón qodef solo trae PDF de la edición, texto "Descargar archivo"; las ediciones viejas de Revista Azara usan `http://www.` en el href — `normalizarHostUrl` cubre el dedup); si hay MÁS de 1 PDF (normas/autores) se setea `revisionPendiente` (cortafuegos humano, fase 2 Revista Azara). Titulares de Revista Azara MIXTOS (verificado 2026-09-27 N14 y N1): modernas usan 1 `<p>` por titular (bullet "•" en `<span lang="ES-MX">`, salvo el primero que viene crudo), ediciones viejas (N1 2013) usan UN solo `<p>` con `<br>` (el primer bullet envuelto en `<strong>`) — `extraerTitularesDeHtml` cubre ambos (split por `<br>` Y por `</p>` en cadena). Secciones: `periodico-exploracion-y-ciencia` (🗞️, piloto 3 eds) y `revista-azara` (📰, fase 2, 14 eds). El scraper lo corre SIEMPRE el usuario: `node scripts/scraper-playwright.js --seccion=<slug>`
 
 ### Discord Bot
 - **NGROK** debe apuntar al bot (puerto 3001), no al backend
@@ -143,7 +144,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
   "fechaExtraccion": "ISO string",
   "linkPdfEn": "string (opcional — versión en inglés, ítems bilingües)",
   "revisionPendiente": "bool (opcional — esqueleto curado sin PDF, p.ej. postal con página rota)",
-  "titulares": ["string", "..." ] (opcional — SOLO hemeroteca, PLANV3 V3.6: titulares de la edición SIN bullet; hacen encontrable el ítem en /buscar y se listan en /libro en el campo 🗞️ Titulares. NO se muestran en listados ni en resultados de búsqueda)"
+  "titulares": ["string", "..." ] (opcional — SOLO hemeroteca, PLANV3 V3.6: titulares de la edición SIN bullet; hacen encontrable el ítem en /buscar y se listan en /libro en el campo 🗞️ Titulares. NO se muestran en listados de categorías; en los RESULTADOS de /buscar se muestra SOLO el/los titular(es) COINCIDENTE(S) con el término como contexto del match — "• " + titular, máx 2 + "…y N más" según las coincidencias. Helpers puros en formatos.js: `normalizarBusqueda` (MISMA semántica que libros.js L146, conserva la ñ) y `titularesCoincidentes(libro, termino)`)"
 }
 ```
 

@@ -62,6 +62,38 @@ function enlacesPdf(libro) {
 }
 
 /**
+ * Normalizar texto para búsquedas laxas — MISMA semántica que la API
+ * (backend/src/routes/libros.js, normalizarBusqueda): quita ACENTOS (áéíóúü)
+ * y pasa a minúsculas, pero CONSERVA la ñ (carácter propio del español, no un
+ * acento). El bot la replica solo para elegir QUÉ titulares mostrar como
+ * contexto del match en /buscar — la API ya filtró el ítem; acá se replica el
+ * mismo criterio para no mentirle al usuario con titulares que no coinciden.
+ */
+function normalizarBusqueda(s) {
+  return (s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, c => (c === '\u0303' ? '\u0303' : ''))
+    .normalize('NFC')
+    .toLowerCase();
+}
+
+/**
+ * Titular(es) de una edición de HEMEROTECA que coinciden con el término de
+ * búsqueda — el "contexto del match" (PLANV3 V3.6): si el ítem apareció porque
+ * un titular contenía el término, se muestra ESE titular, no solo el título de
+ * la edición (que por sí solo no explica por qué matcheó).
+ * Devuelve { visibles: [hasta 2 titulares], total: #coincidencias }.
+ * Si matcheó por TÍTULO/AUTOR (ningún titular contiene el término), total = 0 →
+ * el resultado NO muestra línea extra. Libros/RE (sin titulares) → total = 0.
+ */
+function titularesCoincidentes(libro, termino) {
+  if (!Array.isArray(libro.titulares) || !termino) return { visibles: [], total: 0 };
+  const t = normalizarBusqueda(termino);
+  const coinciden = libro.titulares.filter(tit => normalizarBusqueda(tit).includes(t));
+  return { visibles: coinciden.slice(0, 2).map(tit => tit.substring(0, 256)), total: coinciden.length };
+}
+
+/**
  * Embed + botones de paginación para resultados de búsqueda (/buscar y ◀▶).
  */
 function construirMensajeBusqueda(termino, libros, pagina, total) {
@@ -73,6 +105,14 @@ function construirMensajeBusqueda(termino, libros, pagina, total) {
     // Colección de LIBROS (series/desgloses: desambigua "Tomo 02"); en RE la
     // colección YA es la categoría mostrada arriba, no se repite.
     if (!sec.esRecursos && libro.coleccion) value += `\n🗂️ ${libro.coleccion}`;
+    // Contexto del match de HEMEROTECA: "• " + titular(es) coincidente(s) (misma
+    // convención que /libro). Solo si el término está en algún titular; si el
+    // match vino por el título de la edición, no se agrega línea extra.
+    const match = titularesCoincidentes(libro, termino);
+    if (match.total > 0) {
+      value += '\n' + match.visibles.map(t => `• ${t}`).join('\n');
+      if (match.total > match.visibles.length) value += `\n…y ${match.total - match.visibles.length} más`;
+    }
     value += '\n' + enlacesPdf(libro);
     return { name: libro.titulo.substring(0, 256), value };
   });
@@ -241,7 +281,10 @@ function construirMensajeCategoriaLibros(sec, nombreCategoria, libros, pagina, t
 
   return {
     embeds: [{
-      title: `${emoji} ${nombreSeccion}: ${nombreCategoria}`,
+      // En HEMEROTECA la única categoría ES la publicación → el título no repite
+      // "🗞️ Periódico Exploración y Ciencia: Periódico Exploración y Ciencia"
+      // (verificado en el E2E del piloto; se aplica igual a Revista Azara en Fase 2).
+      title: SECCIONES_HEMEROTECA.has(sec) ? `${emoji} ${nombreSeccion}` : `${emoji} ${nombreSeccion}: ${nombreCategoria}`,
       color: 0x00AE86,
       fields,
       footer: { text: totalPaginas > 1 ? `Página ${pagina + 1} de ${totalPaginas} — ${total} resultados` : `${total} resultados` }
@@ -259,6 +302,8 @@ module.exports = {
   SECCIONES_HEMEROTECA,
   infoSeccion,
   enlacesPdf,
+  normalizarBusqueda,
+  titularesCoincidentes,
   construirMensajeBusqueda,
   construirMensajeSecciones,
   construirMensajeCategoriasSeccion,

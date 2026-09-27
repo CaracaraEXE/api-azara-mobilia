@@ -380,10 +380,14 @@ const obtenerDatosLibro = obtenerDatosItem;
  * hemeroteca — función PURA exportada (testeable con fixture real, PLANV3 V3.6).
  * Header "<p><strong>Contenido</strong></p>" se descarta. Los titulares se separan
  * por <br> Y por <p> (verificado): Periódico usa UN solo <p> con titulares separados
- * por <br>; Revista Azara usa 1 <p> POR titular. Se quita el bullet inicial "•" —
- * se guarda SIN bullet (dato puro; el bot pinta el "• " al renderizar, decisión V3.6)
- * — y se limpian tags/entidades/espacios (usa textContent-equivalente tras quitar
- * tags: el "•" vive dentro de <span lang="ES-MX">, algunos titulares tienen <em>).
+ * por <br>; Revista Azara es MIXTA — ediciones modernas (N14, 2025) usan 1 <p> POR
+ * titular (el bullet "•" vive dentro de <span lang="ES-MX">, salvo el primer titular
+ * que trae el "•" crudo), ediciones viejas (N1, 2013) usan UN solo <p> con <br> como
+ * el Periódico (verificado 2026-09-27 contra N14 y N1). Se quita el bullet inicial
+ * "•" — se guarda SIN bullet (dato puro; el bot pinta el "• " al renderizar, decisión
+ * V3.6) — y se limpian tags/entidades/espacios (usa textContent-equivalente tras
+ * quitar tags: el "•" puede estar crudo o en <span lang="ES-MX">, algunos titulares
+ * tienen <i>/<em>).
  */
 function extraerTitularesDeHtml(html) {
   if (!html) return [];
