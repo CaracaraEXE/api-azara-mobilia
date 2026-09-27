@@ -29,7 +29,7 @@ function obtenerCategoriasYLibros() {
         const libros = JSON.parse(fs.readFileSync(rutaCompleta, 'utf8'));
         
         // Extraer slug del nombre del archivo: libros-paleontologia.json → paleontologia; recursos-educativos.json → recursos-educativos
-        const slug = archivo.replace(/^(libros|recursos)-/, '').replace('.json', '');
+        const slug = (archivo.startsWith('libros-') ? archivo.replace('libros-', '') : archivo).replace('.json', '');
         
         // Determinar nombre de la categoría desde el primer libro o el slug
         const nombre = libros.length > 0 && libros[0].categoria 
@@ -72,7 +72,7 @@ function obtenerTodosLosLibros() {
 
   for (const archivo of archivos) {
     try {
-      const slug = archivo.replace(/^(libros|recursos)-/, '').replace('.json', '');
+      const slug = (archivo.startsWith('libros-') ? archivo.replace('libros-', '') : archivo).replace('.json', '');
       const librosArr = JSON.parse(fs.readFileSync(path.join(DATA_DIR, archivo), 'utf8'));
       const nombre = librosArr.length > 0 && librosArr[0].categoria
         ? librosArr[0].categoria

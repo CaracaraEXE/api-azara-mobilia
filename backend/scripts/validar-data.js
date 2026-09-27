@@ -59,7 +59,7 @@ function normalizarUrlDup(url) {
 }
 
 for (const archivo of archivos) {
-  const categoria = archivo.replace(/^(libros|recursos)-/, '').replace(/\.json$/, '');
+  const categoria = (archivo.startsWith('libros-') ? archivo.replace('libros-', '') : archivo).replace(/\.json$/, '');
   const datos = leerArchivo(archivo);
   if (datos === null) continue;
   if (!Array.isArray(datos)) {
@@ -169,7 +169,7 @@ for (const archivo of archivos) {
 console.log('\n🧑‍🔬 Portal de revisión humana (esqueletos por completar vía PR):');
 let hayEsqueletos = false;
 for (const archivo of archivos) {
-  const categoria = archivo.replace(/^(libros|recursos)-/, '').replace(/\.json$/, '');
+  const categoria = (archivo.startsWith('libros-') ? archivo.replace('libros-', '') : archivo).replace(/\.json$/, '');
   const datos = leerArchivo(archivo);
   if (!Array.isArray(datos)) continue;
   for (const l of datos) {
