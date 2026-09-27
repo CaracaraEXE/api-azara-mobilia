@@ -20,16 +20,16 @@ function obtenerCategoriasYLibros() {
   const archivos = fs.readdirSync(DATA_DIR);
   const categorias = [];
   
-  // Filtrar solo archivos libros-*.json (excluir libros.json centralizado)
+  // Filtrar solo archivos libros-*.json y recursos-*.json (excluir libros.json centralizado)
   archivos
-    .filter(archivo => archivo.startsWith('libros-') && archivo.endsWith('.json') && archivo !== 'libros.json')
+    .filter(archivo => (archivo.startsWith('libros-') || archivo.startsWith('recursos-')) && archivo.endsWith('.json') && archivo !== 'libros.json')
     .forEach(archivo => {
       try {
         const rutaCompleta = path.join(DATA_DIR, archivo);
         const libros = JSON.parse(fs.readFileSync(rutaCompleta, 'utf8'));
         
-        // Extraer slug del nombre del archivo: libros-paleontologia.json → paleontologia
-        const slug = archivo.replace('libros-', '').replace('.json', '');
+        // Extraer slug del nombre del archivo: libros-paleontologia.json → paleontologia; recursos-educativos.json → recursos-educativos
+        const slug = archivo.replace(/^(libros|recursos)-/, '').replace('.json', '');
         
         // Determinar nombre de la categoría desde el primer libro o el slug
         const nombre = libros.length > 0 && libros[0].categoria 
@@ -67,12 +67,12 @@ function obtenerCategoriasYLibros() {
  */
 function obtenerTodosLosLibros() {
   const archivos = fs.readdirSync(DATA_DIR)
-    .filter(archivo => archivo.startsWith('libros-') && archivo.endsWith('.json') && archivo !== 'libros.json');
+    .filter(archivo => (archivo.startsWith('libros-') || archivo.startsWith('recursos-')) && archivo.endsWith('.json') && archivo !== 'libros.json');
   const porId = new Map();
 
   for (const archivo of archivos) {
     try {
-      const slug = archivo.replace('libros-', '').replace('.json', '');
+      const slug = archivo.replace(/^(libros|recursos)-/, '').replace('.json', '');
       const librosArr = JSON.parse(fs.readFileSync(path.join(DATA_DIR, archivo), 'utf8'));
       const nombre = librosArr.length > 0 && librosArr[0].categoria
         ? librosArr[0].categoria

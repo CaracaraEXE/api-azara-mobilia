@@ -5,8 +5,8 @@
  * 
  * Uso:
  *   node scripts/scraper-playwright.js                  (usa SCRAPEAR_CATEGORIA por defecto)
- *   node scripts/scraper-playwright.js --categoria=slug  (una categoría específica)
- *   node scripts/scraper-playwright.js --todas           (todas las categorías)
+ *   node scripts/scraper-playwright.js --categoria=slug  (categoría de libros; recursos-educativos = sección completa)
+ *   node scripts/scraper-playwright.js --todas           (todas las categorías de libros + recursos)
  */
 
 const { chromium } = require('playwright');
@@ -30,6 +30,41 @@ const CATEGORIAS = [
   { nombre: 'Auspiciados', slug: 'auspiciados', url: 'https://fundacionazara.org.ar/libros/libros-auspiciados/' },
 ];
 
+/**
+ * Sección Recursos Educativos (PLANV3 §4): los 10 subgrupos definidos por el usuario,
+ * cada uno con su URL raíz de grilla. El scraper recorre TODOS los subgrupos y guarda
+ * UN archivo recursos-educativos.json, con `coleccion` = nombre del subgrupo.
+ * Los subgrupos son planos (no jerárquicos): el usuario eligió las URLs raíz.
+ * OJO: "Posters de Paleontología" es SINGULAR (/poster-de-paleontologia/), el plural da 404.
+ */
+const RECURSOS_EDUCATIVOS = {
+  tipo: 'recursos',
+  nombre: 'Recursos educativos',
+  slug: 'recursos-educativos',
+  subgrupos: [
+    { nombre: 'Cuadernillos', url: 'https://fundacionazara.org.ar/cuadernillos/' },
+    { nombre: 'Posters de Geología', url: 'https://fundacionazara.org.ar/posters-de-geologia/' },
+    { nombre: 'Posters de Paleontología', url: 'https://fundacionazara.org.ar/poster-de-paleontologia/' },
+    { nombre: 'Posters de Ambiente', url: 'https://fundacionazara.org.ar/posters-de-ambiente/' },
+    { nombre: 'Posters de Biodiversidad', url: 'https://fundacionazara.org.ar/posters-de-biodiversidad/' },
+    { nombre: 'Posters de Antropología, Historia y Patrimonio', url: 'https://fundacionazara.org.ar/posters-de-antropologia/' },
+    { nombre: 'Cartillas', url: 'https://fundacionazara.org.ar/cartillas' },
+    { nombre: 'Folletos de Biodiversidad', url: 'https://fundacionazara.org.ar/folletos-de-biodiversidad/' },
+    { nombre: 'Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas', url: 'https://fundacionazara.org.ar/folletos-de-museos-sitios-arqueologicos-y-areas-naturales-protegidas/' },
+    { nombre: 'Postales', url: 'https://fundacionazara.org.ar/postales' },
+  ]
+};
+
+/**
+ * Secciones unificadas del scraper (PLANV3 §5.1): las 13 categorías de libros
+ * (tipo 'libros', 1 archivo por categoría) + la sección de recursos educativos
+ * (tipo 'recursos', 1 archivo con subgrupos). run() despacha por tipo.
+ */
+const SECCIONES = [
+  ...CATEGORIAS.map(c => ({ ...c, tipo: 'libros' })),
+  RECURSOS_EDUCATIVOS
+];
+
 // Colecciones multi-libro catalogadas (PLANV2.md §4.1). El scraper desglosa SOLO estas URLs;
 // cualquier otra página con >1 PDF/h4/img se loguea como "posible colección no catalogada".
 // patrones: pares-h4-pdf | contenedor-por-libro | div-titulos-carrousel | imagenes-sueltas | pdfs-romanos
@@ -42,6 +77,9 @@ const COLECCIONES_CONOCIDAS = [
   { url: 'https://fundacionazara.org.ar/fauna-argentina-amenazada/', patron: 'imagenes-sueltas', coleccion: 'Fauna argentina amenazada' },
   { url: 'https://fundacionazara.org.ar/los-invertebrados-fosiles/', patron: 'pdfs-romanos', coleccion: 'Los invertebrados fósiles' },
   { url: 'https://fundacionazara.org.ar/trazos-nativos-diseno-iconografico-de-las-sierras-de-cordoba-serie-infantil-para-colorear/', patron: 'imagenes-sueltas', coleccion: 'Trazos nativos. Diseño iconográfico de las sierras de Córdoba' },
+  // PLANV3 §5.2: colección de Recursos Educativos (7 cuadernillos). Sus PDFs usan
+  // www.fundacionazara.org.ar (host mezclado) → clavesDeLibro normaliza el host.
+  { url: 'https://fundacionazara.org.ar/miradas-de-la-argentina/', patron: 'pares-h4-pdf', coleccion: 'Miradas de la Argentina' },
 ];
 
 // === CONFIGURACIÓN ===
@@ -173,6 +211,76 @@ async function obtenerDatosLibro(page, url) {
   return { titulo, autor, anio, linkPdf, imagenPortada };
 }
 
+/**
+ * Extraer datos de una página individual de RECURSO educativo (PLANV3 §5.2).
+ * DIFERENCIAS con obtenerDatosLibro: las páginas de recursos NO tienen <h4> de
+ * título (ese nodo está oculto/contaminado con la fecha, p.ej. "24 Nov Miradas...");
+ * el título sale de la cabecera SEO; el PDF vive en /img/recursos-educativos/; y el
+ * año es la fecha de publicación del post (no un campo "Autor, año" en el texto).
+ *
+ * Título (cascada, PLANV3 §5.2): JSON-LD headline → og:title → document.title.
+ *   - headline (Yoast): limpio, sin sufijo ("Miradas de la Argentina") — el fiable.
+ *   - og:title: viene con sufijo " - Fundación Azara" → se limpia.
+ *   - document.title: igual con sufijo → se limpia.
+ */
+async function obtenerDatosRecurso(page, url) {
+  await page.goto(url, { waitUntil: 'networkidle' });
+  await esperar(500);
+
+  // --- Título: cascada JSON-LD headline → og:title → document.title ---
+  let titulo = await page.evaluate(() => {
+    // 1) JSON-LD (Yoast): primer nodo con "headline" = título del post
+    for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+      try {
+        const data = JSON.parse(s.textContent);
+        const nodos = data && data['@graph'] ? data['@graph'] : (Array.isArray(data) ? data : [data]);
+        for (const n of nodos) {
+          if (n && typeof n.headline === 'string' && n.headline.trim()) return n.headline.trim();
+        }
+      } catch { /* script JSON inválido → probar el siguiente */ }
+    }
+    // 2) og:title
+    const og = document.querySelector('meta[property="og:title"]');
+    if (og && og.getAttribute('content')) return og.getAttribute('content').trim();
+    // 3) document.title
+    return document.title.trim();
+  }).catch(() => null);
+
+  if (titulo) {
+    // Quitar sufijo del sitio ("Título - Fundación Azara") y colapsar espacios/comas raras
+    titulo = titulo
+      .replace(/\s*-\s*Fundaci[oó]n Azara\s*$/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  // --- Portada: og:image (imagen canónica del post) → fallback primera img de contenido ---
+  let imagenPortada = await page.$eval('meta[property="og:image"]', el => (el.getAttribute('content') || '').trim()).catch(() => '');
+  if (!imagenPortada) {
+    imagenPortada = await page.$$eval('img', imgs => {
+      for (const img of imgs) {
+        const src = img.src || img.getAttribute('data-src') || '';
+        if (src && !/logo-azara|banner-azara/.test(src) && !src.endsWith('.svg')) return src;
+      }
+      return '';
+    }).catch(() => '');
+  }
+  imagenPortada = imagenPortada || null;
+
+  // --- PDF: scoping al article (los hrefs del header/footer no contaminan).
+  // Se usa a[href*=".pdf"] y limpiarUrlPdf: mismo fix C11 de libros (apóstrofo residual). ---
+  const linkPdfRaw = await page.$eval('article a[href*=".pdf"]', el => el.href).catch(() => null);
+  const linkPdf = linkPdfRaw ? limpiarUrlPdf(linkPdfRaw) : null;
+
+  // --- Año: fecha de publicación del post (PLANV3 §5.2), dato base sin confianza ciega ---
+  const anio = await page.$eval(
+    'meta[property="article:published_time"]',
+    el => { const m = (el.getAttribute('content') || '').match(/^(\d{4})/); return m ? parseInt(m[1], 10) : null; }
+  ).catch(() => null);
+
+  return { titulo, autor: null, anio, linkPdf, imagenPortada };
+}
+
 // ============================================================
 // FIXES Y HELPERS (PLANV2.md §4.2, §10)
 // ============================================================
@@ -180,6 +288,16 @@ async function obtenerDatosLibro(page, url) {
 /** Fix C11: quitar apóstrofo/espacios residuales del href (ej: "...pdf&#039;" → "...pdf") */
 function limpiarUrlPdf(href) {
   return (href || '').trim().replace(/'+$/, '').trim();
+}
+
+/**
+ * Normalizar URL para CLAVES de dedup (PLANV3 §5.2): el sitio mezcla hosts — los
+ * PDFs de Recursos Educativos usan www.fundacionazara.org.ar, el resto no. Para que
+ * el MISMO ítem dedupice entre re-scrapes/archivos, la clave ignora www. y el slash final.
+ * NO se usa para almacenar: el linkPdf guardado conserva la URL real.
+ */
+function normalizarHostUrl(url) {
+  return (url || '').trim().replace(/^https?:\/\/www\./i, 'https://').replace(/\/+$/, '');
 }
 
 /** Fix B5: limpiar prefijo "Editorial X | " → quedarse con la última parte tras "|" */
@@ -209,7 +327,7 @@ const TITULO_PLACEHOLDER = /^tomo\s+(\d+|[ivxlcdm]+)$/i;
 function clavesDeLibro({ imagenPortada, linkPdf, titulo }) {
   const claves = [];
   if (imagenPortada) claves.push('img:' + normalizarImg(imagenPortada));
-  if (linkPdf) claves.push('pdf:' + linkPdf.trim());
+  if (linkPdf) claves.push('pdf:' + normalizarHostUrl(linkPdf));
   if (titulo && !TITULO_PLACEHOLDER.test(titulo.trim())) claves.push('titulo:' + normalizarTexto(titulo));
   return claves;
 }
@@ -557,23 +675,30 @@ async function obtenerDatosColeccion(page, coleccion) {
 }
 
 /**
- * Índice global de libros ya registrados (PLANV2 §10): clave estable → entrada.
- * Incluye TODAS las categorías y el temp de la actual para ids estables entre
- * re-scrapes y para que un libro publicado en 2 categorías comparta UN id.
+ * Índice global de ítems ya registrados (PLANV2 §10 / PLANV3 §5.4): clave estable → entrada.
+ * Incluye los archivos del prefijo indicado y el temp de la sección actual, para ids
+ * estables entre re-scrapes y para que un ítem publicado en 2 categorías comparta UN id.
+ *
+ * prefijo: 'libros' → solo libros-*.json (las categorías de libros se deduplican entre
+ * sí, PLANV2 §10). 'recursos' → SOLO recursos-*.json: un recurso NUNCA se consolida
+ * contra un libro automáticamente (PLANV3 §6); si comparte linkPdf/portada con un libro,
+ * validar-data lo reporta y la verificación/decisión es humana.
  */
-function construirIndiceGlobal(librosActuales, categoriaSlug) {
+function construirIndiceGlobal(librosActuales, categoriaSlug, prefijo = 'libros') {
   const indice = new Map();
   const indexar = (libro, categoria) => {
     for (const clave of clavesDeLibro(libro)) {
       indice.set(clave, { id: libro.id, libro, categoria });
     }
   };
+  const esDePrefijo = new RegExp(`^${prefijo}-.+\\.json$`);
+  const quitarPrefijo = new RegExp(`^${prefijo}-`);
   for (const f of fs.readdirSync(DATA_DIR)) {
-    if (!/^libros-.+\.json$/.test(f)) continue;
+    if (!esDePrefijo.test(f)) continue;
     if (f.includes(`${categoriaSlug}.temp`)) continue; // el temp actual se indexa vía librosActuales
     try {
       const arr = JSON.parse(fs.readFileSync(path.join(DATA_DIR, f), 'utf-8'));
-      const cat = f.replace(/^libros-/, '').replace(/\.json$/, '');
+      const cat = f.replace(quitarPrefijo, '').replace(/\.json$/, '');
       arr.forEach(l => indexar(l, cat));
     } catch { /* archivo ilegible: se ignora (el validar:data lo reporta) */ }
   }
@@ -787,6 +912,160 @@ async function scrapearCategoria(browser, categoria) {
 }
 
 /**
+ * Scrapear la sección Recursos Educativos completo (PLANV3 §5.3): recorre TODOS los
+ * subgrupos definidos por el usuario, desglosa colecciones catalogadas (miradas-de-
+ * la-argentina → 7 PDFs) y guarda UN archivo recursos-educativos.json.
+ * `coleccion` de cada ítem = nombre del subgrupo (la API los agrupa por ?coleccion=;
+ * los desgloses conservan el nombre de su colección real, p.ej. "Miradas de la Argentina").
+ *
+ * Índice global SOLO sobre recursos-*.json (PLANV3 §6): un recurso NUNCA se consolida
+ * contra un libro automáticamente. Si comparte PDF/portada con un libro existente,
+ * validar-data lo reporta y la verificación/decisión es humana.
+ *
+ * Progreso (crash-resiliente): el temp guarda los subgrupos YA COMPLETADOS + los ítems
+ * acumulados; al retomar se saltan los completados y se re-scrapea el subgrupo en curso
+ * (sus ítems ya guardados se consolidan por id — política "existente gana").
+ */
+async function scrapearSeccionRecursos(browser, seccion) {
+  console.log(`\n🎨 Scraping: ${seccion.nombre}`);
+  
+  // Nombre del archivo: tipo + slug SIN repetir el prefijo ("recursos-educativos.json",
+  // no "recursos-recursos-educativos.json").
+  const nombreArchivo = `recursos-${seccion.slug.replace(/^recursos-/, '')}`;
+  const rutaFinal = path.join(DATA_DIR, `${nombreArchivo}.json`);
+  const rutaTemp = path.join(DATA_DIR, `${nombreArchivo}.temp.json`);
+  
+  const page = await browser.newPage();
+  
+  try {
+    // --- Progreso previo: subgrupos completados + ítems acumulados ---
+    let subgruposCompletados = new Set();
+    let recursos = [];
+    if (fs.existsSync(rutaTemp)) {
+      try {
+        const previo = JSON.parse(fs.readFileSync(rutaTemp, 'utf-8'));
+        subgruposCompletados = new Set(previo.subgruposCompletados || []);
+        recursos = Array.isArray(previo.recursos) ? previo.recursos : [];
+        console.log(`   ♻️ Progreso anterior: ${recursos.length} ítems acumulados, ${subgruposCompletados.size} subgrupos completados`);
+      } catch {
+        console.log('   ⚠️ Archivo temporal corrupto, empezando de cero');
+      }
+    }
+    
+    const indiceGlobal = construirIndiceGlobal(recursos, seccion.slug, 'recursos');
+    
+    const guardarTemp = () => {
+      fs.writeFileSync(rutaTemp, JSON.stringify({
+        subgruposCompletados: [...subgruposCompletados],
+        recursos
+      }, null, 2));
+    };
+    
+    // Registrar un ítem individual (subgrupo o degradación de colección) con dedup y overrides
+    const registrarItem = (datos, subgrupo) => {
+      if (!datos || !datos.titulo) {
+        console.log('         ⚠️ Sin título (verificar URL)');
+        return;
+      }
+      const { _duplicadoDe, ...item } = registrarOConsolidar(indiceGlobal, {
+        ...datos,
+        coleccion: subgrupo.nombre
+      });
+      recursos.push(aplicarOverrides(item));
+      console.log(_duplicadoDe
+        ? `         🔗 Reutilizado id ${_duplicadoDe.id} (${_duplicadoDe.categoria})`
+        : `         ✅ ${datos.titulo.substring(0, 60)}...`);
+    };
+    
+    for (const subgrupo of seccion.subgrupos) {
+      if (subgruposCompletados.has(subgrupo.nombre)) {
+        console.log(`   ⏭️ ${subgrupo.nombre}: ya completado (se salta)`);
+        continue;
+      }
+      console.log(`\n   🗂️ Subgrupo: ${subgrupo.nombre}`);
+      
+      const urlsRecursos = await obtenerUrlsLibros(page, subgrupo.url);
+      if (urlsRecursos.length === 0) {
+        console.log('      ⚠️ No se encontraron recursos');
+        subgruposCompletados.add(subgrupo.nombre); // no re-golpear la web en el siguiente intento
+        guardarTemp();
+        continue;
+      }
+      
+      let procesados = 0;
+      for (let i = 0; i < urlsRecursos.length; i++) {
+        const url = urlsRecursos[i];
+        procesados++;
+        console.log(`      📄 [${i + 1}/${urlsRecursos.length}] ${url.split('/').filter(Boolean).pop() || url}`);
+        
+        try {
+          const coleccion = COLECCIONES_CONOCIDAS.find(c => c.url === url);
+          
+          if (coleccion) {
+            // Desglose multi-ítem (miradas-de-la-argentina → 7 PDFs)
+            await page.goto(url, { waitUntil: 'networkidle' });
+            await esperar(500);
+            const itemsColeccion = await obtenerDatosColeccion(page, coleccion);
+            
+            if (itemsColeccion.length >= 1) {
+              let reutilizados = 0;
+              for (const item of itemsColeccion) {
+                const { _duplicadoDe, ...limpio } = registrarOConsolidar(indiceGlobal, item);
+                recursos.push(aplicarOverrides(limpio));
+                if (_duplicadoDe) reutilizados++;
+              }
+              console.log(`         🗂️ ${coleccion.coleccion}: ${itemsColeccion.length} ítems desglosados` + (reutilizados ? ` (${reutilizados} reutilizaban id)` : ''));
+            } else {
+              // Degradación segura: el patrón no matcheó → tratar como página individual
+              console.log(`         ⚠️ Sin desglose para "${coleccion.coleccion}" (patrón ${coleccion.patron}) — ruta original`);
+              const datos = await obtenerDatosRecurso(page, url);
+              registrarItem(datos, subgrupo);
+            }
+          } else {
+            const datos = await obtenerDatosRecurso(page, url);
+            registrarItem(datos, subgrupo);
+            
+            // Detector de posibles colecciones no catalogadas (mismo criterio que libros):
+            // la página ya quedó navegada por obtenerDatosRecurso → solo cuenta, sin goto extra.
+            const sospecha = await page.evaluate(() => ({
+              pdfs: document.querySelectorAll('a[href*=".pdf"]').length,
+              imgs: new Set([...document.querySelectorAll('img')]
+                .map(i => i.src || '')
+                .filter(s => s.includes('uploads') && s && !/logo-azara|banner-azara/.test(s) && !s.endsWith('.svg'))).size
+            }));
+            if (sospecha.pdfs > 1 || sospecha.imgs > 1) {
+              console.log(`         🚩 POSIBLE COLECCIÓN NO CATALOGADA → ${url} (pdfs:${sospecha.pdfs}, imgs:${sospecha.imgs})`);
+            }
+          }
+        } catch (error) {
+          console.log(`         ❌ Error: ${error.message}`);
+        }
+        
+        if (procesados % GUARDAR_CADA === 0) guardarTemp();
+        await esperar(800);
+      }
+      
+      subgruposCompletados.add(subgrupo.nombre);
+      guardarTemp();
+      console.log(`      ✅ Subgrupo completado: ${subgrupo.nombre} — ${recursos.length} ítems acumulados`);
+    }
+    
+    console.log(`   📊 Total recursos: ${recursos.length}`);
+    
+    // Guardar archivo final (array plano) y limpiar temp
+    fs.writeFileSync(rutaFinal, JSON.stringify(recursos, null, 2));
+    if (fs.existsSync(rutaTemp)) {
+      fs.unlinkSync(rutaTemp);
+    }
+    
+    return { ...seccion, recursos };
+    
+  } finally {
+    await page.close();
+  }
+}
+
+/**
  * Función principal
  */
 async function run() {
@@ -794,13 +1073,14 @@ async function run() {
   console.log('📚 Scraper Playwright - Fundación Azara');
   console.log('═══════════════════════════════════════════════════════════\n');
   
-  // Filtrar categorías
-  const categoriasParaScrapear = CATEGORIA_SELECTED === 'TODAS' 
-    ? CATEGORIAS 
-    : CATEGORIAS.filter(c => c.slug === CATEGORIA_SELECTED);
+  // Filtrar secciones: --todas → todas; --categoria=slug → una sección puntual.
+  // recursos-educativos es UNA sección de tipo 'recursos' (10 subgrupos → 1 archivo).
+  const seccionesParaScrapear = CATEGORIA_SELECTED === 'TODAS' 
+    ? SECCIONES 
+    : SECCIONES.filter(s => s.slug === CATEGORIA_SELECTED);
   
-  if (categoriasParaScrapear.length === 0) {
-    console.error(`❌ Categoría '${CATEGORIA_SELECTED}' no encontrada.`);
+  if (seccionesParaScrapear.length === 0) {
+    console.error(`❌ Sección '${CATEGORIA_SELECTED}' no encontrada.`);
     process.exit(1);
   }
   
@@ -812,9 +1092,14 @@ async function run() {
   const browser = await chromium.launch({ headless: true });
   
   try {
-    for (const categoria of categoriasParaScrapear) {
-      await scrapearCategoria(browser, categoria);
-      console.log(`   💾 Guardado en: libros-${categoria.slug}.json`);
+    for (const seccion of seccionesParaScrapear) {
+      if (seccion.tipo === 'recursos') {
+        await scrapearSeccionRecursos(browser, seccion);
+        console.log(`   💾 Guardado en: recursos-${seccion.slug.replace(/^recursos-/, '')}.json`);
+      } else {
+        await scrapearCategoria(browser, seccion);
+        console.log(`   💾 Guardado en: libros-${seccion.slug}.json`);
+      }
       await esperar(2000);
     }
     
@@ -833,10 +1118,14 @@ if (require.main === module) {
 
 module.exports = {
   CATEGORIAS,
+  RECURSOS_EDUCATIVOS,
+  SECCIONES,
   COLECCIONES_CONOCIDAS,
   obtenerUrlsLibros,
   obtenerDatosLibro,
+  obtenerDatosRecurso,
   obtenerDatosColeccion,
+  scrapearSeccionRecursos,
   extraerParesH4Pdf,
   extraerContenedorPorLibro,
   extraerDivTitulosCarrousel,
@@ -844,6 +1133,7 @@ module.exports = {
   extraerPdfsRomanos,
   limpiarUrlPdf,
   limpiarInformacionAutor,
+  normalizarHostUrl,
   normalizarTexto,
   parsearAutorAnio,
   tituloDesdeFilename
