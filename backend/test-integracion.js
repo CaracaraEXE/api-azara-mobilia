@@ -3,14 +3,12 @@
  *
  * Zero-deps: `node test-integracion.js` (o `npm test` en backend/).
  * Monta el app REAL (src/index.js) en un puerto efímero y verifica el contrato
- * por HTTP. Es la red de seguridad para el refactor de NAMING (`/api/libros` →
- * `/api/catalogo`): congela el COMPORTAMIENTO (totales, filtros, dedup, búsqueda
- * por titulares, stats) para detectar regresiones no intencionales.
+ * por HTTP. Red de seguridad del refactor de NAMING (`/api/libros` → `/api/catalogo`,
+ * 2026-10-14): congela el COMPORTAMIENTO (totales, filtros, dedup, búsqueda por
+ * titulares, stats, semántica ESTRICTA de ?categoria= y filtro ?seccion=).
  *
  * Los valores esperados se CALCULAN desde data/ (self-calibrating): si re-scrapeás
  * y cambian las cantidades, el test sigue siendo válido.
- *
- * ⚠️ Tras renombrar los endpoints, actualizar la constante API_BASE.
  */
 
 const path = require('path');
@@ -19,8 +17,7 @@ const fs = require('fs');
 const DATA_DIR = path.join(__dirname, 'src', 'data');
 const app = require('./src/index');
 
-// TODO(refactor): cambiar a '/api/catalogo' cuando se generalice el naming.
-const API_BASE = '/api/libros';
+const API_BASE = '/api/catalogo';
 
 let ok = 0;
 let fail = 0;
@@ -50,12 +47,18 @@ const archivosData = descubrirArchivos();
 const seccionesEsperadas = [...new Set(archivosData.map(a => a.seccion))].sort();
 const idsUnicos = new Set();
 const porSeccion = new Map();
+const idsUnicosPorSeccion = new Map(); // dedup por id DENTRO de cada sección
 const itemsPorArchivo = new Map();
 for (const { seccion, ruta } of archivosData) {
   const items = JSON.parse(fs.readFileSync(ruta, 'utf8'));
   itemsPorArchivo.set(ruta, items);
   porSeccion.set(seccion, (porSeccion.get(seccion) || 0) + items.length);
-  for (const it of items) if (it && it.id) idsUnicos.add(it.id);
+  if (!idsUnicosPorSeccion.has(seccion)) idsUnicosPorSeccion.set(seccion, new Set());
+  for (const it of items) {
+    if (!it || !it.id) continue;
+    idsUnicos.add(it.id);
+    idsUnicosPorSeccion.get(seccion).add(it.id);
+  }
 }
 const TOTAL_ESPERADO = idsUnicos.size; // dedup por id (multi-categoría comparte id)
 const ARCHIVOS_ESPERADOS = archivosData.length;
@@ -128,6 +131,26 @@ async function main() {
         igual(`"${nombre}" → count de data`, r.data.length, porSeccion.get(seccion));
         check(`"${nombre}" → todos de su sección`, r.data.every(i => i.seccion === seccion));
       }
+
+      // Semántica ESTRICTA (2026-10-14): un término PARCIAL ya NO matchea varias categorías.
+      // Antes `?categoria=ciencia` traía "Historia De La Ciencia" + "Periódico ... y Ciencia".
+      const rc = await get(`${API_BASE}?categoria=ciencia&limite=1000`);
+      igual('?categoria=ciencia (parcial) → 0 ítems', rc.data.length, 0);
+      const rp = await get(`${API_BASE}?categoria=paleonto&limite=1000`);
+      igual('?categoria=paleonto (parcial) → 0 ítems', rp.data.length, 0);
+    }
+
+    // ── 4b. Filtro por sección ────────────────────────────
+    console.log('\n[4b] Filtro ?seccion=');
+    {
+      for (const sec of seccionesEsperadas) {
+        const r = await get(`${API_BASE}?seccion=${encodeURIComponent(sec)}&limite=1000`);
+        check(`seccion=${sec}: success, no vacía y todos de esa sección`,
+          r.success === true && r.data.length > 0 && r.data.every(i => i.seccion === sec));
+        igual(`seccion=${sec}: count === ids únicos de la sección`, r.data.length, idsUnicosPorSeccion.get(sec).size);
+      }
+      const rMal = await get(`${API_BASE}?seccion=noexiste&limite=1000`);
+      igual('seccion inexistente → 0 ítems', rMal.data.length, 0);
     }
 
     // ── 5. Filtro por colección (RE) ──────────────────────
@@ -174,6 +197,9 @@ async function main() {
 
       igual('categorias/lista total', (await get(`${API_BASE}/categorias/lista`)).meta.total, ARCHIVOS_ESPERADOS);
       check('colecciones/lista success', (await get(`${API_BASE}/colecciones/lista`)).success === true);
+
+      const home = await get('/');
+      check('GET / anuncia /api/catalogo', home.endpoints && home.endpoints.catalogo === '/api/catalogo');
     }
   } finally {
     server.close();

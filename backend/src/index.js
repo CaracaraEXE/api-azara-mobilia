@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const librosRoutes = require('./routes/libros');
+const catalogoRoutes = require('./routes/catalogo');
 const categoriasRoutes = require('./routes/categorias');
 
 const app = express();
@@ -12,18 +12,18 @@ app.use(cors());
 app.use(express.json());
 
 // Rutas
-app.use('/api/libros', librosRoutes);
+app.use('/api/catalogo', catalogoRoutes);
 app.use('/api/categorias', categoriasRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => {
   res.json({ 
     mensaje: 'API Azara funcionando 🦎',
-    version: '1.0.0',
+    version: '2.0.0',
     endpoints: {
-      libros: '/api/libros',
+      catalogo: '/api/catalogo',
       categorias: '/api/categorias',
-      stats: '/api/libros/stats/general'
+      stats: '/api/catalogo/stats/general'
     }
   });
 });

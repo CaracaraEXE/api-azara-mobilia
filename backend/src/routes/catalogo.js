@@ -1,8 +1,9 @@
 /**
- * Rutas de la API - Libros
- * 
- * Lee dinámicamente todos los archivos libros-[categoria].json
- * desde la carpeta data/
+ * Rutas de la API - Catálogo
+ *
+ * Lee dinámicamente TODAS las secciones de data/ (data/<seccion>/<archivo>.json):
+ * libros, recursos educativos y hemeroteca (periódico + Revista Azara). El término
+ * "catálogo" es neutro: la API sirve más que libros.
  */
 
 const express = require('express');
@@ -163,24 +164,30 @@ function normalizarCategoria(s) {
     .replace(/^-+|-+$/g, '');
 }
 
-// GET /api/libros - Lista todos los libros
+// GET /api/catalogo - Lista todos los libros
 router.get('/', (req, res) => {
   try {
-    const { categoria, coleccion, busqueda, pagina = 1, limite = 20 } = req.query;
+    const { seccion, categoria, coleccion, busqueda, pagina = 1, limite = 20 } = req.query;
     
     let libros = obtenerTodosLosLibros();
     
+    // Filtrar por SECCIÓN: 'libros' | 'recursos' | 'periodico-exploracion-y-ciencia' | 'revista-azara'
+    // (el campo `seccion` se deriva de la carpeta de data/). Match exacto por slug.
+    if (seccion) {
+      libros = libros.filter(l => l.seccion === seccion);
+    }
+
     // Filtrar por categoría: acepta NOMBRE ("Areas Naturales") o SLUG ("areas-naturales"),
-    // con o sin tildes — la comparación se hace en forma canónica. Usa TODAS las categorías
-    // del libro (un libro multi-categoría figura en cada una, sin repetir el registro).
+    // con o sin tildes — la comparación se hace en forma canónica (normalizarCategoria).
+    // MATCH EXACTO (2026-10-14): un término PARCIAL ya NO matchea varias categorías (antes
+    // `?categoria=ciencia` traía "Historia De La Ciencia" + "Periódico ... y Ciencia").
+    // Para búsqueda parcial usar `?busqueda=`. Usa TODAS las categorías del libro
+    // (un libro multi-categoría figura en cada una, sin repetir el registro).
     if (categoria) {
       const objetivo = normalizarCategoria(categoria);
       libros = libros.filter(l => {
         const cats = (l.categorias && l.categorias.length) ? l.categorias : [l.categoria];
-        return cats.some(c => {
-          const nc = normalizarCategoria(c);
-          return nc === objetivo || nc.includes(objetivo);
-        });
+        return cats.some(c => normalizarCategoria(c) === objetivo);
       });
     }
 
@@ -218,12 +225,12 @@ router.get('/', (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error en GET /api/libros:', error);
+    console.error('Error en GET /api/catalogo:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// GET /api/libros/:id - Obtener un libro por ID
+// GET /api/catalogo/:id - Obtener un libro por ID
 router.get('/:id', (req, res) => {
   try {
     const { id } = req.params;
@@ -240,12 +247,12 @@ router.get('/:id', (req, res) => {
       res.status(404).json({ success: false, error: 'Libro no encontrado' });
     }
   } catch (error) {
-    console.error('Error en GET /api/libros/:id:', error);
+    console.error('Error en GET /api/catalogo/:id:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// GET /api/libros/colecciones/lista - Lista las colecciones/series (metadata, sin libros)
+// GET /api/catalogo/colecciones/lista - Lista las colecciones/series (metadata, sin libros)
 router.get('/colecciones/lista', (req, res) => {
   try {
     const colecciones = obtenerColecciones();
@@ -258,12 +265,12 @@ router.get('/colecciones/lista', (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error en GET /api/libros/colecciones/lista:', error);
+    console.error('Error en GET /api/catalogo/colecciones/lista:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// GET /api/libros/categorias/lista - Lista todas las categorías
+// GET /api/catalogo/categorias/lista - Lista todas las categorías
 router.get('/categorias/lista', (req, res) => {
   try {
     const categorias = obtenerCategoriasYLibros();
@@ -283,12 +290,12 @@ router.get('/categorias/lista', (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error en GET /api/libros/categorias/lista:', error);
+    console.error('Error en GET /api/catalogo/categorias/lista:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// GET /api/libros/stats - Estadísticas generales (deduplicadas por id, PLANV2 §10)
+// GET /api/catalogo/stats - Estadísticas generales (deduplicadas por id, PLANV2 §10)
 router.get('/stats/general', (req, res) => {
   try {
     const categorias = obtenerCategoriasYLibros();
@@ -311,7 +318,7 @@ router.get('/stats/general', (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error en GET /api/libros/stats:', error);
+    console.error('Error en GET /api/catalogo/stats:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
