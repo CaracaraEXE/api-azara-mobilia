@@ -191,9 +191,32 @@ async function main() {
     console.log('\n[8] Stats y sub-listas');
     {
       const s = await get(`${API_BASE}/stats/general`);
-      igual('stats.totalLibros === ids únicos', s.data.totalLibros, TOTAL_ESPERADO);
+      igual('stats.totalItems === ids únicos', s.data.totalItems, TOTAL_ESPERADO);
       igual('stats.totalCategorias === nº de archivos', s.data.totalCategorias, ARCHIVOS_ESPERADOS);
-      check('stats: conPdf + sinPdf === total', s.data.librosConPdf + s.data.librosSinPdf === s.data.totalLibros);
+      check('stats: itemsConPdf + itemsSinPdf === totalItems',
+        s.data.itemsConPdf + s.data.itemsSinPdf === s.data.totalItems);
+      check('stats: sin claves "libros*" (terminología neutra)',
+        !Object.keys(s.data).some(k => k.toLowerCase().includes('libros')));
+
+      // Desglose por SECCIÓN (2026-10-14): el shape ya no acopla todo a "libros".
+      check('stats.secciones es un array', Array.isArray(s.data.secciones));
+      igual('stats.secciones.length === nº de secciones', s.data.secciones.length, seccionesEsperadas.length);
+      igual('stats.secciones: suma de items === totalItems',
+        s.data.secciones.reduce((a, x) => a + x.items, 0), s.data.totalItems);
+      igual('stats.secciones: suma de categorias === totalCategorias',
+        s.data.secciones.reduce((a, x) => a + x.categorias, 0), s.data.totalCategorias);
+      {
+        let seccionesOk = true;
+        for (const sec of seccionesEsperadas) {
+          const e = s.data.secciones.find(x => x.seccion === sec);
+          if (!e) { seccionesOk = false; console.log(`      (falta sección ${sec})`); continue; }
+          if (e.items !== idsUnicosPorSeccion.get(sec).size) {
+            seccionesOk = false; console.log(`      (items ${sec}: ${e.items} ≠ ${idsUnicosPorSeccion.get(sec).size})`);
+          }
+          if (e.itemsConPdf + e.itemsSinPdf !== e.items) seccionesOk = false;
+        }
+        check('stats.secciones: cada sección con items y PDF consistentes', seccionesOk);
+      }
 
       igual('categorias/lista total', (await get(`${API_BASE}/categorias/lista`)).meta.total, ARCHIVOS_ESPERADOS);
       check('colecciones/lista success', (await get(`${API_BASE}/colecciones/lista`)).success === true);

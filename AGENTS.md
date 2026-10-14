@@ -4,9 +4,9 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 
 ## Current State (Sep 2026)
 
-- ✅ **13/13 categorías scrapeadas** (data/fichas/) + **Recursos Educativos** (data/recursos/) + **hemeroteca COMPLETA (2026-09-27): 3 ediciones** del Periódico (data/periodico-exploracion-y-ciencia/) + **14 ediciones** de Revista Azara (data/revista-azara/) — **452 FILAS** (suma cruda: 326 libros + 109 RE + 3 + 14) = **445 ÍTEMS ÚNICOS** que la API devuelve (dedup por id: 7 libros están en 2 categorías de libros → 319 libros únicos; 1 esqueleto en revisión: postal Guacamayo Militar). ⚠️ El "452" histórico es la suma de filas; `stats/general` y la búsqueda global reportan **445** (uno por obra). En `/categorias` la suma de cantidades da 452 (un libro multi-categoría cuenta en CADA categoría) — ambos números son correctos en su contexto (PLANV2 §10).
+- ✅ **13/13 categorías scrapeadas** (data/libros/) + **Recursos Educativos** (data/recursos/) + **hemeroteca COMPLETA (2026-09-27): 3 ediciones** del Periódico (data/periodico-exploracion-y-ciencia/) + **14 ediciones** de Revista Azara (data/revista-azara/) — **452 FILAS** (suma cruda: 326 libros + 109 RE + 3 + 14) = **445 ÍTEMS ÚNICOS** que la API devuelve (dedup por id: 7 libros están en 2 categorías de libros → 319 libros únicos; 1 esqueleto en revisión: postal Guacamayo Militar). ⚠️ El "452" histórico es la suma de filas; `stats/general` y la búsqueda global reportan **445** (uno por obra). En `/categorias` la suma de cantidades da 452 (un libro multi-categoría cuenta en CADA categoría) — ambos números son correctos en su contexto (PLANV2 §10).
 - ✅ **PLANV3 V3.6 — Hemeroteca (2026-09-27)**: scraper + API + bot listos y EN PRODUCCIÓN para las SECCIONES `periodico-exploracion-y-ciencia` (Periódico Exploración y Ciencia, 🗞️) y `revista-azara` (Revista Azara, 📰). **Piloto + E2E COMPLETO + FASE 2 COMPLETA** (validado por el usuario en Discord): búsqueda por titulares con titular coincidente, salto directo a ediciones (sin título duplicado), `/ficha` con campo 🗞️ Titulares, regresión libros/RE limpia. Estructura de Revista Azara VERIFICADA antes de correr (grilla v4 con `h5.portfolio_title`, PDF único `a.qodef-qi-button[href$=".pdf"]` por edición, titulares mixtos modernas `<p>` / viejas `<br>` — todo cubierto sin cambios). El cortafuegos `revisionPendiente` quedó disponible como red de seguridad (no se disparó en Fase 2: los PDFs de Normas para Autores viven en la página de SECCIÓN, fuera de `article.mix`). El scraper lo corre SIEMPRE el usuario: `node scripts/scraper-playwright.js --seccion=<slug>`.
-- ✅ Datos en carpetas por sección: `data/fichas/fichas-*.json` (13) + `data/recursos/recursos-educativos.json` (1 archivo, campo `coleccion` = subgrupo)
+- ✅ Datos en carpetas por sección: `data/libros/libros-*.json` (13) + `data/recursos/recursos-educativos.json` (1 archivo, campo `coleccion` = subgrupo)
 - ✅ API Express.js funcionando con endpoints GET (respuestas con campo `seccion: 'libros'|'recursos'`)
 - ✅ Scraper con CLI: `--todas` / `--seccion=<slug>` / `--categoria=<slug>` (mutuamente excluyentes)
 - ✅ **Discord Bot funcionando** — Express + HTTP Interactions (sin discord.js)
@@ -23,7 +23,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 | Capa | Tecnología |
 |------|-----------|
 | Backend | Express.js (puerto 3000) |
-| Storage | JSON por categoría (`data/fichas-*.json`) |
+| Storage | JSON por categoría (`data/libros-*.json`) |
 | Scraper | **Playwright** (navegador real, evita CloudFlare) |
 | Bot Server | Express.js (puerto 3001, standalone) |
 | Bot Auth | **tweetnacl** (verificación Ed25519, sin discord.js) |
@@ -92,7 +92,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 1. Usuario ejecuta `/buscar X` → bot responde con type 4 (embed + botones)
 2. Usuario clickea ▶ → Discord envía MESSAGE_COMPONENT
 3. Bot responde type 6 (DEFERRED_UPDATE_MESSAGE) para avisar que procesa
-4. Bot consulta `GET /api/fichas?busqueda=X&limite=5&pagina=N`
+4. Bot consulta `GET /api/catalogo?busqueda=X&limite=5&pagina=N`
 5. Bot hace PATCH al mensaje original via webhook de Discord
 6. Mensaje se actualiza con nuevos resultados y botones
 
@@ -101,9 +101,9 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 1. Usuario ejecuta `/categorias` → bot responde con type 4 (embed + Select de SECCIONES — `sec-select`)
 2. Usuario elige sección (`libros` | `recursos` | `periodico-exploracion-y-ciencia` | `revista-azara`) → bot consulta las categorías de ESA sección:
    - libros → `GET /api/categorias` filtrado por `seccion === 'libros'`
-   - recursos → `GET /api/categorias` + `GET /api/fichas/colecciones/lista` (las colecciones cuyos `categorias` pertenecen a la sección RE)
+   - recursos → `GET /api/categorias` + `GET /api/catalogo/colecciones/lista` (las colecciones cuyos `categorias` pertenecen a la sección RE)
    - hemeroteca → `GET /api/categorias` filtrado por su sección: 1 sola categoría (la publicación)
-3. **Salto directo de hemeroteca (PLANV3 V3.6)**: si la sección tiene `categorias.length === 1`, el bot saltea el select de categorías y muestra DIRECTAMENTE las ediciones (`GET /api/fichas?categoria=<nombre>` + `construirMensajeCategoriaLibros`) — con ◀/▶ y 🔙 que vuelve al PASO 1 (select de secciones).
+3. **Salto directo de hemeroteca (PLANV3 V3.6)**: si la sección tiene `categorias.length === 1`, el bot saltea el select de categorías y muestra DIRECTAMENTE las ediciones (`GET /api/catalogo?categoria=<nombre>` + `construirMensajeCategoriaLibros`) — con ◀/▶ y 🔙 que vuelve al PASO 1 (select de secciones).
 4. Usuario elige categoría → bot consulta `?categoria=` (libros Y hemeroteca) o `?coleccion=` (recursos) y hace PATCH con ítems + ◀/▶ + 🔙 Volver
 5. Usuario clickea 🔙 → bot vuelve al paso 3 (select de categorías) en libros/RE; en hemeroteca vuelve al paso 1 (select de secciones)
 
@@ -112,7 +112,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 1. Usuario ejecuta `/ficha <id>` de un ítem CON titulares (hemeroteca) → `comandoLibro` devuelve `formatos.construirMensajeLibro(libro, false)` (type 4): embed compacto SIN el field 🗞️ + botón `📖 Ver titulares (N)` con `custom_id = {cmd:'tits-toggle', id, v:false}`
 2. Usuario clickea el botón → Discord envía MESSAGE_COMPONENT
 3. Bot responde type 6 (DEFERRED_UPDATE_MESSAGE)
-4. Bot hace `GET /api/fichas/<id>` y re-renderiza con `construirMensajeLibro(libro, !v)` (PATCH al mensaje original) — el embed ahora incluye el field 🗞️ y el botón pasa a `🔽 Ocultar titulares` con `v:true`
+4. Bot hace `GET /api/catalogo/<id>` y re-renderiza con `construirMensajeLibro(libro, !v)` (PATCH al mensaje original) — el embed ahora incluye el field 🗞️ y el botón pasa a `🔽 Ocultar titulares` con `v:true`
 5. Click de nuevo → mismo camino, invierte el estado
 
 Notas:

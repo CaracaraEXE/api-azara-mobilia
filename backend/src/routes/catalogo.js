@@ -295,26 +295,65 @@ router.get('/categorias/lista', (req, res) => {
   }
 });
 
-// GET /api/catalogo/stats - Estadísticas generales (deduplicadas por id, PLANV2 §10)
+/**
+ * Resumen de un conjunto de ítems (global o de una sección): total y cuántos
+ * tienen PDF/autor/año. Terminología NEUTRA "items" (2026-10-14): el catálogo
+ * sirve 4 secciones, no solo libros.
+ */
+function resumirItems(items) {
+  const itemsConPdf = items.filter(l => l.linkPdf).length;
+  return {
+    items: items.length,
+    itemsConPdf,
+    itemsSinPdf: items.length - itemsConPdf,
+    itemsConAutor: items.filter(l => l.autor).length,
+    itemsConAnio: items.filter(l => l.anio).length
+  };
+}
+
+// GET /api/catalogo/stats/general - Estadísticas del catálogo completo Y por
+// SECCIÓN (deduplicadas por id, PLANV2 §10). Sin claves "libros*": el catálogo
+// sirve 4 secciones (libros | recursos | periodico-... | revista-azara).
 router.get('/stats/general', (req, res) => {
   try {
     const categorias = obtenerCategoriasYLibros();
     const todos = obtenerTodosLosLibros();
-    
-    const totalLibros = todos.length;
-    const librosConPdf = todos.filter(l => l.linkPdf).length;
-    const librosConAutor = todos.filter(l => l.autor).length;
-    const librosConAnio = todos.filter(l => l.anio).length;
-    
+
+    // Categorías (archivos) por sección → alimenta `categorias` de cada sección.
+    const categoriasPorSeccion = new Map();
+    for (const cat of categorias) {
+      const sec = cat.seccion || 'libros';
+      categoriasPorSeccion.set(sec, (categoriasPorSeccion.get(sec) || 0) + 1);
+    }
+
+    // Ítems únicos por sección (mismo dedup por id que la API: un ítem
+    // multi-categoría cuenta UNA vez por sección).
+    const itemsPorSeccion = new Map();
+    for (const item of todos) {
+      const sec = item.seccion;
+      if (!itemsPorSeccion.has(sec)) itemsPorSeccion.set(sec, []);
+      itemsPorSeccion.get(sec).push(item);
+    }
+
+    const total = resumirItems(todos);
+    const secciones = [...itemsPorSeccion.entries()]
+      .map(([seccion, items]) => ({
+        seccion,
+        categorias: categoriasPorSeccion.get(seccion) || 0,
+        ...resumirItems(items)
+      }))
+      .sort((a, b) => a.seccion.localeCompare(b.seccion, 'es'));
+
     res.json({
       success: true,
       data: {
-        totalLibros,
+        totalItems: total.items,
         totalCategorias: categorias.length,
-        librosConPdf,
-        librosSinPdf: totalLibros - librosConPdf,
-        librosConAutor,
-        librosConAnio
+        itemsConPdf: total.itemsConPdf,
+        itemsSinPdf: total.itemsSinPdf,
+        itemsConAutor: total.itemsConAutor,
+        itemsConAnio: total.itemsConAnio,
+        secciones
       }
     });
   } catch (error) {
