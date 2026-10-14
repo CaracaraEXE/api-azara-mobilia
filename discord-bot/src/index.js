@@ -21,6 +21,10 @@ const PORT = process.env.PORT || 3001;
 const API_URL = process.env.API_URL || 'http://localhost:3000';
 const formatos = require('./formatos');
 
+// Orden EXPLÍCITO del dropdown de secciones de /categorias (PLANV3 V3.6):
+// libros y RE primero (compat), después la hemeroteca (Periódico, Revista Azara).
+const ORDEN_SECCIONES = ['libros', 'recursos', 'periodico-exploracion-y-ciencia', 'revista-azara'];
+
 // ──────────────────────────────────────────────
 //  Tipos de interacción de Discord
 // ──────────────────────────────────────────────
@@ -138,6 +142,8 @@ app.post('/interactions', verifyDiscordRequest, async (req, res) => {
           await manejarPaginacionCategoria(interaction, res, payload);
         } else if (payload.cmd === 'cat-back') {
           await manejarVolverCategorias(interaction, res, payload);
+        } else if (payload.cmd === 'tits-toggle') {
+          await manejarToggleTitulares(interaction, res, payload);
         }
       } catch (error) {
         console.error('❌ Error en componente:', error);
@@ -212,42 +218,10 @@ async function comandoLibro(options) {
       return { content: `No encontré un libro con ID "${id}".` };
     }
 
-    const libro = datos.data;
-
-    // Sección (emoji) + categoría REAL: en RE la categoría visible es la
-    // colección/subgrupo; 'Recursos Educativos' es la SECCIÓN, no la categoría.
-    const sec = formatos.infoSeccion(libro);
-
-    const fields = [
-      { name: `${sec.emoji} Sección`, value: sec.nombre, inline: true },
-      { name: '📁 Categoría', value: sec.categoriaReal, inline: true },
-      { name: '✍️ Autor', value: libro.autor || 'Desconocido', inline: true },
-      { name: '📅 Año', value: libro.anio ? libro.anio.toString() : 'Desconocido', inline: true }
-    ];
-
-    // Colección de LIBROS (PLANV2 §2): series/desgloses ("Tomo 02"); en RE ya está en Categoría.
-    if (!sec.esRecursos && libro.coleccion) {
-      fields.push({ name: '🗂️ Colección', value: libro.coleccion, inline: false });
-    }
-
-    if (libro.linkPdf) {
-      // Bilingües (linkPdfEn, p.ej. El Shincal): ambos enlaces, ES · EN
-      const enlaces = [`[Español](${libro.linkPdf})`];
-      if (libro.linkPdfEn) enlaces.push(`[English](${libro.linkPdfEn})`);
-      fields.push({ name: '📄 PDF', value: enlaces.join(' · '), inline: false });
-    }
-
-    const embed = {
-      title: libro.titulo.substring(0, 256),
-      color: 0x00AE86,
-      fields,
-    };
-
-    if (libro.imagenPortada) {
-      embed.image = { url: libro.imagenPortada };
-    }
-
-    return { embeds: [embed] };
+    // Presentación movida a formatos.js (pura, testeable). El 2º argumento es el
+    // estado INICIAL del toggle de titulares: ocultos por defecto → /libro
+    // compacto; el botón 📖 los muestra re-renderizando vía 'tits-toggle'.
+    return formatos.construirMensajeLibro(datos.data, false);
   } catch (error) {
     console.error('Error al obtener libro:', error);
     return { content: '❌ Error al conectar con la API.' };
@@ -269,13 +243,15 @@ async function comandoCategorias() {
     }
 
     // Agrupar por sección (la API entrega categoria.seccion tras la migración
-    // a carpetas por sección). Orden estable: libros primero, RE después.
+    // a carpetas por sección). El nombre sale de formatos (single source of
+    // truth, PLANV3 V3.6) y el orden es EXPLÍCITO (ORDEN_SECCIONES) para que la
+    // hemeroteca aparezca después de libros/RE sin depender del orden de fs.
     const porSeccion = new Map();
     for (const cat of datos.data) {
       const sec = cat.seccion || 'libros'; // compat: categorías sin seccion → libros
       const e = porSeccion.get(sec) || {
         seccion: sec,
-        nombre: sec === 'recursos' ? 'Recursos educativos' : 'Libros',
+        nombre: formatos.SECCIONES_NOMBRES[sec] || sec,
         cantidad: 0,
         categorias: 0
       };
@@ -284,7 +260,11 @@ async function comandoCategorias() {
       porSeccion.set(sec, e);
     }
     const secciones = [...porSeccion.values()]
-      .sort((a, b) => (a.seccion === 'libros' ? 0 : 1) - (b.seccion === 'libros' ? 0 : 1));
+      .sort((a, b) => {
+        const ia = ORDEN_SECCIONES.indexOf(a.seccion);
+        const ib = ORDEN_SECCIONES.indexOf(b.seccion);
+        return (ia === -1 ? ORDEN_SECCIONES.length : ia) - (ib === -1 ? ORDEN_SECCIONES.length : ib);
+      });
     const totalItems = secciones.reduce((s, x) => s + x.cantidad, 0);
 
     return formatos.construirMensajeSecciones(secciones, totalItems);
@@ -326,6 +306,32 @@ async function patchError(interaction, texto) {
     embeds: [],
     components: []
   });
+}
+
+/**
+ * Toggle de titulares de /libro (hemeroteca): alterna mostrar/ocultar el campo
+ * 🗞️ Titulares RE-RENDERIZANDO el mensaje completo (Discord no tiene colapso).
+ * El estado viene en el custom_id (v = ¿visibles AHORA?); el nuevo es !v.
+ * Solo /libro lleva este botón — /buscar y los listados no lo usan.
+ */
+async function manejarToggleTitulares(interaction, res, payload) {
+  const { id, v } = payload;
+
+  res.json({ type: InteractionResponseType.DEFERRED_UPDATE_MESSAGE });
+
+  try {
+    const respuesta = await fetch(`${API_URL}/api/libros/${id}`);
+    const datos = await respuesta.json();
+
+    if (datos.success) {
+      await patchMensajeOriginal(interaction, formatos.construirMensajeLibro(datos.data, !v));
+    } else {
+      await patchError(interaction, '❌ No encontré el ítem para actualizar.');
+    }
+  } catch (error) {
+    console.error('❌ Error en toggle de titulares:', error);
+    await patchError(interaction, '❌ Error al conectar con la API.');
+  }
 }
 
 /**
@@ -379,8 +385,10 @@ async function obtenerCategoriasDeSeccion(sec) {
 
   const respuesta = await fetch(`${API_URL}/api/categorias`);
   const datos = await respuesta.json();
+  // FIX V3.6: el default filtra por la SECCIÓN recibida (antes hardcodeado
+  // 'libros') → cubre la hemeroteca con su categoría única sin rama especial.
   const categorias = (datos.data || [])
-    .filter(c => (c.seccion || 'libros') === 'libros')
+    .filter(c => (c.seccion || 'libros') === sec)
     .map(c => ({ nombre: c.nombre, cantidad: c.cantidad }));
   return { categorias, total: categorias.reduce((s, c) => s + c.cantidad, 0) };
 }
@@ -403,6 +411,23 @@ async function manejarSeleccionSeccion(interaction, res) {
 
   try {
     const { categorias, total } = await obtenerCategoriasDeSeccion(sec);
+
+    // Salto directo (PLANV3 V3.6): secciones con 1 sola categoría (la hemeroteca)
+    // muestran DIRECTAMENTE sus ediciones, sin el select de categorías intermedio.
+    if (categorias.length === 1) {
+      const nombreCategoria = categorias[0].nombre;
+      const respuesta = await fetch(
+        `${API_URL}/api/libros?categoria=${encodeURIComponent(nombreCategoria)}&limite=5&pagina=1`
+      );
+      const datos = await respuesta.json();
+      if (datos.success && datos.data.length > 0) {
+        await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriaLibros(sec, nombreCategoria, datos.data, 0, datos.meta.total));
+      } else {
+        await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriaLibros(sec, nombreCategoria, [], 0, 0));
+      }
+      return;
+    }
+
     await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriasSeccion(sec, categorias, total));
   } catch (error) {
     console.error('Error al seleccionar sección:', error);
@@ -491,6 +516,15 @@ async function manejarVolverCategorias(interaction, res, payload) {
 
   try {
     const { categorias, total } = await obtenerCategoriasDeSeccion(sec);
+
+    // Salto directo (PLANV3 V3.6): si la sección tiene 1 sola categoría, el 🔙
+    // vuelve al PASO 1 (select de secciones), no al select de categorías.
+    if (categorias.length === 1) {
+      const paso1 = await comandoCategorias();
+      await patchMensajeOriginal(interaction, paso1);
+      return;
+    }
+
     await patchMensajeOriginal(interaction, formatos.construirMensajeCategoriasSeccion(sec, categorias, total));
   } catch (error) {
     console.error('Error al volver a categorías:', error);

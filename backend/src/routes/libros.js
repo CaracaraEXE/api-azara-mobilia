@@ -14,19 +14,23 @@ const path = require('path');
 const DATA_DIR = path.join(__dirname, '../data');
 
 /**
- * Listar los archivos de datos de TODAS las secciones (src/data/libros/*.json,
- * src/data/recursos/*.json). La carpeta padre = seccion ('libros' | 'recursos'),
- * el nombre del archivo lleva el prefijo de la sección: libros-{slug}.json.
+ * Listar los archivos de datos de TODAS las secciones (todas las subcarpetas de data/).
+ * Descubrimiento AUTOMÁTICO (PLANV3 V3.6): toda subcarpeta de data/ es una SECCIÓN;
+ * los archivos válidos son los que EMPIEZAN con el nombre de la carpeta:
+ *   libros/libros-*.json (13), recursos/recursos-educativos.json,
+ *   periodico-exploracion-y-ciencia/periodico-exploracion-y-ciencia.json, ...
  * Se devuelve la ruta completa + la sección para derivar los campos en runtime.
  */
 function listarArchivosData() {
   const archivos = [];
-  for (const carpeta of ['libros', 'recursos']) {
-    const dir = path.join(DATA_DIR, carpeta);
-    if (!fs.existsSync(dir)) continue;
+  if (!fs.existsSync(DATA_DIR)) return archivos;
+  for (const carpeta of fs.readdirSync(DATA_DIR, { withFileTypes: true })) {
+    if (!carpeta.isDirectory()) continue;
+    const dir = path.join(DATA_DIR, carpeta.name);
+    const re = new RegExp(`^${carpeta.name}(-.+)?\\.json$`);
     for (const f of fs.readdirSync(dir)) {
-      if (/^(libros|recursos)-.+\.json$/.test(f)) {
-        archivos.push({ ruta: path.join(dir, f), seccion: carpeta });
+      if (re.test(f)) {
+        archivos.push({ ruta: path.join(dir, f), seccion: carpeta.name });
       }
     }
   }
@@ -187,12 +191,13 @@ router.get('/', (req, res) => {
       libros = libros.filter(l => l.coleccion && normalizarCategoria(l.coleccion).includes(objetivo));
     }
     
-    // Filtrar por búsqueda (título, autor) — sin acentos ni mayúsculas
+    // Filtrar por búsqueda (título, autor, titulares de hemeroteca) — sin acentos ni mayúsculas
     if (busqueda) {
       const termino = normalizarBusqueda(busqueda);
       libros = libros.filter(l => 
         normalizarBusqueda(l.titulo).includes(termino) ||
-        (l.autor && normalizarBusqueda(l.autor).includes(termino))
+        (l.autor && normalizarBusqueda(l.autor).includes(termino)) ||
+        (Array.isArray(l.titulares) && l.titulares.some(t => normalizarBusqueda(t).includes(termino)))
       );
     }
     
