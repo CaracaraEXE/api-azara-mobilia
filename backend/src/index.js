@@ -28,7 +28,11 @@ app.get('/', (req, res) => {
   });
 });
 
-// Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-});
+// Iniciar servidor (SOLO si se ejecuta directo, no al importar desde tests)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

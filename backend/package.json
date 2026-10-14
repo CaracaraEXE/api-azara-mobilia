@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
+    "test": "node test-integracion.js",
     "scrape": "node scripts/scraper.js",
     "scrape-pw": "node scripts/scraper-playwright.js",
     "scrape-todas": "node scripts/scraper-playwright.js --todas",
