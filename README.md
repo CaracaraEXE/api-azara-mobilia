@@ -172,21 +172,63 @@ azara/
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| GET | `/api/catalogo` | Lista los ítems del catálogo (con paginación y filtros) |
-| GET | `/api/catalogo/:id` | Obtiene un ítem por ID |
-| GET | `/api/categorias` | Lista categorías disponibles (con su sección) |
-| GET | `/api/catalogo/stats/general` | Estadísticas del catálogo: totales + desglose por sección |
+| GET | `/` | Info de la API (versión + lista de endpoints) |
+| GET | `/api/catalogo` | Lista ítems del catálogo (paginación + filtros) |
+| GET | `/api/catalogo/:id` | Obtiene un ítem por ID (`404` si no existe) |
+| GET | `/api/catalogo/stats/general` | Estadísticas: totales + desglose por sección |
+| GET | `/api/catalogo/categorias/lista` | Categorías (metadata: nombre, slug, cantidad, url) |
+| GET | `/api/catalogo/colecciones/lista` | Colecciones/series (metadata, sin ítems) |
+| GET | `/api/categorias` | Categorías con su `seccion` (la usa el bot para navegar) |
+
+> ⚠️ **No existe** un endpoint `/api/secciones`. Las secciones se obtienen del campo `seccion` de `/api/categorias`, o del array `secciones[]` de `/api/catalogo/stats/general`.
 
 ### Parámetros de Query (GET /api/catalogo)
 
 | Parámetro | Ejemplo | Descripción |
 |-----------|---------|-------------|
-| `busqueda` | `?busqueda=dinosaurio` | Busca en título, autor y titulares |
-| `categoria` | `?categoria=Paleontologia` | Filtra por categoría (match EXACTO del nombre o slug) |
+| `busqueda` | `?busqueda=dinosaurio` | Busca en título, autor y titulares (ignora acentos/mayúsculas) |
+| `categoria` | `?categoria=Paleontologia` | Filtra por categoría (match EXACTO de nombre o slug) |
 | `coleccion` | `?coleccion=Cuadernillos` | Filtra por colección/serie (match parcial) |
 | `seccion` | `?seccion=revista-azara` | Filtra por sección (`libros` \| `recursos` \| `periodico-exploracion-y-ciencia` \| `revista-azara`) |
-| `pagina` | `?pagina=2` | Número de página |
-| `limite` | `?limite=20` | Resultados por página |
+| `pagina` | `?pagina=2` | Número de página (default `1`) |
+| `limite` | `?limite=20` | Ítems por página (default `20`) |
+
+Los filtros se pueden **combinar** (se aplican en AND): `?seccion=libros&categoria=flora-y-fauna&limite=5`.
+
+### Cómo buscar (ejemplos)
+
+```bash
+# Búsqueda por texto libre (título, autor o titulares de hemeroteca)
+curl "http://localhost:3000/api/catalogo?busqueda=huemul"
+
+# Ítems de una categoría (acepta nombre exacto O slug)
+curl "http://localhost:3000/api/catalogo?categoria=Flora+y+Fauna"
+curl "http://localhost:3000/api/catalogo?categoria=flora-y-fauna"
+
+# Ítems de una sección completa
+curl "http://localhost:3000/api/catalogo?seccion=revista-azara"
+
+# Una colección/serie (match parcial)
+curl "http://localhost:3000/api/catalogo?coleccion=trazos"
+
+# Combinar filtros + paginar
+curl "http://localhost:3000/api/catalogo?seccion=libros&categoria=paleontologia&pagina=1&limite=5"
+
+# Un ítem puntual por ID
+curl "http://localhost:3000/api/catalogo/lib-3zgddm8g"
+```
+
+Respuesta de `GET /api/catalogo` (paginada):
+
+```json
+{
+  "success": true,
+  "data": [
+    { "id": "lib-3zgddm8g", "titulo": "...", "categoria": "...", "seccion": "libros", "linkPdf": "..." }
+  ],
+  "meta": { "total": 445, "pagina": 1, "limite": 20, "totalPaginas": 23 }
+}
+```
 
 ## 🤖 Comandos del Bot de Discord
 
