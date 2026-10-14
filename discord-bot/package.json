@@ -1,7 +1,7 @@
 {
   "name": "azara-discord-bot",
-  "version": "1.0.0",
-  "description": "Bot de Discord para buscar libros de la Fundación Azara (vía HTTP Interactions)",
+  "version": "2.0.0",
+  "description": "Bot de Discord para explorar el catálogo de la Fundación Azara (vía HTTP Interactions)",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -9,7 +9,7 @@
     "test": "node test-formatos.js",
     "register": "node src/register.js"
   },
-  "keywords": ["discord", "bot", "azara", "libros"],
+  "keywords": ["discord", "bot", "azara", "catalogo"],
   "author": "",
   "license": "ISC",
   "dependencies": {

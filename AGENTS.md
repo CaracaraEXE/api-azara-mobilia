@@ -4,9 +4,9 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 
 ## Current State (Sep 2026)
 
-- ✅ **13/13 categorías scrapeadas** (data/libros/) + **Recursos Educativos** (data/recursos/) + **hemeroteca COMPLETA (2026-09-27): 3 ediciones** del Periódico (data/periodico-exploracion-y-ciencia/) + **14 ediciones** de Revista Azara (data/revista-azara/) — **452 FILAS** (suma cruda: 326 libros + 109 RE + 3 + 14) = **445 ÍTEMS ÚNICOS** que la API devuelve (dedup por id: 7 libros están en 2 categorías de libros → 319 libros únicos; 1 esqueleto en revisión: postal Guacamayo Militar). ⚠️ El "452" histórico es la suma de filas; `stats/general` y la búsqueda global reportan **445** (uno por obra). En `/categorias` la suma de cantidades da 452 (un libro multi-categoría cuenta en CADA categoría) — ambos números son correctos en su contexto (PLANV2 §10).
-- ✅ **PLANV3 V3.6 — Hemeroteca (2026-09-27)**: scraper + API + bot listos y EN PRODUCCIÓN para las SECCIONES `periodico-exploracion-y-ciencia` (Periódico Exploración y Ciencia, 🗞️) y `revista-azara` (Revista Azara, 📰). **Piloto + E2E COMPLETO + FASE 2 COMPLETA** (validado por el usuario en Discord): búsqueda por titulares con titular coincidente, salto directo a ediciones (sin título duplicado), `/libro` con campo 🗞️ Titulares, regresión libros/RE limpia. Estructura de Revista Azara VERIFICADA antes de correr (grilla v4 con `h5.portfolio_title`, PDF único `a.qodef-qi-button[href$=".pdf"]` por edición, titulares mixtos modernas `<p>` / viejas `<br>` — todo cubierto sin cambios). El cortafuegos `revisionPendiente` quedó disponible como red de seguridad (no se disparó en Fase 2: los PDFs de Normas para Autores viven en la página de SECCIÓN, fuera de `article.mix`). El scraper lo corre SIEMPRE el usuario: `node scripts/scraper-playwright.js --seccion=<slug>`.
-- ✅ Datos en carpetas por sección: `data/libros/libros-*.json` (13) + `data/recursos/recursos-educativos.json` (1 archivo, campo `coleccion` = subgrupo)
+- ✅ **13/13 categorías scrapeadas** (data/fichas/) + **Recursos Educativos** (data/recursos/) + **hemeroteca COMPLETA (2026-09-27): 3 ediciones** del Periódico (data/periodico-exploracion-y-ciencia/) + **14 ediciones** de Revista Azara (data/revista-azara/) — **452 FILAS** (suma cruda: 326 libros + 109 RE + 3 + 14) = **445 ÍTEMS ÚNICOS** que la API devuelve (dedup por id: 7 libros están en 2 categorías de libros → 319 libros únicos; 1 esqueleto en revisión: postal Guacamayo Militar). ⚠️ El "452" histórico es la suma de filas; `stats/general` y la búsqueda global reportan **445** (uno por obra). En `/categorias` la suma de cantidades da 452 (un libro multi-categoría cuenta en CADA categoría) — ambos números son correctos en su contexto (PLANV2 §10).
+- ✅ **PLANV3 V3.6 — Hemeroteca (2026-09-27)**: scraper + API + bot listos y EN PRODUCCIÓN para las SECCIONES `periodico-exploracion-y-ciencia` (Periódico Exploración y Ciencia, 🗞️) y `revista-azara` (Revista Azara, 📰). **Piloto + E2E COMPLETO + FASE 2 COMPLETA** (validado por el usuario en Discord): búsqueda por titulares con titular coincidente, salto directo a ediciones (sin título duplicado), `/ficha` con campo 🗞️ Titulares, regresión libros/RE limpia. Estructura de Revista Azara VERIFICADA antes de correr (grilla v4 con `h5.portfolio_title`, PDF único `a.qodef-qi-button[href$=".pdf"]` por edición, titulares mixtos modernas `<p>` / viejas `<br>` — todo cubierto sin cambios). El cortafuegos `revisionPendiente` quedó disponible como red de seguridad (no se disparó en Fase 2: los PDFs de Normas para Autores viven en la página de SECCIÓN, fuera de `article.mix`). El scraper lo corre SIEMPRE el usuario: `node scripts/scraper-playwright.js --seccion=<slug>`.
+- ✅ Datos en carpetas por sección: `data/fichas/fichas-*.json` (13) + `data/recursos/recursos-educativos.json` (1 archivo, campo `coleccion` = subgrupo)
 - ✅ API Express.js funcionando con endpoints GET (respuestas con campo `seccion: 'libros'|'recursos'`)
 - ✅ Scraper con CLI: `--todas` / `--seccion=<slug>` / `--categoria=<slug>` (mutuamente excluyentes)
 - ✅ **Discord Bot funcionando** — Express + HTTP Interactions (sin discord.js)
@@ -15,15 +15,15 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 - ✅ Botón "Volver" a categorías de la MISMA sección
 - ✅ IDs de libros visibles (`🆔 \`lib-abc123\``) en resultados
 - ✅ Presentación del bot separada en `discord-bot/src/formatos.js` (pura, testeable sin servidor) — tests en `discord-bot/test-formatos.js` (42 checks, `npm test`)
-- ✅ **Red de seguridad de tests (2026-10-14)**: `backend` → `npm test` = `test-integracion.js` (32 checks, 0 deps): monta el app REAL en puerto efímero (`src/index.js` ahora exporta `app` + guard `require.main`) y verifica totales, paginación, filtros (`categoria`/`coleccion`/`busqueda`), búsqueda por titulares, detalle, stats y sub-listas. Valores esperados AUTO-CALCULADOS desde `data/`. Pendiente de actualizar `API_BASE` al renombrar los endpoints.
-- ✅ **`/libro` con TOGGLE de titulares (2026-10-14)**: ítems de hemeroteca muestran los titulares OCULTOS por defecto + botón `📖 Ver titulares (N)` que los muestra/oculta re-renderizando (PATCH). Ver "Flujo del toggle" abajo.
+- ✅ **Red de seguridad de tests (2026-10-14)**: `backend` → `npm test` = `test-integracion.js` (44 checks, 0 deps): monta el app REAL en puerto efímero, verifica `?categoria=` ESTRICTA (parciales → 0), nuevo filtro `?seccion=`, totales dedup, paginación, búsqueda por titulares, detalle, stats y sub-listas. Valores auto-calculados desde `data/`. `API_BASE` pasa a `/api/catalogo`, `index.js` exporta `app` + guard `require.main`, `GET /` anuncia `/api/catalogo`.
+- ✅ **`/ficha` con TOGGLE de titulares (2026-10-14)**: ítems de hemeroteca muestran los titulares OCULTOS por defecto + botón `📖 Ver titulares (N)` que los muestra/oculta re-renderizando (PATCH). Ver "Flujo del toggle" abajo.
 
 ## Stack
 
 | Capa | Tecnología |
 |------|-----------|
 | Backend | Express.js (puerto 3000) |
-| Storage | JSON por categoría (`data/libros-*.json`) |
+| Storage | JSON por categoría (`data/fichas-*.json`) |
 | Scraper | **Playwright** (navegador real, evita CloudFlare) |
 | Bot Server | Express.js (puerto 3001, standalone) |
 | Bot Auth | **tweetnacl** (verificación Ed25519, sin discord.js) |
@@ -34,7 +34,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 | Comando | Descripción |
 |---------|-------------|
 | `/buscar [termino]` | Busca por título, 5 por página, botones ◀/▶ |
-| `/libro [id]` | Detalle de un ítem (Sección + Categoría real). Si es hemeroteca: titulares OCULTOS por defecto + botón `📖 Ver titulares (N)` / `🔽 Ocultar titulares` (solo ítems CON titulares) |
+| `/ficha [id]` | Detalle de un ítem (Sección + Categoría real). Si es hemeroteca: titulares OCULTOS por defecto + botón `📖 Ver titulares (N)` / `🔽 Ocultar titulares` (solo ítems CON titulares) |
 | `/categorias` | Select de SECCIONES (📚 Libros / 🎓 Recursos educativos / 🗞️ Periódico Exploración y Ciencia / 📰 Revista Azara) |
 | → Select sección | Estadísticas + Select de categorías de ESA sección |
 | → Select categoría | Ítems de esa categoría + ◀/▶ + 🔙 Volver (a la misma sección) |
@@ -79,7 +79,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 { cmd: 'cat-select', sec: 'libros' }
 { cmd: 'cat-select', sec: 'recursos' }
 
-// TOGGLE de titulares de /libro (SOLO hemeroteca con titulares; v = ¿visibles AHORA?)
+// TOGGLE de titulares de /ficha (SOLO hemeroteca con titulares; v = ¿visibles AHORA?)
 // El estado viaja en el custom_id → el bot no guarda estado. El nuevo estado es !v.
 { cmd: 'tits-toggle', id: 'lib-pued1cal', v: false }
 
@@ -92,7 +92,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 1. Usuario ejecuta `/buscar X` → bot responde con type 4 (embed + botones)
 2. Usuario clickea ▶ → Discord envía MESSAGE_COMPONENT
 3. Bot responde type 6 (DEFERRED_UPDATE_MESSAGE) para avisar que procesa
-4. Bot consulta `GET /api/libros?busqueda=X&limite=5&pagina=N`
+4. Bot consulta `GET /api/fichas?busqueda=X&limite=5&pagina=N`
 5. Bot hace PATCH al mensaje original via webhook de Discord
 6. Mensaje se actualiza con nuevos resultados y botones
 
@@ -101,24 +101,24 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 1. Usuario ejecuta `/categorias` → bot responde con type 4 (embed + Select de SECCIONES — `sec-select`)
 2. Usuario elige sección (`libros` | `recursos` | `periodico-exploracion-y-ciencia` | `revista-azara`) → bot consulta las categorías de ESA sección:
    - libros → `GET /api/categorias` filtrado por `seccion === 'libros'`
-   - recursos → `GET /api/categorias` + `GET /api/libros/colecciones/lista` (las colecciones cuyos `categorias` pertenecen a la sección RE)
+   - recursos → `GET /api/categorias` + `GET /api/fichas/colecciones/lista` (las colecciones cuyos `categorias` pertenecen a la sección RE)
    - hemeroteca → `GET /api/categorias` filtrado por su sección: 1 sola categoría (la publicación)
-3. **Salto directo de hemeroteca (PLANV3 V3.6)**: si la sección tiene `categorias.length === 1`, el bot saltea el select de categorías y muestra DIRECTAMENTE las ediciones (`GET /api/libros?categoria=<nombre>` + `construirMensajeCategoriaLibros`) — con ◀/▶ y 🔙 que vuelve al PASO 1 (select de secciones).
+3. **Salto directo de hemeroteca (PLANV3 V3.6)**: si la sección tiene `categorias.length === 1`, el bot saltea el select de categorías y muestra DIRECTAMENTE las ediciones (`GET /api/fichas?categoria=<nombre>` + `construirMensajeCategoriaLibros`) — con ◀/▶ y 🔙 que vuelve al PASO 1 (select de secciones).
 4. Usuario elige categoría → bot consulta `?categoria=` (libros Y hemeroteca) o `?coleccion=` (recursos) y hace PATCH con ítems + ◀/▶ + 🔙 Volver
 5. Usuario clickea 🔙 → bot vuelve al paso 3 (select de categorías) en libros/RE; en hemeroteca vuelve al paso 1 (select de secciones)
 
-### Flujo del toggle de titulares (/libro)
+### Flujo del toggle de titulares (/ficha)
 
-1. Usuario ejecuta `/libro <id>` de un ítem CON titulares (hemeroteca) → `comandoLibro` devuelve `formatos.construirMensajeLibro(libro, false)` (type 4): embed compacto SIN el field 🗞️ + botón `📖 Ver titulares (N)` con `custom_id = {cmd:'tits-toggle', id, v:false}`
+1. Usuario ejecuta `/ficha <id>` de un ítem CON titulares (hemeroteca) → `comandoLibro` devuelve `formatos.construirMensajeLibro(libro, false)` (type 4): embed compacto SIN el field 🗞️ + botón `📖 Ver titulares (N)` con `custom_id = {cmd:'tits-toggle', id, v:false}`
 2. Usuario clickea el botón → Discord envía MESSAGE_COMPONENT
 3. Bot responde type 6 (DEFERRED_UPDATE_MESSAGE)
-4. Bot hace `GET /api/libros/<id>` y re-renderiza con `construirMensajeLibro(libro, !v)` (PATCH al mensaje original) — el embed ahora incluye el field 🗞️ y el botón pasa a `🔽 Ocultar titulares` con `v:true`
+4. Bot hace `GET /api/fichas/<id>` y re-renderiza con `construirMensajeLibro(libro, !v)` (PATCH al mensaje original) — el embed ahora incluye el field 🗞️ y el botón pasa a `🔽 Ocultar titulares` con `v:true`
 5. Click de nuevo → mismo camino, invierte el estado
 
 Notas:
 - **Discord no tiene "colapsar"**: el toggle es el bot RE-RENDERIZANDO el mensaje entero (el estado vive en el `custom_id`, no en el bot). Funciona indefinidamente: cada click trae un token de interacción fresco.
 - **Estado COMPARTIDO** (límite de la plataforma): el mensaje es único → si alguien abre/cierra, lo ven todos. Aceptado por el usuario (2026-10-14).
-- **Solo `/libro`**: `/buscar` (solo titular coincidente) y los listados de categoría NO llevan este botón.
+- **Solo `/ficha`**: `/buscar` (solo titular coincidente) y los listados de categoría NO llevan este botón.
 - Ítems SIN titulares (libros/RE): `construirMensajeLibro` NO devuelve `components` (sin botón).
 
 ### Convención de etiquetas (formatos.js)
@@ -130,7 +130,7 @@ Notas:
 - En HEMEROTECA el título del embed de ítems de categoría NO repite la categoría (la única categoría ES la publicación): `🗞️ Periódico Exploración y Ciencia` — sin `: Categoría` (fix E2E piloto 2026-09-27; `construirMensajeCategoriaLibros` usa `SECCIONES_HEMEROTECA.has(sec)`)
 - Ítems bilingües (`linkPdfEn`, p.ej. folleto El Shincal de Quimivil): dos enlaces `📄 [Descargar PDF]` (ES) + `📄 [Descargar PDF (EN)]` — EN siempre como última línea (helper `enlacesPdf` en formatos.js)
 - `🗂️ Colección` como línea extra SOLO en libros (desambigua series "Tomo NN"); en RE ya está en la categoría
-- **`/libro`**: el embed se arma con `construirMensajeLibro(libro, mostrarTitulares)` (NO inline en index.js — refactor 2026-10-14). El field `🗞️ Titulares` se incluye solo si el ítem tiene titulares Y `mostrarTitulares` es true; el listado es `• ` + titular, truncado a ~1000 chars con contador `(mostrando X de N titulares)` (límite de field: 1024). El botón del toggle solo existe para ítems CON titulares.
+- **`/ficha`**: el embed se arma con `construirMensajeLibro(libro, mostrarTitulares)` (NO inline en index.js — refactor 2026-10-14). El field `🗞️ Titulares` se incluye solo si el ítem tiene titulares Y `mostrarTitulares` es true; el listado es `• ` + titular, truncado a ~1000 chars con contador `(mostrando X de N titulares)` (límite de field: 1024). El botón del toggle solo existe para ítems CON titulares.
 
 ## Gotchas
 
@@ -167,7 +167,7 @@ Notas:
   "fechaExtraccion": "ISO string",
   "linkPdfEn": "string (opcional — versión en inglés, ítems bilingües)",
   "revisionPendiente": "bool (opcional — esqueleto curado sin PDF, p.ej. postal con página rota)",
-  "titulares": ["string", "..." ] (opcional — SOLO hemeroteca, PLANV3 V3.6: titulares de la edición SIN bullet; hacen encontrable el ítem en /buscar y se listan en /libro en el campo 🗞️ Titulares — OCULTOS por defecto, el botón toggle los muestra/oculta. NO se muestran en listados de categorías; en los RESULTADOS de /buscar se muestra SOLO el/los titular(es) COINCIDENTE(S) con el término como contexto del match — "• " + titular, máx 2 + "…y N más" según las coincidencias. Helpers puros en formatos.js: `normalizarBusqueda` (MISMA semántica que libros.js L146, conserva la ñ) y `titularesCoincidentes(libro, termino)`)"
+  "titulares": ["string", "..." ] (opcional — SOLO hemeroteca, PLANV3 V3.6: titulares de la edición SIN bullet; hacen encontrable el ítem en /buscar y se listan en /ficha en el campo 🗞️ Titulares — OCULTOS por defecto, el botón toggle los muestra/oculta. NO se muestran en listados de categorías; en los RESULTADOS de /buscar se muestra SOLO el/los titular(es) COINCIDENTE(S) con el término como contexto del match — "• " + titular, máx 2 + "…y N más" según las coincidencias. Helpers puros en formatos.js: `normalizarBusqueda` (MISMA semántica que libros.js L146, conserva la ñ) y `titularesCoincidentes(libro, termino)`)"
 }
 ```
 

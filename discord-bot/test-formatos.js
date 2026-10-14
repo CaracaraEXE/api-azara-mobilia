@@ -4,7 +4,7 @@
  * Zero-deps: se corre con `node test-formatos.js` (o `npm test`). Vive en el
  * REPO a propósito: los tests en temp se pierden y no sirven de red de seguridad.
  *
- * Cubre el helper construirMensajeLibro y el TOGGLE de titulares de /libro:
+ * Cubre el helper construirMensajeLibro y el TOGGLE de titulares de /ficha:
  *   - estado oculto (default): sin field 🗞️, botón "📖 Ver titulares (N)"
  *   - estado visible: field 🗞️ con "• " + titulares, botón "🔽 Ocultar titulares"
  *   - el estado viaja en el custom_id ({cmd:'tits-toggle', id, v})
@@ -67,8 +67,8 @@ const reCurso = {
   linkPdf: 'http://ejemplo/r.pdf'
 };
 
-// ── 1. /libro con titulares, estado OCULTO (default) ─────
-console.log('\n[1] /libro con titulares — estado OCULTO');
+// ── 1. /ficha con titulares, estado OCULTO (default) ─────
+console.log('\n[1] /ficha con titulares — estado OCULTO');
 {
   const m = formatos.construirMensajeLibro(conTitulares, false);
   const e = m.embeds[0];
@@ -93,8 +93,8 @@ console.log('\n[1] /libro con titulares — estado OCULTO');
   igual('custom_id', b?.custom_id, JSON.stringify({ cmd: 'tits-toggle', id: 'lib-test01', v: false }));
 }
 
-// ── 2. /libro con titulares, estado VISIBLE ──────────────
-console.log('\n[2] /libro con titulares — estado VISIBLE');
+// ── 2. /ficha con titulares, estado VISIBLE ──────────────
+console.log('\n[2] /ficha con titulares — estado VISIBLE');
 {
   const m = formatos.construirMensajeLibro(conTitulares, true);
   const e = m.embeds[0];
@@ -109,7 +109,7 @@ console.log('\n[2] /libro con titulares — estado VISIBLE');
 }
 
 // ── 3. Ítem SIN titulares (libro normal): sin botón ──────
-console.log('\n[3] /libro sin titulares — sin botón, con Colección');
+console.log('\n[3] /ficha sin titulares — sin botón, con Colección');
 {
   const m = formatos.construirMensajeLibro(libroNormal, false);
   const e = m.embeds[0];

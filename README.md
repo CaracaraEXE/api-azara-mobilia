@@ -30,19 +30,19 @@ Los libros están organizados en **13 categorías**. Actualmente **267 libros sc
 
 | # | Categoría | Libros | Con PDF | URL |
 |---|-----------|:------:|:-------:|-----|
-| 1 | Institucionales | 10 | 10 | `/libros/` |
-| 2 | Astronomía y Geología | 9 | 6 | `/libros/libros-de-astronomia-y-geologia/` |
-| 3 | Paleontología | 17 | 15 | `/libros/libros-de-paleontologia/` |
-| 4 | Evolución, genética, ecología y etología | 5 | 5 | `/libros/libros-de-evolucion-genetica-ecologia-y-etologia/` |
-| 5 | Divulgación científica | 1 | 0 | `/libros/libros-de-divulgacion-cientifica/` |
-| 6 | Exploraciones, historia de la ciencia y biografías | 35 | 30 | `/libros-de-exploraciones-historia-de-la-ciencia-y-biografias/` |
-| 7 | Ambiente | 12 | 12 | `/libros-de-ambiente/` |
-| 8 | Antropología | 29 | 27 | `/libros/libros-de-antropologia/` |
-| 9 | Flora y Fauna | **63** | 53 | `/libros/libros-de-flora-y-fauna/` |
-| 10 | Áreas naturales | 21 | 20 | `/libros/libros-de-areas-naturales/` |
-| 11 | Historia y patrimonio cultural | 5 | 5 | `/libros-de-historia-y-patrimonio-cultural/` |
-| 12 | Infantiles | 8 | 7 | `/libros/libros-infantiles/` |
-| 13 | Auspiciados | 52 | 0 | `/libros/libros-auspiciados/` |
+| 1 | Institucionales | 10 | 10 | `/fichas/` |
+| 2 | Astronomía y Geología | 9 | 6 | `/fichas/fichas-de-astronomia-y-geologia/` |
+| 3 | Paleontología | 17 | 15 | `/fichas/fichas-de-paleontologia/` |
+| 4 | Evolución, genética, ecología y etología | 5 | 5 | `/fichas/fichas-de-evolucion-genetica-ecologia-y-etologia/` |
+| 5 | Divulgación científica | 1 | 0 | `/fichas/fichas-de-divulgacion-cientifica/` |
+| 6 | Exploraciones, historia de la ciencia y biografías | 35 | 30 | `/fichas-de-exploraciones-historia-de-la-ciencia-y-biografias/` |
+| 7 | Ambiente | 12 | 12 | `/fichas-de-ambiente/` |
+| 8 | Antropología | 29 | 27 | `/fichas/fichas-de-antropologia/` |
+| 9 | Flora y Fauna | **63** | 53 | `/fichas/fichas-de-flora-y-fauna/` |
+| 10 | Áreas naturales | 21 | 20 | `/fichas/fichas-de-areas-naturales/` |
+| 11 | Historia y patrimonio cultural | 5 | 5 | `/fichas-de-historia-y-patrimonio-cultural/` |
+| 12 | Infantiles | 8 | 7 | `/fichas/fichas-infantiles/` |
+| 13 | Auspiciados | 52 | 0 | `/fichas/fichas-auspiciados/` |
 | | **TOTAL** | **267** | **190** | |
 
 > ⚠️ **Nota sobre URLs:** Dos categorías tenían URLs incorrectas en la lista original. Fueron corregidas durante el desarrollo. Ver `PLAN.md` para detalles.
@@ -69,7 +69,7 @@ Los libros están organizados en **13 categorías**. Actualmente **267 libros sc
 {
   "id": "lib-abc123",
   "titulo": "Enciclopedia de los Dinosaurios Argentinos",
-  "linkPdf": "https://fundacionazara.org.ar/img/libros/enciclopedia-dinosaurios.pdf",
+  "linkPdf": "https://fundacionazara.org.ar/img/fichas/enciclopedia-dinosaurios.pdf",
   "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/02/enciclopedia-dinosaurios.jpg",
   "autor": "José F. Bonaparte",
   "anio": 2024,
@@ -93,14 +93,14 @@ Los libros están organizados en **13 categorías**. Actualmente **267 libros sc
 │               scripts/scraper-playwright.js                     │
 │                                                                │
 │  Extrae: título, linkPdf, imagenPortada, autor, año           │
-│  Guarda: data/libros-[categoria].json (13 archivos)           │
+│  Guarda: data/fichas-[categoria].json (13 archivos)           │
 │  Soporta: --categoria=slug, --todas, guardado incremental     │
 └────────────────────────────┬───────────────────────────────────┘
                              │
                              ▼
 ┌────────────────────────────────────────────────────────────────┐
 │                      JSON (Fase 1)                             │
-│                    data/libros-*.json                          │
+│                    data/fichas-*.json                          │
 │                                                                │
 │                ──────→  PostgreSQL (Fase 2, futuro)            │
 └────────────────────────────────────────────────────────────────┘
@@ -108,13 +108,13 @@ Los libros están organizados en **13 categorías**. Actualmente **267 libros sc
                              ▼
 ┌────────────────────────────────────────────────────────────────┐
 │                       EXPRESS.JS API                            │
-│             localhost:3000/api/libros                           │
+│             localhost:3000/api/catalogo                           │
 │                                                                │
-│  GET  /api/libros              → lista todos                   │
-│  GET  /api/libros/:id          → uno solo                      │
-│  GET  /api/libros?categoria=X  → filtrar                       │
+│  GET  /api/catalogo              → lista todos                   │
+│  GET  /api/catalogo/:id          → uno solo                      │
+│  GET  /api/catalogo?categoria=X  → filtrar                       │
 │  GET  /api/categorias          → lista categorías              │
-│  GET  /api/libros/stats/general → estadísticas                 │
+│  GET  /api/catalogo/stats/general → estadísticas                 │
 └────────────────────────────┬───────────────────────────────────┘
                              │ (HTTP requests)
                              ▼
@@ -127,7 +127,7 @@ Los libros están organizados en **13 categorías**. Actualmente **267 libros sc
 │  │  /buscar mamiferos   → 5 res. + botones ◀ 1/3 ▶       │   │
 │  │                       Cada libro muestra 🆔 id         │   │
 │  ├─────────────────────────────────────────────────────────┤   │
-│  │  /libro lib-abc123  → detalle del libro                │   │
+│  │  /ficha lib-abc123  → detalle del libro                │   │
 │  ├─────────────────────────────────────────────────────────┤   │
 │  │  /categorias        → lista + Select Menu ▼            │   │
 │  │    └─→ seleccionás  → libros + ◀/▶ + 🔙 Volver        │   │
@@ -143,7 +143,7 @@ azara/
 │   ├── src/
 │   │   ├── index.js             ← entry point
 │   │   ├── routes/
-│   │   │   ├── libros.js        ← endpoints /api/libros
+│   │   │   ├── libros.js        ← endpoints /api/catalogo
 │   │   │   └── categorias.js    ← endpoint /api/categorias
 │   │   └── data/
 │   │       ├── libros-*.json    ← 13 archivos (uno por categoría)
@@ -172,12 +172,12 @@ azara/
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| GET | `/api/libros` | Lista todos los libros (con paginación y filtros) |
-| GET | `/api/libros/:id` | Obtiene un libro por ID |
+| GET | `/api/catalogo` | Lista todos los libros (con paginación y filtros) |
+| GET | `/api/catalogo/:id` | Obtiene un libro por ID |
 | GET | `/api/categorias` | Lista categorías disponibles |
-| GET | `/api/libros/stats/general` | Estadísticas generales |
+| GET | `/api/catalogo/stats/general` | Estadísticas generales |
 
-### Parámetros de Query (GET /api/libros)
+### Parámetros de Query (GET /api/catalogo)
 
 | Parámetro | Ejemplo | Descripción |
 |-----------|---------|-------------|
@@ -191,7 +191,7 @@ azara/
 | Comando | Ejemplo | Descripción |
 |---------|---------|-------------|
 | `/buscar` | `/buscar paleontología` | Busca libros. Muestra 5 por página con botones ◀/▶ |
-| `/libro` | `/libro lib-abc123` | Muestra detalle de un libro específico |
+| `/ficha` | `/ficha lib-abc123` | Muestra detalle de un libro específico |
 | `/categorias` | `/categorias` | Lista categorías con Select Menu. Al seleccionar una, muestra sus libros con paginación |
 
 ### Características interactivas
@@ -199,7 +199,7 @@ azara/
 - **Botones ◀ / ▶**: Navegación entre páginas de resultados (tanto en `/buscar` como en categorías)
 - **Select Menu ▼**: Menú desplegable con las 13 categorías al usar `/categorias`
 - **🔙 Volver**: Vuelve al listado general de categorías
-- **🆔 ID visible**: Cada libro muestra su ID para poder usarlo con `/libro`
+- **🆔 ID visible**: Cada libro muestra su ID para poder usarlo con `/ficha`
 
 ## ✅ Roadmap de Desarrollo
 
@@ -209,10 +209,10 @@ azara/
 - [x] Express.js configurado
 
 ### Fase 2: API Express ✅
-- [x] GET /api/libros (listar + filtrar)
-- [x] GET /api/libros/:id
+- [x] GET /api/catalogo (listar + filtrar)
+- [x] GET /api/catalogo/:id
 - [x] GET /api/categorias
-- [x] GET /api/libros/stats/general
+- [x] GET /api/catalogo/stats/general
 
 ### Fase 3: Scraping ✅
 - [x] Playwright funcionando (navegador real, evita CloudFlare)
@@ -224,7 +224,7 @@ azara/
 - [x] Servidor Express standalone (HTTP Interactions, sin discord.js)
 - [x] Verificación Ed25519 con tweetnacl
 - [x] Comando `/buscar` con paginación por botones
-- [x] Comando `/libro`
+- [x] Comando `/ficha`
 - [x] Comando `/categorias` con Select Menu + paginación + Volver
 - [x] IDs de libros visibles en resultados
 

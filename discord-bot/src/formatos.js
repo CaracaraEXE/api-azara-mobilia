@@ -63,7 +63,7 @@ function enlacesPdf(libro) {
 
 /**
  * Normalizar texto para búsquedas laxas — MISMA semántica que la API
- * (backend/src/routes/libros.js, normalizarBusqueda): quita ACENTOS (áéíóúü)
+ * (backend/src/routes/catalogo.js, normalizarBusqueda): quita ACENTOS (áéíóúü)
  * y pasa a minúsculas, pero CONSERVA la ñ (carácter propio del español, no un
  * acento). El bot la replica solo para elegir QUÉ titulares mostrar como
  * contexto del match en /buscar — la API ya filtró el ítem; acá se replica el
@@ -106,7 +106,7 @@ function construirMensajeBusqueda(termino, libros, pagina, total) {
     // colección YA es la categoría mostrada arriba, no se repite.
     if (!sec.esRecursos && libro.coleccion) value += `\n🗂️ ${libro.coleccion}`;
     // Contexto del match de HEMEROTECA: "• " + titular(es) coincidente(s) (misma
-    // convención que /libro). Solo si el término está en algún titular; si el
+    // convención que /ficha). Solo si el término está en algún titular; si el
     // match vino por el título de la edición, no se agrega línea extra.
     const match = titularesCoincidentes(libro, termino);
     if (match.total > 0) {
@@ -297,7 +297,7 @@ function construirMensajeCategoriaLibros(sec, nombreCategoria, libros, pagina, t
 }
 
 /**
- * Embed de DETALLE de un ítem (/libro) + botón TOGGLE de titulares.
+ * Embed de DETALLE de un ítem (/ficha) + botón TOGGLE de titulares.
  *
  * mostrarTitulares: si el ítem tiene titulares (hemeroteca), el field 🗞️ se
  * incluye SOLO cuando es true. El botón que alterna muestra/oculta ese listado:

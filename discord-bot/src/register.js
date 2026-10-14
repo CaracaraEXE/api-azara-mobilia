@@ -29,7 +29,7 @@ if (!DISCORD_TOKEN || !DISCORD_CLIENT_ID) {
 const comandos = [
   {
     name: 'buscar',
-    description: 'Buscar libros de la Fundación Azara por título',
+    description: 'Buscar en el catálogo de la Fundación Azara (título, autor o titulares)',
     options: [
       {
         type: 3, // STRING
@@ -40,53 +40,56 @@ const comandos = [
     ]
   },
   {
-    name: 'libro',
-    description: 'Ver detalles de un libro específico por su ID',
+    name: 'ficha',
+    description: 'Ver el detalle de un ítem del catálogo por su ID',
     options: [
       {
         type: 3, // STRING
         name: 'id',
-        description: 'ID del libro (ej: lib-abc123)',
+        description: 'ID del ítem (ej: lib-abc123)',
         required: true
       }
     ]
   },
   {
     name: 'categorias',
-    description: 'Listar todas las categorías de libros disponibles'
+    description: 'Explorar el catálogo por sección y categoría'
   }
 ];
 
 async function registrarComandos() {
   const url = `https://discord.com/api/v10/applications/${DISCORD_CLIENT_ID}/commands`;
 
-  console.log('📡 Registrando comandos slash en Discord...\n');
+  console.log('📡 Registrando comandos slash en Discord (overwrite global)...\n');
 
-  for (const comando of comandos) {
-    try {
-      const respuesta = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bot ${DISCORD_TOKEN}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(comando)
-      });
+  // PUT = OVERWRITE de todos los comandos GLOBALES (reemplaza el set completo).
+  // Así el rename /libro → /ficha elimina el comando viejo automáticamente (si se
+  // usara POST uno por uno, /libro quedaría zombi en Discord).
+  try {
+    const respuesta = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bot ${DISCORD_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(comandos)
+    });
 
-      if (respuesta.ok) {
-        const data = await respuesta.json();
-        console.log(`   ✅ /${comando.name} — ${comando.description}`);
-      } else {
-        const error = await respuesta.text();
-        console.log(`   ❌ /${comando.name} — Error ${respuesta.status}: ${error}`);
+    if (respuesta.ok) {
+      const data = await respuesta.json();
+      for (const c of data) {
+        console.log(`   ✅ /${c.name} — ${c.description}`);
       }
-    } catch (error) {
-      console.log(`   ❌ /${comando.name} — Error de red: ${error.message}`);
+    } else {
+      const error = await respuesta.text();
+      console.log(`   ❌ Error ${respuesta.status}: ${error}`);
     }
+  } catch (error) {
+    console.log(`   ❌ Error de red: ${error.message}`);
   }
 
   console.log('\n✅ Registro completado.');
-  console.log('💡 Recordá que los comandos pueden tardar unos minutos en aparecer en Discord.');
+  console.log('💡 El overwrite elimina los comandos viejos (p.ej. /libro). Puede tardar unos minutos en aparecer en Discord.');
 }
 
 registrarComandos();
