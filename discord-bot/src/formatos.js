@@ -296,6 +296,84 @@ function construirMensajeCategoriaLibros(sec, nombreCategoria, libros, pagina, t
   };
 }
 
+/**
+ * Embed de DETALLE de un ítem (/libro) + botón TOGGLE de titulares.
+ *
+ * mostrarTitulares: si el ítem tiene titulares (hemeroteca), el field 🗞️ se
+ * incluye SOLO cuando es true. El botón que alterna muestra/oculta ese listado:
+ * Discord no tiene "colapsar" — el bot RE-RENDERIZA el mensaje entero (PATCH) y
+ * el estado viaja en el custom_id (v = ¿visibles AHORA?), sin estado en el bot.
+ *
+ * El botón solo existe para ítems CON titulares (libros/RE no lo llevan, no
+ * tienen lista que alternar). El orden de los fields es el de siempre:
+ * Sección/Categoría/Autor/Año (inline) → Colección → Titulares → PDF.
+ * El listado se trunca a ~1000 chars (límite de un field de embed: 1024) con
+ * contador "(mostrando X de N)" — la edición vieja N1 (18 titulares) lo supera.
+ */
+function construirMensajeLibro(libro, mostrarTitulares) {
+  const sec = infoSeccion(libro);
+
+  const fields = [
+    { name: `${sec.emoji} Sección`, value: sec.nombre, inline: true },
+    { name: '📁 Categoría', value: sec.categoriaReal, inline: true },
+    { name: '✍️ Autor', value: libro.autor || 'Desconocido', inline: true },
+    { name: '📅 Año', value: libro.anio ? libro.anio.toString() : 'Desconocido', inline: true }
+  ];
+
+  // Colección de LIBROS (series/desgloses "Tomo 02"); en RE ya está en Categoría.
+  if (!sec.esRecursos && libro.coleccion) {
+    fields.push({ name: '🗂️ Colección', value: libro.coleccion, inline: false });
+  }
+
+  const titulares = Array.isArray(libro.titulares) ? libro.titulares : [];
+  const tieneTitulares = titulares.length > 0;
+
+  if (tieneTitulares && mostrarTitulares) {
+    const lineas = titulares.map(t => `• ${t}`);
+    let texto = lineas.join('\n');
+    if (texto.length > 1000) {
+      const recorte = texto.lastIndexOf('\n', 1000);
+      texto = recorte > 100 ? texto.substring(0, recorte) : texto.substring(0, 1000);
+      const visibles = (texto.match(/\n/g) || []).length + 1;
+      texto += `\n*(mostrando ${visibles} de ${lineas.length} titulares)*`;
+    }
+    fields.push({ name: '🗞️ Titulares', value: texto, inline: false });
+  }
+
+  if (libro.linkPdf) {
+    // Bilingües (linkPdfEn, p.ej. El Shincal): ambos enlaces, ES · EN
+    const enlaces = [`[Español](${libro.linkPdf})`];
+    if (libro.linkPdfEn) enlaces.push(`[English](${libro.linkPdfEn})`);
+    fields.push({ name: '📄 PDF', value: enlaces.join(' · '), inline: false });
+  }
+
+  const embed = {
+    title: libro.titulo.substring(0, 256),
+    color: 0x00AE86,
+    fields
+  };
+
+  if (libro.imagenPortada) {
+    embed.image = { url: libro.imagenPortada };
+  }
+
+  const mensaje = { embeds: [embed] };
+
+  if (tieneTitulares) {
+    mensaje.components = [{
+      type: 1,
+      components: [{
+        type: 2,
+        style: 2,
+        label: mostrarTitulares ? '🔽 Ocultar titulares' : `📖 Ver titulares (${titulares.length})`,
+        custom_id: JSON.stringify({ cmd: 'tits-toggle', id: libro.id, v: Boolean(mostrarTitulares) })
+      }]
+    }];
+  }
+
+  return mensaje;
+}
+
 module.exports = {
   SECCIONES_NOMBRES,
   SECCIONES_EMOJIS,
@@ -307,5 +385,6 @@ module.exports = {
   construirMensajeBusqueda,
   construirMensajeSecciones,
   construirMensajeCategoriasSeccion,
-  construirMensajeCategoriaLibros
+  construirMensajeCategoriaLibros,
+  construirMensajeLibro
 };

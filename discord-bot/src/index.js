@@ -142,6 +142,8 @@ app.post('/interactions', verifyDiscordRequest, async (req, res) => {
           await manejarPaginacionCategoria(interaction, res, payload);
         } else if (payload.cmd === 'cat-back') {
           await manejarVolverCategorias(interaction, res, payload);
+        } else if (payload.cmd === 'tits-toggle') {
+          await manejarToggleTitulares(interaction, res, payload);
         }
       } catch (error) {
         console.error('❌ Error en componente:', error);
@@ -216,57 +218,10 @@ async function comandoLibro(options) {
       return { content: `No encontré un libro con ID "${id}".` };
     }
 
-    const libro = datos.data;
-
-    // Sección (emoji) + categoría REAL: en RE la categoría visible es la
-    // colección/subgrupo; 'Recursos Educativos' es la SECCIÓN, no la categoría.
-    const sec = formatos.infoSeccion(libro);
-
-    const fields = [
-      { name: `${sec.emoji} Sección`, value: sec.nombre, inline: true },
-      { name: '📁 Categoría', value: sec.categoriaReal, inline: true },
-      { name: '✍️ Autor', value: libro.autor || 'Desconocido', inline: true },
-      { name: '📅 Año', value: libro.anio ? libro.anio.toString() : 'Desconocido', inline: true }
-    ];
-
-    // Colección de LIBROS (PLANV2 §2): series/desgloses ("Tomo 02"); en RE ya está en Categoría.
-    if (!sec.esRecursos && libro.coleccion) {
-      fields.push({ name: '🗂️ Colección', value: libro.coleccion, inline: false });
-    }
-
-    // Titulares de hemeroteca (PLANV3 V3.6): se listan acá (NO en /buscar —
-    // los titulares solo hacen encontrable el ítem). "• " + titular, truncado a
-    // ~1000 chars + contador (el límite de un field de embed de Discord es 1024).
-    if (Array.isArray(libro.titulares) && libro.titulares.length) {
-      const lineas = libro.titulares.map(t => `• ${t}`);
-      let texto = lineas.join('\n');
-      if (texto.length > 1000) {
-        const recorte = texto.lastIndexOf('\n', 1000);
-        texto = recorte > 100 ? texto.substring(0, recorte) : texto.substring(0, 1000);
-        const visibles = (texto.match(/\n/g) || []).length + 1;
-        texto += `\n*(mostrando ${visibles} de ${lineas.length} titulares)*`;
-      }
-      fields.push({ name: '🗞️ Titulares', value: texto, inline: false });
-    }
-
-    if (libro.linkPdf) {
-      // Bilingües (linkPdfEn, p.ej. El Shincal): ambos enlaces, ES · EN
-      const enlaces = [`[Español](${libro.linkPdf})`];
-      if (libro.linkPdfEn) enlaces.push(`[English](${libro.linkPdfEn})`);
-      fields.push({ name: '📄 PDF', value: enlaces.join(' · '), inline: false });
-    }
-
-    const embed = {
-      title: libro.titulo.substring(0, 256),
-      color: 0x00AE86,
-      fields,
-    };
-
-    if (libro.imagenPortada) {
-      embed.image = { url: libro.imagenPortada };
-    }
-
-    return { embeds: [embed] };
+    // Presentación movida a formatos.js (pura, testeable). El 2º argumento es el
+    // estado INICIAL del toggle de titulares: ocultos por defecto → /libro
+    // compacto; el botón 📖 los muestra re-renderizando vía 'tits-toggle'.
+    return formatos.construirMensajeLibro(datos.data, false);
   } catch (error) {
     console.error('Error al obtener libro:', error);
     return { content: '❌ Error al conectar con la API.' };
@@ -351,6 +306,32 @@ async function patchError(interaction, texto) {
     embeds: [],
     components: []
   });
+}
+
+/**
+ * Toggle de titulares de /libro (hemeroteca): alterna mostrar/ocultar el campo
+ * 🗞️ Titulares RE-RENDERIZANDO el mensaje completo (Discord no tiene colapso).
+ * El estado viene en el custom_id (v = ¿visibles AHORA?); el nuevo es !v.
+ * Solo /libro lleva este botón — /buscar y los listados no lo usan.
+ */
+async function manejarToggleTitulares(interaction, res, payload) {
+  const { id, v } = payload;
+
+  res.json({ type: InteractionResponseType.DEFERRED_UPDATE_MESSAGE });
+
+  try {
+    const respuesta = await fetch(`${API_URL}/api/libros/${id}`);
+    const datos = await respuesta.json();
+
+    if (datos.success) {
+      await patchMensajeOriginal(interaction, formatos.construirMensajeLibro(datos.data, !v));
+    } else {
+      await patchError(interaction, '❌ No encontré el ítem para actualizar.');
+    }
+  } catch (error) {
+    console.error('❌ Error en toggle de titulares:', error);
+    await patchError(interaction, '❌ Error al conectar con la API.');
+  }
 }
 
 /**
