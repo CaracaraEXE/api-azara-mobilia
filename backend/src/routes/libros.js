@@ -14,44 +14,65 @@ const path = require('path');
 const DATA_DIR = path.join(__dirname, '../data');
 
 /**
+ * Listar los archivos de datos de TODAS las secciones (todas las subcarpetas de data/).
+ * Descubrimiento AUTOMÁTICO (PLANV3 V3.6): toda subcarpeta de data/ es una SECCIÓN;
+ * los archivos válidos son los que EMPIEZAN con el nombre de la carpeta:
+ *   libros/libros-*.json (13), recursos/recursos-educativos.json,
+ *   periodico-exploracion-y-ciencia/periodico-exploracion-y-ciencia.json, ...
+ * Se devuelve la ruta completa + la sección para derivar los campos en runtime.
+ */
+function listarArchivosData() {
+  const archivos = [];
+  if (!fs.existsSync(DATA_DIR)) return archivos;
+  for (const carpeta of fs.readdirSync(DATA_DIR, { withFileTypes: true })) {
+    if (!carpeta.isDirectory()) continue;
+    const dir = path.join(DATA_DIR, carpeta.name);
+    const re = new RegExp(`^${carpeta.name}(-.+)?\\.json$`);
+    for (const f of fs.readdirSync(dir)) {
+      if (re.test(f)) {
+        archivos.push({ ruta: path.join(dir, f), seccion: carpeta.name });
+      }
+    }
+  }
+  return archivos;
+}
+
+/**
  * Obtener todas las categorías y sus libros desde archivos individuales
  */
 function obtenerCategoriasYLibros() {
-  const archivos = fs.readdirSync(DATA_DIR);
   const categorias = [];
   
-  // Filtrar solo archivos libros-*.json (excluir libros.json centralizado)
-  archivos
-    .filter(archivo => archivo.startsWith('libros-') && archivo.endsWith('.json') && archivo !== 'libros.json')
-    .forEach(archivo => {
-      try {
-        const rutaCompleta = path.join(DATA_DIR, archivo);
-        const libros = JSON.parse(fs.readFileSync(rutaCompleta, 'utf8'));
-        
-        // Extraer slug del nombre del archivo: libros-paleontologia.json → paleontologia
-        const slug = archivo.replace('libros-', '').replace('.json', '');
-        
-        // Determinar nombre de la categoría desde el primer libro o el slug
-        const nombre = libros.length > 0 && libros[0].categoria 
-          ? libros[0].categoria 
-          : slug.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
-        
-        // Agregar categoría a cada libro
-        const librosConCategoria = libros.map(libro => ({
-          ...libro,
-          categoria: nombre
-        }));
-        
-        categorias.push({
-          nombre,
-          slug,
-          url: `/libros/libros-de-${slug}/`,
-          libros: librosConCategoria
-        });
-      } catch (error) {
-        console.error(`Error al leer ${archivo}:`, error.message);
-      }
-    });
+  for (const { ruta, seccion } of listarArchivosData()) {
+    try {
+      const libros = JSON.parse(fs.readFileSync(ruta, 'utf8'));
+      
+      // Extraer slug del nombre del archivo: libros-paleontologia.json → paleontologia; recursos-educativos.json → recursos-educativos
+      const nombreArchivo = path.basename(ruta);
+      const slug = (nombreArchivo.startsWith('libros-') ? nombreArchivo.replace('libros-', '') : nombreArchivo).replace('.json', '');
+      
+      // Determinar nombre de la categoría desde el primer libro o el slug
+      const nombre = libros.length > 0 && libros[0].categoria 
+        ? libros[0].categoria 
+        : slug.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+      
+      // Agregar categoría a cada libro
+      const librosConCategoria = libros.map(libro => ({
+        ...libro,
+        categoria: nombre
+      }));
+      
+      categorias.push({
+        nombre,
+        slug,
+        seccion,
+        url: `/libros/libros-de-${slug}/`,
+        libros: librosConCategoria
+      });
+    } catch (error) {
+      console.error(`Error al leer ${ruta}:`, error.message);
+    }
+  }
   
   return categorias;
 }
@@ -66,14 +87,13 @@ function obtenerCategoriasYLibros() {
  * multi-categoría desaparece de la navegación de las categorías no-principales.
  */
 function obtenerTodosLosLibros() {
-  const archivos = fs.readdirSync(DATA_DIR)
-    .filter(archivo => archivo.startsWith('libros-') && archivo.endsWith('.json') && archivo !== 'libros.json');
   const porId = new Map();
 
-  for (const archivo of archivos) {
+  for (const { ruta, seccion } of listarArchivosData()) {
     try {
-      const slug = archivo.replace('libros-', '').replace('.json', '');
-      const librosArr = JSON.parse(fs.readFileSync(path.join(DATA_DIR, archivo), 'utf8'));
+      const nombreArchivo = path.basename(ruta);
+      const slug = (nombreArchivo.startsWith('libros-') ? nombreArchivo.replace('libros-', '') : nombreArchivo).replace('.json', '');
+      const librosArr = JSON.parse(fs.readFileSync(ruta, 'utf8'));
       const nombre = librosArr.length > 0 && librosArr[0].categoria
         ? librosArr[0].categoria
         : slug.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
@@ -83,11 +103,11 @@ function obtenerTodosLosLibros() {
         if (existente) {
           if (!existente.categorias.includes(nombre)) existente.categorias.push(nombre);
         } else {
-          porId.set(libro.id, { ...libro, categoria: nombre, categorias: [nombre] });
+          porId.set(libro.id, { ...libro, seccion, categoria: nombre, categorias: [nombre] });
         }
       }
     } catch (error) {
-      console.error(`Error al leer ${archivo}:`, error.message);
+      console.error(`Error al leer ${ruta}:`, error.message);
     }
   }
   return [...porId.values()];
@@ -171,12 +191,13 @@ router.get('/', (req, res) => {
       libros = libros.filter(l => l.coleccion && normalizarCategoria(l.coleccion).includes(objetivo));
     }
     
-    // Filtrar por búsqueda (título, autor) — sin acentos ni mayúsculas
+    // Filtrar por búsqueda (título, autor, titulares de hemeroteca) — sin acentos ni mayúsculas
     if (busqueda) {
       const termino = normalizarBusqueda(busqueda);
       libros = libros.filter(l => 
         normalizarBusqueda(l.titulo).includes(termino) ||
-        (l.autor && normalizarBusqueda(l.autor).includes(termino))
+        (l.autor && normalizarBusqueda(l.autor).includes(termino)) ||
+        (Array.isArray(l.titulares) && l.titulares.some(t => normalizarBusqueda(t).includes(termino)))
       );
     }
     

@@ -15,9 +15,41 @@ const path = require('path');
 
 const DATA_DIR = path.join(__dirname, '../src/data');
 
-const archivos = fs.readdirSync(DATA_DIR)
-  .filter(f => /^libros-.+\.json$/.test(f))
-  .sort();
+/**
+ * Listar archivos de datos de TODAS las secciones (todas las subcarpetas de data/).
+ * Descubrimiento AUTOMÁTICO (PLANV3 V3.6): toda subcarpeta de data/ es una
+ * SECCIÓN; los archivos válidos EMPIEZAN con el nombre de la carpeta
+ * (libros/libros-*.json, recursos/recursos-educativos.json, hemeroteca/{slug}.json).
+ * Se devuelven rutas RELATIVAS (libros\libros-paleontologia.json) para que el
+ * resto del script siga usando path.join(DATA_DIR, archivo) y basename para la
+ * categoría.
+ */
+function listarArchivosData() {
+  const archivos = [];
+  if (!fs.existsSync(DATA_DIR)) return archivos;
+  for (const carpeta of fs.readdirSync(DATA_DIR, { withFileTypes: true })) {
+    if (!carpeta.isDirectory()) continue;
+    const dir = path.join(DATA_DIR, carpeta.name);
+    const re = new RegExp(`^${carpeta.name}(-.+)?\\.json$`);
+    for (const f of fs.readdirSync(dir)) {
+      if (re.test(f)) {
+        archivos.push(path.join(carpeta.name, f));
+      }
+    }
+  }
+  return archivos.sort();
+}
+
+/**
+ * Slug de categoría desde el archivo: libros/libros-paleontologia.json →
+ * paleontologia; recursos/recursos-educativos.json → recursos-educativos.
+ */
+function categoriaDeArchivo(archivo) {
+  const nombre = path.basename(archivo);
+  return (nombre.startsWith('libros-') ? nombre.replace('libros-', '') : nombre).replace(/\.json$/, '');
+}
+
+const archivos = listarArchivosData();
 
 const problemas = [];
 const idsGlobales = new Map();      // id → { categoria, libro }
@@ -43,13 +75,23 @@ function leerArchivo(archivo) {
   try {
     return JSON.parse(fs.readFileSync(path.join(DATA_DIR, archivo), 'utf-8'));
   } catch (e) {
-    problemas.push(`[${archivo}] JSON inválido o ilegible: ${e.message}`);
+    problemas.push(`[${path.basename(archivo)}] JSON inválido o ilegible: ${e.message}`);
     return null;
   }
 }
 
+/**
+ * Normalizar URL para comparar duplicados (PLANV3 §5.2/§6): el sitio mezcla hosts
+ * (www.fundacionazara.org.ar en PDFs de Recursos vs sin www. en libros). Para que un
+ * MISMO archivo en ambas secciones salga en el reporte de verificación humana, se
+ * comparan las claves con el host normalizado — igual criterio que el scraper.
+ */
+function normalizarUrlDup(url) {
+  return (url || '').trim().replace(/^https?:\/\/www\./i, 'https://').replace(/\/+$/, '');
+}
+
 for (const archivo of archivos) {
-  const categoria = archivo.replace(/^libros-/, '').replace(/\.json$/, '');
+  const categoria = categoriaDeArchivo(archivo);
   const datos = leerArchivo(archivo);
   if (datos === null) continue;
   if (!Array.isArray(datos)) {
@@ -111,6 +153,16 @@ for (const archivo of archivos) {
       problemas.push(`${ref} fechaExtraccion inválida: ${JSON.stringify(libro.fechaExtraccion)}`);
     }
 
+    // titulares (hemeroteca, PLANV3 V3.6): si está presente, array de strings no vacíos
+    if ('titulares' in libro && (!Array.isArray(libro.titulares) || libro.titulares.some(t => typeof t !== 'string' || !t.trim()))) {
+      problemas.push(`${ref} titulares inválido (array de strings no vacíos): ${JSON.stringify(libro.titulares)}`);
+    }
+    // categoria (hemeroteca, PLANV3 V3.6): si está presente, string no vacío
+    // (los archivos de hemeroteca SÍ llevan categoria; los de libros/RE no)
+    if (libro.categoria != null && (typeof libro.categoria !== 'string' || !libro.categoria.trim())) {
+      problemas.push(`${ref} categoria no es string no vacío: ${JSON.stringify(libro.categoria)}`);
+    }
+
     // coleccion: si está presente, debe ser string no vacía
     if ('coleccion' in libro && (typeof libro.coleccion !== 'string' || !libro.coleccion.trim())) {
       problemas.push(`${ref} coleccion vacía o no string: ${JSON.stringify(libro.coleccion)}`);
@@ -122,21 +174,24 @@ for (const archivo of archivos) {
 
     // --- URLs duplicadas (posible duplicado) ---
     // Con el MISMO id (multi-categoría) se saltea; con ids DISTINTOS es problema.
+    // Claves con host normalizado: un PDF con/sin www. del mismo archivo = duplicado.
     if (libro.linkPdf) {
-      const previos = linkPdfs.get(libro.linkPdf) || [];
+      const clave = normalizarUrlDup(libro.linkPdf);
+      const previos = linkPdfs.get(clave) || [];
       if (previos.length && previos.every(p => p.id !== libro.id)) {
         problemas.push(`linkPdf duplicado (ids distintos): ${libro.linkPdf} → ${previos.map(p => `${p.categoria}|${p.titulo}`).join(', ')} y ${categoria}|${libro.titulo}`);
       }
       previos.push({ categoria, titulo: libro.titulo, id: libro.id });
-      linkPdfs.set(libro.linkPdf, previos);
+      linkPdfs.set(clave, previos);
     }
     if (libro.imagenPortada) {
-      const previos = portadas.get(libro.imagenPortada) || [];
+      const clave = normalizarUrlDup(libro.imagenPortada);
+      const previos = portadas.get(clave) || [];
       if (previos.length && previos.every(p => p.id !== libro.id)) {
         problemas.push(`imagenPortada duplicada (ids distintos): ${libro.imagenPortada} → ${previos.map(p => `${p.categoria}|${p.titulo}`).join(', ')} y ${categoria}|${libro.titulo}`);
       }
       previos.push({ categoria, titulo: libro.titulo, id: libro.id });
-      portadas.set(libro.imagenPortada, previos);
+      portadas.set(clave, previos);
     }
 
     // --- Conteos ---
@@ -149,14 +204,14 @@ for (const archivo of archivos) {
   resumenGeneral.conRevision += porCategoria.conRevision;
   resumenGeneral.sinTitulo += porCategoria.sinTitulo;
 
-  console.log(`📊 ${categoria}: ${porCategoria.total} libros | ${porCategoria.conPdf} con PDF | ${porCategoria.conRevision} revisionPendiente | ${porCategoria.sinTitulo} sin título`);
+  console.log(`📊 ${categoria}: ${porCategoria.total} ítems | ${porCategoria.conPdf} con PDF | ${porCategoria.conRevision} revisionPendiente | ${porCategoria.sinTitulo} sin título`);
 }
 
 // --- Portal de revisión humana (§6) ---
 console.log('\n🧑‍🔬 Portal de revisión humana (esqueletos por completar vía PR):');
 let hayEsqueletos = false;
 for (const archivo of archivos) {
-  const categoria = archivo.replace(/^libros-/, '').replace(/\.json$/, '');
+  const categoria = categoriaDeArchivo(archivo);
   const datos = leerArchivo(archivo);
   if (!Array.isArray(datos)) continue;
   for (const l of datos) {
@@ -171,7 +226,7 @@ if (!hayEsqueletos) console.log('   (ninguno)');
 
 // --- Salida final ---
 console.log('\n' + '═'.repeat(64));
-console.log(`📦 TOTAL: ${resumenGeneral.total} libros | ${resumenGeneral.conPdf} con PDF | ${resumenGeneral.conRevision} revisionPendiente | ${resumenGeneral.sinTitulo} sin título`);
+console.log(`📦 TOTAL: ${resumenGeneral.total} ítems | ${resumenGeneral.conPdf} con PDF | ${resumenGeneral.conRevision} revisionPendiente | ${resumenGeneral.sinTitulo} sin título`);
 console.log(`🔗 Libros en múltiples categorías (intencional, mismo id): ${multiCategoria.size}`);
 if (problemas.length) {
   console.log(`\n❌ ${problemas.length} problema(s) encontrados:`);

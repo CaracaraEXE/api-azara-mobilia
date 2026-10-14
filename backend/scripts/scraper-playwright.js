@@ -4,9 +4,11 @@
  * Usa navegador real para evitar CloudFlare
  * 
  * Uso:
- *   node scripts/scraper-playwright.js                  (usa SCRAPEAR_CATEGORIA por defecto)
- *   node scripts/scraper-playwright.js --categoria=slug  (una categoría específica)
- *   node scripts/scraper-playwright.js --todas           (todas las categorías)
+ *   node scripts/scraper-playwright.js                        (usa SCRAPEAR_CATEGORIA por defecto)
+ *   node scripts/scraper-playwright.js --categoria=slug       (UNA categoría puntual de una sección por-categoría, ej. 'paleontologia'; SOLO secciones por-categoría = libros)
+ *   node scripts/scraper-playwright.js --seccion=slug         (UNA sección completa: 'libros', 'recursos-educativos', 'periodico-exploracion-y-ciencia' o 'revista-azara')
+ *   node scripts/scraper-playwright.js --todas                (todas las secciones: libros + recursos educativos + hemeroteca)
+ *   --seccion y --categoria son mutuamente excluyentes; --todas es prioritario.
  */
 
 const { chromium } = require('playwright');
@@ -30,6 +32,91 @@ const CATEGORIAS = [
   { nombre: 'Auspiciados', slug: 'auspiciados', url: 'https://fundacionazara.org.ar/libros/libros-auspiciados/' },
 ];
 
+/**
+ * Categorías de Recursos Educativos (PLANV3 §4): los 10 subgrupos del usuario (hoy
+ * usuario, cada uno con su URL raíz de grilla. Son categorías planas, IGUAL que las
+ * 13 de libros (crítica del usuario 2026-09-27: "RE tiene categorías propias igual
+ * que libros") — lo que cambia con Libros es SOLO la persistencia (ver SECCIONES).
+ * OJO: "Posters de Paleontología" es SINGULAR (/poster-de-paleontologia/), el plural da 404.
+ */
+const CATEGORIAS_RECURSOS = [
+  { nombre: 'Cuadernillos', slug: 'cuadernillos', url: 'https://fundacionazara.org.ar/cuadernillos/' },
+  { nombre: 'Posters de Geología', slug: 'posters-de-geologia', url: 'https://fundacionazara.org.ar/posters-de-geologia/' },
+  { nombre: 'Posters de Paleontología', slug: 'poster-de-paleontologia', url: 'https://fundacionazara.org.ar/poster-de-paleontologia/' },
+  { nombre: 'Posters de Ambiente', slug: 'posters-de-ambiente', url: 'https://fundacionazara.org.ar/posters-de-ambiente/' },
+  { nombre: 'Posters de Biodiversidad', slug: 'posters-de-biodiversidad', url: 'https://fundacionazara.org.ar/posters-de-biodiversidad/' },
+  { nombre: 'Posters de Antropología, Historia y Patrimonio', slug: 'posters-de-antropologia', url: 'https://fundacionazara.org.ar/posters-de-antropologia/' },
+  { nombre: 'Cartillas', slug: 'cartillas', url: 'https://fundacionazara.org.ar/cartillas' },
+  { nombre: 'Folletos de Biodiversidad', slug: 'folletos-de-biodiversidad', url: 'https://fundacionazara.org.ar/folletos-de-biodiversidad/' },
+  { nombre: 'Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas', slug: 'folletos-de-museos-sitios-arqueologicos-y-areas-naturales-protegidas', url: 'https://fundacionazara.org.ar/folletos-de-museos-sitios-arqueologicos-y-areas-naturales-protegidas/' },
+  { nombre: 'Postales', slug: 'postales', url: 'https://fundacionazara.org.ar/postales' },
+];
+
+/**
+ * SECCIONES unificadas (PLANV3 §5.1 rediseñado 2026-09-27): Libros y Recursos
+ * educativos comparten la MISMA estructura — sección → categorías planas → grilla →
+ * página individual — y se scrapean con EL MISMO flujo (scrapearSeccion) y EL MISMO
+ * extractor (obtenerDatosItem). La diferencia entre secciones es declarativa:
+ *   - prefijoArchivo: base de los nombres de archivo ('libros' → libros-*.json,
+ *     'recursos' → recursos-*.json, 'periodico-exploracion-y-ciencia' → su carpeta).
+ *   - archivoUnico: false (Libros) → 1 archivo por categoría; true (Recursos educativos
+ *     y Hemeroteca) → 1 archivo por sección ({slug}.json, fix V3.6).
+ * HEMEROTECA (PLANV3 V3.6, 2026-09-27): la ÚNICA excepción con extractores propios —
+ * sus grillas son portfolio de Qode Bridge (article.mix en .projects_holder) y la
+ * página individual NO trae h1/h4/portada fiables → obtenerUrlsPortafolio /
+ * obtenerDatosPortafolio / extraerTitularesDeHtml (ver más abajo). El resto del
+ * flujo (persistencia, dedup, temp) es el mismo archivo único de RE.
+ */
+const SECCIONES = [
+  {
+    tipo: 'libros',
+    nombre: 'Libros',
+    slug: 'libros',
+    prefijoArchivo: 'libros',
+    categorias: CATEGORIAS, // las 13 categorías de libros, igual que RE hardcodea las suyas
+  },
+  {
+    tipo: 'recursos',
+    nombre: 'Recursos educativos',
+    slug: 'recursos-educativos',
+    prefijoArchivo: 'recursos',
+    archivoUnico: true, // 1 archivo recursos-educativos.json con coleccion = categoría
+    categorias: CATEGORIAS_RECURSOS,
+  },
+  // Hemeroteca (PLANV3 V3.6, 2026-09-27): cada publicación periódica es una SECCIÓN
+  // de primer nivel (NO una categoría intermedia — corrección del usuario). tipo
+  // 'hemeroteca' (NO 'publicaciones': choca con las Publicaciones Científicas de la
+  // Fundación, fuera de alcance — decisión del usuario 2026-09-27). archivoUnico con
+  // slug === prefijoArchivo → el archivo final es {slug}.json (fix V3.6). La grilla
+  // es portfolio de Qode Bridge (article.mix en .projects_holder) → extractores
+  // DEDICADOS obtenerUrlsPortafolio/obtenerDatosPortafolio: es la ÚNICA excepción al
+  // flujo unificado (libros/RE comparten extractores; la individual de hemeroteca no
+  // tiene h1/h4/portada fiables — título y portada vienen de la grilla).
+  {
+    tipo: 'hemeroteca',
+    nombre: 'Periódico Exploración y Ciencia',
+    slug: 'periodico-exploracion-y-ciencia',
+    prefijoArchivo: 'periodico-exploracion-y-ciencia',
+    archivoUnico: true,
+    categorias: [
+      { nombre: 'Periódico Exploración y Ciencia', slug: 'periodico-exploracion-y-ciencia', url: 'https://fundacionazara.org.ar/periodico-exploracion-y-ciencia/' },
+    ],
+  },
+  {
+    tipo: 'hemeroteca',
+    nombre: 'Revista Azara',
+    slug: 'revista-azara',
+    prefijoArchivo: 'revista-azara',
+    archivoUnico: true,
+    categorias: [
+      { nombre: 'Revista Azara', slug: 'revista-azara', url: 'https://fundacionazara.org.ar/revista-azara/' },
+    ],
+  },
+];
+
+// Alias compat: RECURSOS_EDUCATIVOS era la sección de recursos.
+const RECURSOS_EDUCATIVOS = SECCIONES[1];
+
 // Colecciones multi-libro catalogadas (PLANV2.md §4.1). El scraper desglosa SOLO estas URLs;
 // cualquier otra página con >1 PDF/h4/img se loguea como "posible colección no catalogada".
 // patrones: pares-h4-pdf | contenedor-por-libro | div-titulos-carrousel | imagenes-sueltas | pdfs-romanos
@@ -42,6 +129,9 @@ const COLECCIONES_CONOCIDAS = [
   { url: 'https://fundacionazara.org.ar/fauna-argentina-amenazada/', patron: 'imagenes-sueltas', coleccion: 'Fauna argentina amenazada' },
   { url: 'https://fundacionazara.org.ar/los-invertebrados-fosiles/', patron: 'pdfs-romanos', coleccion: 'Los invertebrados fósiles' },
   { url: 'https://fundacionazara.org.ar/trazos-nativos-diseno-iconografico-de-las-sierras-de-cordoba-serie-infantil-para-colorear/', patron: 'imagenes-sueltas', coleccion: 'Trazos nativos. Diseño iconográfico de las sierras de Córdoba' },
+  // PLANV3 §5.2: colección de Recursos Educativos (7 cuadernillos). Sus PDFs usan
+  // www.fundacionazara.org.ar (host mezclado) → clavesDeLibro normaliza el host.
+  { url: 'https://fundacionazara.org.ar/miradas-de-la-argentina/', patron: 'pares-h4-pdf', coleccion: 'Miradas de la Argentina' },
 ];
 
 // === CONFIGURACIÓN ===
@@ -51,13 +141,27 @@ const SCRAPEAR_CATEGORIA = 'auspiciados';
 
 // --- Parsear argumentos CLI ---
 const args = process.argv.slice(2);
-const CATEGORIA_ARG = args.find(a => a.startsWith('--categoria='));
-const ES_TODAS = args.includes('--todas');
+const ARG_TODAS = args.includes('--todas');
+const ARG_SECCION = args.find(a => a.startsWith('--seccion='));
+const ARG_CATEGORIA = args.find(a => a.startsWith('--categoria='));
 
-const CATEGORIA_SELECTED = ES_TODAS
-  ? 'TODAS'
-  : CATEGORIA_ARG
-    ? CATEGORIA_ARG.split('=')[1]
+// --todas es prioritario (compat con el uso histórico); --seccion y --categoria
+// son mutuamente excluyentes: ambos piden un objetivo puntual DISTINTO.
+if (ARG_TODAS && (ARG_SECCION || ARG_CATEGORIA)) {
+  console.warn('⚠️ --todas gana: se ignora el objetivo puntual indicado.');
+}
+if (ARG_SECCION && ARG_CATEGORIA) {
+  console.error('❌ No se pueden usar --seccion y --categoria juntos. Elegí uno.');
+  process.exit(1);
+}
+
+// MODO: 'todas' | 'seccion' | 'categoria' — el objetivo explícito gana sobre el
+// default histórico (SCRAPEAR_CATEGORIA = una categoría puntual).
+const MODO = ARG_TODAS ? 'todas' : ARG_SECCION ? 'seccion' : 'categoria';
+const OBJETIVO_SLUG = ARG_SECCION
+  ? ARG_SECCION.split('=')[1]
+  : ARG_CATEGORIA
+    ? ARG_CATEGORIA.split('=')[1]
     : SCRAPEAR_CATEGORIA;
 // -----------------------------
 
@@ -97,43 +201,131 @@ async function obtenerUrlsLibros(page, urlCategoria) {
 }
 
 /**
- * Extraer datos de una página individual
- * 
- * Orden de selectores para el título:
- *   1. <h4> (99% de los libros)
- *   2. Fallback: primer <p> con contenido sustancial
+ * Extraer ediciones desde la grilla portfolio de hemeroteca (PLANV3 V3.6):
+ * Qode Bridge arma los ítems como article.mix dentro de .projects_holder. Devuelve
+ * objetos {url, titulo, portada} — la grilla es la FUENTE DE VERDAD del título y la
+ * portada (la página individual NO trae h1/h4 fiables: la edición N14 de Revista
+ * Azara no tiene h1).
+ * Selectores verificados (N3 Periódico / N14 Revista Azara, 2026-09-27):
+ *   - título `.portfolio_title a` POR CLASE (h6 en Periódico, h5 en Revista — NO por
+ *     tag): trae espacio leading → .trim() obligatorio.
+ *   - portada `.image_holder img` (con <span class='image'> intermedio; soporta
+ *     lazy-load con data-src / data-lazy-src).
+ *   - `a.portfolio_link_class` es un ancla VACÍA → el href del ítem sale de
+ *     .portfolio_title a (fallback a[href*="portfolio_page"]).
+ * Nota capitalización: Revista Azara N12-N14 viene en MAYÚSCULAS + EN DASH (U+2013) —
+ * se guarda tal cual (fidelidad a la grilla); la búsqueda es case-insensitive.
  */
-async function obtenerDatosLibro(page, url) {
+async function obtenerUrlsPortafolio(page, urlCategoria) {
+  console.log('   🔍 Obteniendo lista de ediciones (grilla portfolio)...');
+
+  await page.goto(urlCategoria, { waitUntil: 'networkidle' });
+  await esperar(1000);
+
+  const items = await page.$$eval('.projects_holder article.mix', arts =>
+    arts.map(a => {
+      const t = a.querySelector('.portfolio_title a');
+      let img = '';
+      for (const im of a.querySelectorAll('img')) {
+        const src = im.src || im.getAttribute('data-src') || im.getAttribute('data-lazy-src') || '';
+        if (src && !/logo-azara|banner-azara/.test(src) && !src.endsWith('.svg')) { img = src; break; }
+      }
+      return {
+        url: (t && t.href) || (a.querySelector('a[href*="portfolio_page"]') || {}).href || '',
+        titulo: t ? t.textContent.replace(/\s+/g, ' ').trim() : '',
+        portada: img
+      };
+    }).filter(p => p.url && p.titulo)
+  );
+
+  const unicos = items.filter((p, i, arr) => arr.findIndex(x => x.url === p.url) === i);
+  console.log(`   ✅ Encontradas ${unicos.length} ediciones`);
+  return unicos;
+}
+
+/**
+ * Extraer datos de una página individual — extractor ÚNICO para libros Y recursos
+ * educativos (PLANV3 §5.2 unificado): el sitio usa el mismo theme para ambos tipos,
+ * solo cambia qué nodo trae el título. La cascada lo resuelve SIN ramas por sección:
+ *
+ * Título (cascada): <h4> (libros, fiable al 99%) → JSON-LD headline (Yoast, limpio) →
+ * og:title → document.title → fallback primer <p> sustancial.
+ *   - Las páginas de RE NO tienen <h4> de título (está oculto/contaminado con la fecha,
+ *     p.ej. "24 Nov Miradas...") → caen naturalmente a la cascada SEO.
+ *   - og:title y document.title traen sufijo "- Fundación Azara" → se limpia.
+ *   - El <h2 class="entry_title"> NUNCA se usa: viene oculto por CSS y con la fecha.
+ *
+ * Autor/año: si el título salió del <h4>, se intenta "h4 + p" con formato "Autor, Año"
+ * (convención de libros). Si salió de la cascada SEO (RE), el año es la fecha de
+ * publicación del post (article:published_time) — dato base, la cura manda.
+ */
+async function obtenerDatosItem(page, url) {
   await page.goto(url, { waitUntil: 'networkidle' });
   await esperar(500);
-  
-  // --- Título ---
-  let titulo = await page.$eval('h4', el => el.textContent.trim()).catch(() => null);
-  
-// --- Autor y año ---
-  let autor = null;
-  let anio = null;
-  
-  const infoRaw = await page.$eval('h4 + p', el => el.textContent.trim()).catch(() => '');
-  if (infoRaw) {
-    // Fix B5 (PLANV2): limpiar prefijo "Editorial X | " ANTES del regex
-    const infoLimpia = limpiarInformacionAutor(infoRaw);
-    const match = infoLimpia.match(/^(.+?),\s*(\d{4})/);
-    if (match) {
-      autor = match[1].trim();
-      anio = parseInt(match[2]);
+
+  // --- Título (cascada) ---
+  let titulo = await page.$eval('h4', el => el.textContent.replace(/\s+/g, ' ').trim()).catch(() => null);
+  const esH4 = Boolean(titulo);
+
+  if (!titulo) {
+    titulo = await page.evaluate(() => {
+      // 1) JSON-LD (Yoast): primer nodo con "headline" = título del post
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        try {
+          const data = JSON.parse(s.textContent);
+          const nodos = data && data['@graph'] ? data['@graph'] : (Array.isArray(data) ? data : [data]);
+          for (const n of nodos) {
+            if (n && typeof n.headline === 'string' && n.headline.trim()) return n.headline.trim();
+          }
+        } catch { /* script JSON inválido → probar el siguiente */ }
+      }
+      // 2) og:title
+      const og = document.querySelector('meta[property="og:title"]');
+      if (og && og.getAttribute('content')) return og.getAttribute('content').trim();
+      // 3) document.title
+      return document.title.trim();
+    }).catch(() => null);
+
+    if (titulo) {
+      // Quitar sufijo del sitio ("Título - Fundación Azara") y colapsar espacios
+      titulo = titulo
+        .replace(/\s*-\s*Fundaci[oó]n Azara\s*$/i, '')
+        .replace(/\s+/g, ' ')
+        .trim();
     }
   }
-  
-  // --- Fallback si no hay <h4> (páginas con estructura diferente) ---
+
+  // --- Autor y año ---
+  let autor = null;
+  let anio = null;
+
+  if (esH4) {
+    // Convención de libros: "h4 + p" con "Autor, Año" (fix B5: limpiar "Editorial X |")
+    const infoRaw = await page.$eval('h4 + p', el => el.textContent.trim()).catch(() => '');
+    if (infoRaw) {
+      const match = limpiarInformacionAutor(infoRaw).match(/^(.+?),\s*(\d{4})/);
+      if (match) {
+        autor = match[1].trim();
+        anio = parseInt(match[2]);
+      }
+    }
+  } else {
+    // Recursos educativos: año = fecha de publicación del post (dato base)
+    anio = await page.$eval(
+      'meta[property="article:published_time"]',
+      el => { const m = (el.getAttribute('content') || '').match(/^(\d{4})/); return m ? parseInt(m[1], 10) : null; }
+    ).catch(() => null);
+  }
+
+  // --- Fallback si no hay <h4> ni cabecera SEO (páginas con estructura diferente) ---
   if (!titulo) {
     const parrafos = await page.$$eval('.entry-content p, article p', els =>
       els.map(e => e.textContent.trim()).filter(t => t.length > 10 && t !== 'Avisos')
     ).catch(() => []);
-    
+
     if (parrafos.length > 0) {
       const texto = parrafos[0];
-      
+
       // Intentar separar título de "Autor, Año" al final del texto
       const matchAyA = texto.match(/^(.+?)\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)*),\s*(\d{4})\.?$/);
       if (matchAyA) {
@@ -141,26 +333,29 @@ async function obtenerDatosLibro(page, url) {
         autor = matchAyA[2].trim();
         anio = parseInt(matchAyA[3]);
       } else {
-        // Si no se puede separar, usar todo el texto como título
         // Fix B5: si trae prefijo "Editorial X | ", separarlo del título
-        const limpiado = limpiarInformacionAutor(texto);
-        titulo = limpiado;
+        titulo = limpiarInformacionAutor(texto);
       }
     }
   }
-  
+
   // --- PDF ---
   // Fix C11 (PLANV2): el sitio a veces renderiza href="...pdf&#039;" (apóstrofo literal).
   // a[href$=".pdf"] NO matchea ese caso → usar a[href*=".pdf"] y limpiar el apóstrofo final.
-  const linkPdfRaw = await page.$eval('a[href*=".pdf"]', el => el.href).catch(() => null);
+  // Scoping a <article> (los hrefs del header/footer no contaminan) con fallback global
+  // por si alguna página vieja no envuelve el contenido en <article>.
+  const linkPdfRaw = await page.$eval('article a[href*=".pdf"]', el => el.href)
+    .catch(() => page.$eval('a[href*=".pdf"]', el => el.href))
+    .catch(() => null);
   const linkPdf = linkPdfRaw ? limpiarUrlPdf(linkPdfRaw) : null;
-  
+
   // --- Imagen de portada (excluir logo/banner/svg) ---
   // GOTCHA (2026-09-16): el viejo filtro `!src.includes('logo')` excluía portadas
   // cuyo filename contiene "logo" como subcadena ("zooLOGO", "bioLOGO") → Arnaldo
   // Winkelried Bertoni (primer zoologo) y Aventuras de un biólogo quedaban sin
   // portada. El logo del sitio es SIEMPRE "logo-azara-*" y el banner "banner-azara-*".
-  const imagenPortada = await page.$$eval('img', imgs => {
+  // Fallback: og:image si el loop de <img> no encontró nada.
+  let imagenPortada = await page.$$eval('img', imgs => {
     for (const img of imgs) {
       const src = img.src || img.getAttribute('data-src') || '';
       if (src && !/logo-azara|banner-azara/.test(src) && !src.endsWith('.svg')) {
@@ -168,9 +363,101 @@ async function obtenerDatosLibro(page, url) {
       }
     }
     return null;
-  });
-  
+  }).catch(() => null);
+
+  if (!imagenPortada) {
+    imagenPortada = await page.$eval('meta[property="og:image"]', el => (el.getAttribute('content') || '').trim()).catch(() => '') || null;
+  }
+
   return { titulo, autor, anio, linkPdf, imagenPortada };
+}
+
+// Alias compat: obtenerDatosLibro era el extractor de páginas individuales (libros).
+const obtenerDatosLibro = obtenerDatosItem;
+
+/**
+ * Extraer titulares desde el HTML del contenedor de texto-editor de una edición de
+ * hemeroteca — función PURA exportada (testeable con fixture real, PLANV3 V3.6).
+ * Header "<p><strong>Contenido</strong></p>" se descarta. Los titulares se separan
+ * por <br> Y por <p> (verificado): Periódico usa UN solo <p> con titulares separados
+ * por <br>; Revista Azara es MIXTA — ediciones modernas (N14, 2025) usan 1 <p> POR
+ * titular (el bullet "•" vive dentro de <span lang="ES-MX">, salvo el primer titular
+ * que trae el "•" crudo), ediciones viejas (N1, 2013) usan UN solo <p> con <br> como
+ * el Periódico (verificado 2026-09-27 contra N14 y N1). Se quita el bullet inicial
+ * "•" — se guarda SIN bullet (dato puro; el bot pinta el "• " al renderizar, decisión
+ * V3.6) — y se limpian tags/entidades/espacios (usa textContent-equivalente tras
+ * quitar tags: el "•" puede estar crudo o en <span lang="ES-MX">, algunos titulares
+ * tienen <i>/<em>).
+ */
+function extraerTitularesDeHtml(html) {
+  if (!html) return [];
+  const limpiar = t => t
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&#8211;/g, '–')
+    .replace(/&ndash;|&mdash;/gi, '–')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<p[^>]*>/gi, '')
+    .split('\n')
+    .map(limpiar)
+    .map(t => t.replace(/^[•·∙]\s*/, '').trim())
+    .filter(t => t && !/^contenido$/i.test(t));
+}
+
+/**
+ * Extraer datos de UNA edición de hemeroteca desde su página individual
+ * (PLANV3 V3.6): el título y la portada vienen de la GRULLA (contextoDeGrilla = el
+ * objeto {url, titulo, portada} de obtenerUrlsPortafolio) — la individual solo
+ * aporta PDF de la edición + titulares + año.
+ * PDF: botón qodef "Descargar archivo" (a.qodef-qi-button[href$=".pdf"]) dentro de
+ * .elementor-widget-qi_addons_for_elementor_button — exactamente 1 por edición
+ * (verificado N3 y N14). Guard: la grilla de Revista Azara tiene un PDF de "Normas
+ * para autores" (en la grilla, con botón propio) → excluir hrefs/textos que
+ * matcheen /norma|autores/i; si quedara >1 → linkPdf: null + revisionPendiente
+ * (cortafuegos humano). Titulares vía extraerTitularesDeHtml sobre el contenedor
+ * con header "Contenido". Año = regex \((\d{4})\) del título de la grilla.
+ * NO lleva `coleccion` (decisión V3.6): la única categoría YA es la publicación.
+ */
+async function obtenerDatosPortafolio(page, url, { titulo, portada }) {
+  await page.goto(url, { waitUntil: 'networkidle' });
+  await esperar(500);
+
+  // --- PDF de la edición (botón qodef, 1 solo) ---
+  const botones = await page.$$eval('a.qodef-qi-button[href$=".pdf"]', as =>
+    as.map(a => ({ href: a.href || '', texto: (a.textContent || '').trim() }))
+  ).catch(() => []);
+  const candidatos = botones.filter(b => !/norma|autores/i.test(b.href + ' ' + b.texto));
+  const linkPdf = candidatos.length === 1 ? limpiarUrlPdf(candidatos[0].href) : null;
+  const revisionPendiente = candidatos.length !== 1;
+
+  // --- Titulares: contenedor text-editor con header "Contenido" ---
+  const htmlTitulares = await page.evaluate(() => {
+    for (const cont of document.querySelectorAll('.elementor-widget-text-editor .elementor-widget-container')) {
+      if (/<strong>\s*Contenido\s*<\/strong>/i.test(cont.innerHTML)) return cont.innerHTML;
+    }
+    return null;
+  }).catch(() => null);
+  const titulares = extraerTitularesDeHtml(htmlTitulares);
+
+  // --- Año desde el título de la grilla ("Número 3 (2014)" / "NÚMERO 14 (2025)") ---
+  const m = String(titulo || '').match(/\((\d{4})\)/);
+  const anio = m ? parseInt(m[1], 10) : null;
+
+  const item = {
+    titulo: (titulo || '').trim(),
+    linkPdf,
+    imagenPortada: portada || null,
+    autor: null,
+    anio,
+    titulares,
+  };
+  if (revisionPendiente) item.revisionPendiente = true;
+  return item;
 }
 
 // ============================================================
@@ -180,6 +467,16 @@ async function obtenerDatosLibro(page, url) {
 /** Fix C11: quitar apóstrofo/espacios residuales del href (ej: "...pdf&#039;" → "...pdf") */
 function limpiarUrlPdf(href) {
   return (href || '').trim().replace(/'+$/, '').trim();
+}
+
+/**
+ * Normalizar URL para CLAVES de dedup (PLANV3 §5.2): el sitio mezcla hosts — los
+ * PDFs de Recursos Educativos usan www.fundacionazara.org.ar, el resto no. Para que
+ * el MISMO ítem dedupice entre re-scrapes/archivos, la clave ignora www. y el slash final.
+ * NO se usa para almacenar: el linkPdf guardado conserva la URL real.
+ */
+function normalizarHostUrl(url) {
+  return (url || '').trim().replace(/^https?:\/\/www\./i, 'https://').replace(/\/+$/, '');
 }
 
 /** Fix B5: limpiar prefijo "Editorial X | " → quedarse con la última parte tras "|" */
@@ -209,7 +506,7 @@ const TITULO_PLACEHOLDER = /^tomo\s+(\d+|[ivxlcdm]+)$/i;
 function clavesDeLibro({ imagenPortada, linkPdf, titulo }) {
   const claves = [];
   if (imagenPortada) claves.push('img:' + normalizarImg(imagenPortada));
-  if (linkPdf) claves.push('pdf:' + linkPdf.trim());
+  if (linkPdf) claves.push('pdf:' + normalizarHostUrl(linkPdf));
   if (titulo && !TITULO_PLACEHOLDER.test(titulo.trim())) claves.push('titulo:' + normalizarTexto(titulo));
   return claves;
 }
@@ -557,25 +854,40 @@ async function obtenerDatosColeccion(page, coleccion) {
 }
 
 /**
- * Índice global de libros ya registrados (PLANV2 §10): clave estable → entrada.
- * Incluye TODAS las categorías y el temp de la actual para ids estables entre
- * re-scrapes y para que un libro publicado en 2 categorías comparta UN id.
+ * Índice global de ítems ya registrados (PLANV2 §10 / PLANV3 §5.4): clave estable → entrada.
+ * Incluye los archivos del prefijo indicado y el temp de la sección actual, para ids
+ * estables entre re-scrapes y para que un ítem publicado en 2 categorías comparta UN id.
+ *
+ * prefijo: 'libros' → solo libros-*.json (las categorías de libros se deduplican entre
+ * sí, PLANV2 §10). 'recursos' → SOLO recursos-*.json: un recurso NUNCA se consolida
+ * contra un libro automáticamente (PLANV3 §6); si comparte linkPdf/portada con un libro,
+ * validar-data lo reporta y la verificación/decisión es humana.
  */
-function construirIndiceGlobal(librosActuales, categoriaSlug) {
+function construirIndiceGlobal(librosActuales, categoriaSlug, prefijo = 'libros') {
   const indice = new Map();
   const indexar = (libro, categoria) => {
     for (const clave of clavesDeLibro(libro)) {
       indice.set(clave, { id: libro.id, libro, categoria });
     }
   };
-  for (const f of fs.readdirSync(DATA_DIR)) {
-    if (!/^libros-.+\.json$/.test(f)) continue;
-    if (f.includes(`${categoriaSlug}.temp`)) continue; // el temp actual se indexa vía librosActuales
-    try {
-      const arr = JSON.parse(fs.readFileSync(path.join(DATA_DIR, f), 'utf-8'));
-      const cat = f.replace(/^libros-/, '').replace(/\.json$/, '');
-      arr.forEach(l => indexar(l, cat));
-    } catch { /* archivo ilegible: se ignora (el validar:data lo reporta) */ }
+  // FIX V3.6: aceptar también la base {prefijo}.json (hemeroteca: archivo único =
+  // {slug}.json con slug === prefijoArchivo; antes `^prefijo-.+\.json$` no lo veía
+  // y el re-scrape rompía el dedup "existente gana").
+  const esDePrefijo = new RegExp(`^${prefijo}(-.+)?\\.json$`);
+  const quitarPrefijo = new RegExp(`^${prefijo}-`);
+  // Cada sección vive en su propia carpeta (src/data/libros/, src/data/recursos/):
+  // el índice escanea SOLO la de la sección en curso.
+  const dirSeccion = path.join(DATA_DIR, prefijo);
+  if (fs.existsSync(dirSeccion)) {
+    for (const f of fs.readdirSync(dirSeccion)) {
+      if (!esDePrefijo.test(f)) continue;
+      if (f.includes('.temp')) continue; // cualquier .temp (categoría o sección) se indexa vía los arrays en memoria
+      try {
+        const arr = JSON.parse(fs.readFileSync(path.join(dirSeccion, f), 'utf-8'));
+        const cat = f.replace(quitarPrefijo, '').replace(/\.json$/, '');
+        arr.forEach(l => indexar(l, cat));
+      } catch { /* archivo ilegible: se ignora (el validar:data lo reporta) */ }
+    }
   }
   librosActuales.forEach(l => indexar(l, categoriaSlug));
   return indice;
@@ -647,104 +959,167 @@ function registrarOConsolidar(indiceGlobal, datos) {
 }
 
 /**
- * Scrapear una categoría con guardado incremental
+ * Scrapear UNA sección completa — MISMO flujo para libros y recursos educativos
+ * (PLANV3 §5.3 unificado 2026-09-27): itera las categorías de la sección (13 de
+ * libros, 10 de RE), desglosa colecciones catalogadas (COLECCIONES_CONOCIDAS) y
+ * aplica dedup "existente gana" (registrarOConsolidar) contra un índice construido
+ * SOLO con el prefijo de la sección (un recurso NUNCA se consolida contra un libro;
+ * los parecidos los reporta validar-data — PLANV3 §6).
+ *
+ * Dos modos de persistencia, declarados en la sección:
+ *  - archivoUnico: false (Libros) → 1 archivo {prefijo}-{categoria.slug}.json POR
+ *    categoría, con progreso incremental por categoría (temp .temp.json + reanudación
+ *    desde N ítems).
+ *  - archivoUnico: true (Recursos educativos) → 1 archivo {prefijo}-{slug}.json para
+ *    toda la sección; `coleccion` de cada ítem = nombre de su categoría; el temp
+ *    guarda las categorías completadas + los ítems acumulados (al retomar salta las
+ *    completadas y re-scrapea la categoría en curso — sus ítems se consolidan por id).
  */
-async function scrapearCategoria(browser, categoria) {
-  console.log(`\n📚 Scraping: ${categoria.nombre}`);
-  
-  const rutaFinal = path.join(DATA_DIR, `libros-${categoria.slug}.json`);
-  const rutaTemp = path.join(DATA_DIR, `libros-${categoria.slug}.temp.json`);
+async function scrapearSeccion(browser, seccion) {
+  console.log(`\n📦 Scraping sección: ${seccion.nombre}`);
   
   const page = await browser.newPage();
+  const prefijo = seccion.prefijoArchivo;
+  // Cada sección vive en su propia carpeta (libros/, recursos/, y las de hemeroteca:
+  // periodico-exploracion-y-ciencia/, revista-azara/); se crea al arrancar para que
+  // la primera corrida no rompa el índice.
+  const carpetaSeccion = path.join(DATA_DIR, prefijo);
+  fs.mkdirSync(carpetaSeccion, { recursive: true });
+  // FIX V3.6: el archivo único es {slug}.json — cuando slug === prefijoArchivo
+  // (hemeroteca) NO duplicar el prefijo (evita 'revista-azara-revista-azara.json').
+  // Recursos queda igual: slug 'recursos-educativos' → 'recursos-educativos.json'.
+  const rutaFinal = seccion.archivoUnico
+    ? path.join(carpetaSeccion, `${seccion.slug}.json`)
+    : null;
+  const rutaTemp = seccion.archivoUnico
+    ? path.join(carpetaSeccion, `${seccion.slug}.temp.json`)
+    : null;
+  
+  // Progreso previo (modo archivo único): categorías completadas + ítems acumulados
+  let categoriasCompletadas = new Set();
+  let items = [];
+  if (seccion.archivoUnico && fs.existsSync(rutaTemp)) {
+    try {
+      const previo = JSON.parse(fs.readFileSync(rutaTemp, 'utf-8'));
+      categoriasCompletadas = new Set(previo.categoriasCompletadas || []);
+      items = Array.isArray(previo.items) ? previo.items : [];
+      console.log(`   ♻️ Progreso anterior: ${items.length} ítems acumulados, ${categoriasCompletadas.size} categorías completadas`);
+    } catch {
+      console.log('   ⚠️ Archivo temporal corrupto, empezando de cero');
+    }
+  }
   
   try {
-    // Obtener URLs
-    const urlsLibros = await obtenerUrlsLibros(page, categoria.url);
-    
-    if (urlsLibros.length === 0) {
-      console.log('   ⚠️ No se encontraron libros');
-      return { ...categoria, libros: [] };
-    }
-    
-    // Cargar progreso previo si existe archivo temporal
-    let libros = [];
-    let desde = 0;
-    if (fs.existsSync(rutaTemp)) {
-      try {
-        libros = JSON.parse(fs.readFileSync(rutaTemp, 'utf-8'));
-        desde = libros.length;
-        console.log(`   ♻️ Progreso anterior encontrado: ${desde} libros ya scrapeados`);
-      } catch {
-        console.log('   ⚠️ Archivo temporal corrupto, empezando de cero');
-        libros = [];
-      }
-    }
-    
-    // Índice global para deduplicación transversal (PLANV2 §10): mismo libro en 2
-    // categorías → UN solo id. También estabiliza los ids entre re-scrapes.
-    const indiceGlobal = construirIndiceGlobal(libros, categoria.slug);
-    
-    // Extraer datos de cada libro
-    for (let i = desde; i < urlsLibros.length; i++) {
-      const url = urlsLibros[i];
-      console.log(`   📖 [${i + 1}/${urlsLibros.length}]`);
+    for (const categoria of seccion.categorias) {
+      const rutaCategoriaFinal = seccion.archivoUnico
+        ? null
+        : path.join(carpetaSeccion, `${prefijo}-${categoria.slug}.json`);
+      const rutaCategoriaTemp = seccion.archivoUnico
+        ? null
+        : path.join(carpetaSeccion, `${prefijo}-${categoria.slug}.temp.json`);
       
-      try {
-        const coleccion = COLECCIONES_CONOCIDAS.find(c => c.url === url);
+      if (seccion.archivoUnico && categoriasCompletadas.has(categoria.nombre)) {
+        console.log(`   ⏭️ ${categoria.nombre}: ya completada (se salta)`);
+        continue;
+      }
+      console.log(`\n   🗂️ Categoría: ${categoria.nombre}`);
+      
+      // Modo por categoría (Libros): reanudar desde el progreso del temp de esa categoría
+      let desde = 0;
+      if (!seccion.archivoUnico && fs.existsSync(rutaCategoriaTemp)) {
+        try {
+          items = JSON.parse(fs.readFileSync(rutaCategoriaTemp, 'utf-8'));
+          desde = items.length;
+          console.log(`   ♻️ Progreso anterior de la categoría: ${desde} ítems ya scrapeados`);
+        } catch {
+          console.log('   ⚠️ Archivo temporal corrupto, empezando de cero');
+          items = [];
+        }
+      }
+      
+      // Índice para dedup: SOLO los archivos del prefijo de esta sección (PLANV3 §6).
+      // Libros: mismo libro en 2 categorías → UN solo id (PLANV2 §10).
+      const indiceGlobal = construirIndiceGlobal(items, categoria.slug, prefijo);
+      
+      // Guardar temp de la sección (modo archivo único)
+      const guardarTempSeccion = () => {
+        fs.writeFileSync(rutaTemp, JSON.stringify({
+          categoriasCompletadas: [...categoriasCompletadas],
+          items
+        }, null, 2));
+      };
+      
+      const urls = seccion.tipo === 'hemeroteca'
+        ? await obtenerUrlsPortafolio(page, categoria.url)
+        : await obtenerUrlsLibros(page, categoria.url);
+      if (urls.length === 0) {
+        console.log('   ⚠️ No se encontraron ítems');
+        if (seccion.archivoUnico) {
+          categoriasCompletadas.add(categoria.nombre); // no re-golpear la web al retomar
+          guardarTempSeccion();
+        }
+        continue;
+      }
+      
+      // Registrar un ítem individual (dedup + overrides). En modo archivo único,
+      // `coleccion` = categoría (la API agrupa por ?coleccion=).
+      const registrarItem = (datos) => {
+        if (!datos || !datos.titulo) {
+          console.log('         ⚠️ Sin título (verificar URL)');
+          return;
+        }
+        // FIX V3.6: la hemeroteca NO lleva `coleccion` (decisión del usuario) — la
+        // única categoría YA es la publicación; en cambio SÍ lleva `categoria`
+        // (con acentos, "Periódico Exploración y Ciencia") para que la API respete
+        // libros[0].categoria y el nombre visible no sea el slug capitalizado.
+        const contexto = seccion.tipo === 'hemeroteca'
+          ? { ...datos, categoria: seccion.nombre }
+          : (seccion.archivoUnico ? { ...datos, coleccion: categoria.nombre } : datos);
+        const { _duplicadoDe, ...item } = registrarOConsolidar(indiceGlobal, contexto);
+        items.push(aplicarOverrides(item));
+        console.log(_duplicadoDe
+          ? `         🔗 Reutilizado id ${_duplicadoDe.id} (${_duplicadoDe.categoria})`
+          : `         ✅ ${datos.titulo.substring(0, 60)}...`);
+      };
+      
+      // Procesar una URL: desglose de colección catalogada o página individual
+      const procesarUrl = async (url) => {
+        const urlReal = typeof url === 'string' ? url : url.url;
+        // Hemeroteca (PLANV3 V3.6): la individual no tiene h1/h4 fiables — los datos
+        // vienen de la grilla (objeto {url, titulo, portada} del loop). Sin detector
+        // de "posible colección": la individual trae exactamente 1 PDF de edición.
+        if (seccion.tipo === 'hemeroteca') {
+          registrarItem(await obtenerDatosPortafolio(page, urlReal, url));
+          return;
+        }
+        const coleccion = COLECCIONES_CONOCIDAS.find(c => c.url === urlReal);
         
         if (coleccion) {
-          // Desglose de colección multi-libro (PLANV2 §4): esa URL representa varios libros.
+          // Desglose de colección multi-ítem (PLANV2 §4 / PLANV3 §5.2):
+          // esa URL representa varios libros/recursos.
           await page.goto(url, { waitUntil: 'networkidle' });
           await esperar(500);
-          const librosColeccion = await obtenerDatosColeccion(page, coleccion);
+          const itemsColeccion = await obtenerDatosColeccion(page, coleccion);
           
-          if (librosColeccion.length >= 1) {
-            const consolidados = librosColeccion.map(l => {
-              const { _duplicadoDe, ...limpio } = registrarOConsolidar(indiceGlobal, l);
-              return { limpio: aplicarOverrides(limpio), reutilizado: Boolean(_duplicadoDe) };
-            });
-            libros.push(...consolidados.map(c => c.limpio));
-            const reutilizados = consolidados.filter(c => c.reutilizado).length;
-            console.log(`      🗂️ ${coleccion.coleccion}: ${consolidados.length} libros desglosados` + (reutilizados ? ` (${reutilizados} compartían id)` : ''));
-} else {
-            // Degradación segura (§4.1): el patrón no matcheó → ruta original
-            console.log(`      ⚠️ Sin desglose para "${coleccion.coleccion}" (patrón ${coleccion.patron}) — ruta original`);
-            const datos = await obtenerDatosLibro(page, url);
-            if (datos.titulo) {
-              const { _duplicadoDe, ...libro } = registrarOConsolidar(indiceGlobal, {
-                titulo: datos.titulo,
-                linkPdf: datos.linkPdf,
-                imagenPortada: datos.imagenPortada,
-                autor: datos.autor,
-                anio: datos.anio
-              });
-              libros.push(aplicarOverrides(libro));
-              if (_duplicadoDe) console.log(`      🔗 Combinado: ${_duplicadoDe.id} (ya estaba en ${_duplicadoDe.categoria})`);
-              else console.log(`      ✅ ${datos.titulo.substring(0, 50)}...`);
-            } else {
-              console.log(`      ⚠️ Sin título (verificar URL)`);
+          if (itemsColeccion.length >= 1) {
+            let reutilizados = 0;
+            for (const item of itemsColeccion) {
+              const { _duplicadoDe, ...limpio } = registrarOConsolidar(indiceGlobal, item);
+              items.push(aplicarOverrides(limpio));
+              if (_duplicadoDe) reutilizados++;
             }
+            console.log(`         🗂️ ${coleccion.coleccion}: ${itemsColeccion.length} ítems desglosados` + (reutilizados ? ` (${reutilizados} compartían id)` : ''));
+          } else {
+            // Degradación segura: el patrón no matcheó → página individual
+            console.log(`         ⚠️ Sin desglose para "${coleccion.coleccion}" (patrón ${coleccion.patron}) — ruta original`);
+            registrarItem(await obtenerDatosItem(page, url));
           }
         } else {
-          const datos = await obtenerDatosLibro(page, url);
+          const datos = await obtenerDatosItem(page, url);
+          registrarItem(datos);
           
-          if (datos.titulo) {
-            const { _duplicadoDe, ...libro } = registrarOConsolidar(indiceGlobal, {
-              titulo: datos.titulo,
-              linkPdf: datos.linkPdf,
-              imagenPortada: datos.imagenPortada,
-              autor: datos.autor,
-              anio: datos.anio
-            });
-            libros.push(aplicarOverrides(libro));
-            if (_duplicadoDe) console.log(`      🔗 Combinado: ${_duplicadoDe.id} (ya estaba en ${_duplicadoDe.categoria})`);
-            else console.log(`      ✅ ${datos.titulo.substring(0, 50)}...`);
-          } else {
-            console.log(`      ⚠️ Sin título (verificar URL)`);
-          }
-          
-          // Detector de posibles colecciones no catalogadas (PLANV2 §8): la página ya
-          // quedó navegada por obtenerDatosLibro → solo cuenta, sin goto extra.
+          // Detector de posibles colecciones no catalogadas (PLANV2 §8): la página
+          // ya quedó navegada por obtenerDatosItem → solo cuenta, sin goto extra.
           const sospecha = await page.evaluate(() => {
             const pdfs = document.querySelectorAll('a[href*=".pdf"]').length;
             const imgs = new Set([...document.querySelectorAll('img')]
@@ -755,31 +1130,60 @@ async function scrapearCategoria(browser, categoria) {
             return { pdfs, imgs, h4ConImg };
           });
           if (sospecha.pdfs > 1 || sospecha.imgs > 1 || sospecha.h4ConImg > 1) {
-            console.log(`      🚩 POSIBLE COLECCIÓN NO CATALOGADA → ${url} (pdfs:${sospecha.pdfs}, imgs:${sospecha.imgs}, h4+img:${sospecha.h4ConImg})`);
+            console.log(`         🚩 POSIBLE COLECCIÓN NO CATALOGADA → ${url} (pdfs:${sospecha.pdfs}, imgs:${sospecha.imgs}, h4+img:${sospecha.h4ConImg})`);
           }
         }
-      } catch (error) {
-        console.log(`      ❌ Error: ${error.message}`);
+      };
+      
+      let procesados = desde;
+      for (let i = desde; i < urls.length; i++) {
+        const url = urls[i];
+        procesados++;
+        const nombreUrl = (typeof url === 'string' ? url : url.url).split('/').filter(Boolean).pop() || '';
+        console.log(seccion.archivoUnico
+          ? `      📄 [${i + 1}/${urls.length}] ${nombreUrl}`
+          : `      📖 [${i + 1}/${urls.length}]`);
+        
+        try {
+          await procesarUrl(url);
+        } catch (error) {
+          console.log(`      ❌ Error: ${error.message}`);
+        }
+        
+        // Guardado incremental
+        if (seccion.archivoUnico) {
+          if (procesados % GUARDAR_CADA === 0) guardarTempSeccion();
+        } else if (procesados % GUARDAR_CADA === 0 && i > desde) {
+          fs.writeFileSync(rutaCategoriaTemp, JSON.stringify(items, null, 2));
+          console.log(`      💾 Progreso guardado (${items.length} ítems)`);
+        }
+        
+        await esperar(800);
       }
       
-      // Guardado incremental cada N libros
-      if ((i + 1) % GUARDAR_CADA === 0 && i > desde) {
-        fs.writeFileSync(rutaTemp, JSON.stringify(libros, null, 2));
-        console.log(`      💾 Progreso guardado (${libros.length} libros)`);
+      // Cierre de categoría
+      if (seccion.archivoUnico) {
+        categoriasCompletadas.add(categoria.nombre);
+        guardarTempSeccion();
+        console.log(`      ✅ Categoría completada: ${categoria.nombre} — ${items.length} ítems acumulados`);
+      } else {
+        console.log(`   📊 Total extraídos en ${categoria.nombre}: ${items.length}`);
+        fs.writeFileSync(rutaCategoriaFinal, JSON.stringify(items, null, 2));
+        if (fs.existsSync(rutaCategoriaTemp)) fs.unlinkSync(rutaCategoriaTemp);
+        console.log(`   💾 Guardado en: ${path.basename(rutaCategoriaFinal)}`);
+        items = []; // reiniciar para la próxima categoría (modo por categoría)
       }
-      
-      await esperar(800);
     }
     
-    console.log(`   📊 Total extraídos: ${libros.length}`);
-    
-    // Guardar archivo final y limpiar temp
-    fs.writeFileSync(rutaFinal, JSON.stringify(libros, null, 2));
-    if (fs.existsSync(rutaTemp)) {
-      fs.unlinkSync(rutaTemp);
+    // Cierre de sección (modo archivo único)
+    if (seccion.archivoUnico) {
+      console.log(`   📊 Total en sección ${seccion.nombre}: ${items.length}`);
+      fs.writeFileSync(rutaFinal, JSON.stringify(items, null, 2));
+      if (fs.existsSync(rutaTemp)) fs.unlinkSync(rutaTemp);
+      console.log(`   💾 Guardado en: ${path.basename(rutaFinal)}`);
     }
     
-    return { ...categoria, libros };
+    return { ...seccion, items };
     
   } finally {
     await page.close();
@@ -787,34 +1191,63 @@ async function scrapearCategoria(browser, categoria) {
 }
 
 /**
- * Función principal
+ * Resolver el objetivo de scraping a partir del modo CLI (función pura, testeable).
+ * - 'todas'     → todas las secciones.
+ * - 'seccion'   → UNA sección completa por slug ('libros', 'recursos-educativos').
+ * - 'categoria' → UNA categoría puntual, SOLO de secciones por-categoría (libros).
+ *                 Si el slug pertenece a una sección de archivo único (RE), se avisa
+ *                 que use --seccion (una categoría puntual ahí pisaría el archivo
+ *                 final con datos parciales). Si no existe, error con catálogo.
+ */
+function resolverObjetivo(modo, slug) {
+  if (modo === 'todas') {
+    return { objetivo: SECCIONES, mensaje: `Todas las secciones (${SECCIONES.length})` };
+  }
+  if (modo === 'seccion') {
+    const seccion = SECCIONES.find(s => s.slug === slug);
+    if (!seccion) {
+      return { error: `Sección '${slug}' no encontrada. Secciones disponibles: ${SECCIONES.map(s => s.slug).join(', ')}` };
+    }
+    return { objetivo: [seccion], mensaje: `Sección: ${seccion.nombre} (${seccion.categorias.length} categorías)` };
+  }
+  // modo 'categoria'
+  for (const seccion of SECCIONES) {
+    const categoria = seccion.categorias.find(c => c.slug === slug);
+    if (categoria) {
+      if (seccion.archivoUnico) {
+        return { error: `'${slug}' es un subgrupo de la sección '${seccion.slug}', que se scrapea completa en un archivo único. Usá --seccion=${seccion.slug}.` };
+      }
+      return { objetivo: [{ ...seccion, categorias: [categoria] }], mensaje: `Categoría: ${categoria.nombre} (sección ${seccion.nombre})` };
+    }
+  }
+  const catalogo = SECCIONES
+    .filter(s => !s.archivoUnico)
+    .flatMap(s => s.categorias.map(c => `${c.slug} (${s.slug})`));
+  return { error: `Categoría '${slug}' no encontrada en secciones por-categoría. Opciones — secciones: ${SECCIONES.map(s => s.slug).join(', ')} | categorías: ${catalogo.join(', ')}` };
+}
+
+/**
+ * Función principal. El objetivo se resuelve por MODO (--todas / --seccion /
+ * --categoria) con fallback al default histórico SCRAPEAR_CATEGORIA.
  */
 async function run() {
   console.log('═══════════════════════════════════════════════════════════');
   console.log('📚 Scraper Playwright - Fundación Azara');
   console.log('═══════════════════════════════════════════════════════════\n');
-  
-  // Filtrar categorías
-  const categoriasParaScrapear = CATEGORIA_SELECTED === 'TODAS' 
-    ? CATEGORIAS 
-    : CATEGORIAS.filter(c => c.slug === CATEGORIA_SELECTED);
-  
-  if (categoriasParaScrapear.length === 0) {
-    console.error(`❌ Categoría '${CATEGORIA_SELECTED}' no encontrada.`);
+
+  const { objetivo, mensaje, error } = resolverObjetivo(MODO, OBJETIVO_SLUG);
+  if (error) {
+    console.error(`❌ ${error}`);
     process.exit(1);
   }
-  
-  if (CATEGORIA_SELECTED !== 'TODAS') {
-    console.log(`🎯 Scraping: ${CATEGORIA_SELECTED}\n`);
-  }
+  console.log(`🎯 ${mensaje}\n`);
   
   // Iniciar navegador
   const browser = await chromium.launch({ headless: true });
   
   try {
-    for (const categoria of categoriasParaScrapear) {
-      await scrapearCategoria(browser, categoria);
-      console.log(`   💾 Guardado en: libros-${categoria.slug}.json`);
+    for (const seccion of objetivo) {
+      await scrapearSeccion(browser, seccion);
       await esperar(2000);
     }
     
@@ -833,10 +1266,18 @@ if (require.main === module) {
 
 module.exports = {
   CATEGORIAS,
+  RECURSOS_EDUCATIVOS,
+  SECCIONES,
   COLECCIONES_CONOCIDAS,
   obtenerUrlsLibros,
-  obtenerDatosLibro,
+  obtenerUrlsPortafolio, // grilla portfolio de hemeroteca (PLANV3 V3.6)
+  obtenerDatosItem,
+  obtenerDatosLibro, // alias de obtenerDatosItem (compat con el nombre histórico)
+  obtenerDatosPortafolio, // individual de edición de hemeroteca (PLANV3 V3.6)
+  extraerTitularesDeHtml, // función pura (testeable con fixture)
   obtenerDatosColeccion,
+  scrapearSeccion,
+  resolverObjetivo,
   extraerParesH4Pdf,
   extraerContenedorPorLibro,
   extraerDivTitulosCarrousel,
@@ -844,6 +1285,7 @@ module.exports = {
   extraerPdfsRomanos,
   limpiarUrlPdf,
   limpiarInformacionAutor,
+  normalizarHostUrl,
   normalizarTexto,
   parsearAutorAnio,
   tituloDesdeFilename
