@@ -224,7 +224,7 @@ Respuesta de `GET /api/catalogo` (paginada):
 {
   "success": true,
   "data": [
-    { "id": "lib-3zgddm8g", "titulo": "...", "categoria": "...", "seccion": "libros", "linkPdf": "..." }
+    { "id": "lib-3zgddm8g", "titulo": "...", "categorias": ["Ambiente"], "seccion": "libros", "linkPdf": "..." }
   ],
   "meta": { "total": 445, "pagina": 1, "limite": 20, "totalPaginas": 23 }
 }

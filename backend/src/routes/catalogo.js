@@ -83,9 +83,9 @@ function obtenerCategoriasYLibros() {
  *
  * PLANV2 §10: un libro publicado en 2 categorías comparte UN id (el scraper
  * reutiliza el id ya registrado). El dedup evita inflar la búsqueda global y
- * los stats, PERO el filtro por categoría debe usar `categorias` (todas donde
- * figura el libro) y no `categoria` (la principal). Sin esto, un libro
- * multi-categoría desaparece de la navegación de las categorías no-principales.
+ * los stats, PERO cada ítem expone `categorias` (array con TODAS las categorías
+ * donde figura, no una sola 'principal'). Sin esto, un libro multi-categoría
+ * desaparece de la navegación de las categorías no-principales.
  */
 function obtenerTodosLosLibros() {
   const porId = new Map();
@@ -104,7 +104,10 @@ function obtenerTodosLosLibros() {
         if (existente) {
           if (!existente.categorias.includes(nombre)) existente.categorias.push(nombre);
         } else {
-          porId.set(libro.id, { ...libro, seccion, categoria: nombre, categorias: [nombre] });
+          // Se descarta `categoria` del archivo (fuente del nombre): el ítem
+          // expuesto lleva SOLO `categorias` (array, todas donde figura).
+          const { categoria: _categoriaArchivo, ...resto } = libro;
+          porId.set(libro.id, { ...resto, seccion, categorias: [nombre] });
         }
       }
     } catch (error) {
@@ -129,7 +132,7 @@ function obtenerColecciones() {
     }
     c.cantidad++;
     if (libro.linkPdf) c.conPdf++;
-    (libro.categorias && libro.categorias.length ? libro.categorias : [libro.categoria])
+    (libro.categorias || [])
       .forEach(n => c.categorias.add(n));
   }
   return [...mapa.values()]
@@ -186,8 +189,7 @@ router.get('/', (req, res) => {
     if (categoria) {
       const objetivo = normalizarCategoria(categoria);
       libros = libros.filter(l => {
-        const cats = (l.categorias && l.categorias.length) ? l.categorias : [l.categoria];
-        return cats.some(c => normalizarCategoria(c) === objetivo);
+        return (l.categorias || []).some(c => normalizarCategoria(c) === objetivo);
       });
     }
 

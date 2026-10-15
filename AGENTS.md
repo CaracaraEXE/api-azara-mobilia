@@ -15,7 +15,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 - ✅ Botón "Volver" a categorías de la MISMA sección
 - ✅ IDs de libros visibles (`🆔 \`lib-abc123\``) en resultados
 - ✅ Presentación del bot separada en `discord-bot/src/formatos.js` (pura, testeable sin servidor) — tests en `discord-bot/test-formatos.js` (42 checks, `npm test`)
-- ✅ **Red de seguridad de tests (2026-10-14)**: `backend` → `npm test` = `test-integracion.js` (44 checks, 0 deps): monta el app REAL en puerto efímero, verifica `?categoria=` ESTRICTA (parciales → 0), nuevo filtro `?seccion=`, totales dedup, paginación, búsqueda por titulares, detalle, stats y sub-listas. Valores auto-calculados desde `data/`. `API_BASE` pasa a `/api/catalogo`, `index.js` exporta `app` + guard `require.main`, `GET /` anuncia `/api/catalogo`.
+- ✅ **Red de seguridad de tests (2026-10-14)**: `backend` → `npm test` = `test-integracion.js` (52 checks, 0 deps): monta el app REAL en puerto efímero, verifica `?categoria=` ESTRICTA (parciales → 0), nuevo filtro `?seccion=`, totales dedup, paginación, búsqueda por titulares, detalle, stats y sub-listas. Valores auto-calculados desde `data/`. `API_BASE` pasa a `/api/catalogo`, `index.js` exporta `app` + guard `require.main`, `GET /` anuncia `/api/catalogo`.
 - ✅ **`/ficha` con TOGGLE de titulares (2026-10-14)**: ítems de hemeroteca muestran los titulares OCULTOS por defecto + botón `📖 Ver titulares (N)` que los muestra/oculta re-renderizando (PATCH). Ver "Flujo del toggle" abajo.
 
 ## Stack
@@ -171,8 +171,8 @@ Notas:
 }
 ```
 
-Los archivos JSON no tienen campo `categoria` — el backend lo asigna en tiempo real desde el slug del archivo, y agrega `seccion` ('libros' | 'recursos' | 'periodico-exploracion-y-ciencia' | 'revista-azara') según la carpeta.
-**EXCEPCIÓN — hemeroteca (PLANV3 V3.6)**: los ítems de `data/periodico-exploracion-y-ciencia/*.json` y `data/revista-azara/*.json` SÍ llevan `categoria` en el archivo (con acentos: "Periódico Exploración y Ciencia") — la API respeta `libros[0].categoria` (libros.js L51-52); el resto de los archivos no la tienen → cero cambio.
+Los archivos JSON no tienen campo `categoria` — el backend asigna en tiempo real desde el slug del archivo, y agrega `seccion` ('libros' | 'recursos' | 'periodico-exploracion-y-ciencia' | 'revista-azara') según la carpeta, y `categorias` (ARRAY con TODAS las categorías donde figura el ítem — normalmente una sola; un libro multi-categoría comparte id y las acumula). **El ítem expuesto NO lleva `categoria` singular** (redundancia eliminada 2026-10-15): los consumidores leen `categorias`.
+**EXCEPCIÓN — hemeroteca (PLANV3 V3.6)**: los ítems de `data/periodico-exploracion-y-ciencia/*.json` y `data/revista-azara/*.json` SÍ llevan `categoria` en el archivo (con acentos: "Periódico Exploración y Ciencia") — el backend lo usa como FUENTE del nombre de categoría (`libros[0].categoria`, catalogo.js L98-99) pero lo DESCARTA del ítem expuesto, que sale con `categorias`; el resto de los archivos no la tienen → cero cambio.
 Los ítems de RE (`data/recursos/recursos-educativos.json`) tienen además `coleccion` (subgrupo: 'Cuadernillos', 'Posters de Biodiversidad', ...) — es la categoría visible de esa sección. La hemeroteca NO lleva `coleccion` (la categoría única YA es la publicación).
 Los esqueletos (`linkPdf: null` + `revisionPendiente: true`) quedan listados por `scripts/validar-data.js` en el "Portal de revisión humana" para completar vía PR (política: la cura manual no se re-scrapea).
 

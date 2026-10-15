@@ -184,6 +184,8 @@ async function main() {
       const r = await get(`${API_BASE}/${idReal}`);
       check('id real → success', r.success === true);
       igual('id real → devuelve ese id', r.data.id, idReal);
+      check('ítem expone `categorias` (array no vacío)', Array.isArray(r.data.categorias) && r.data.categorias.length > 0);
+      check('ítem NO expone `categoria` singular (redundancia eliminada)', !('categoria' in r.data));
       igual('id inexistente → 404', await status(`${API_BASE}/lib-noexiste`), 404);
     }
 

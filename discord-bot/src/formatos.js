@@ -37,15 +37,20 @@ const SECCIONES_HEMEROTECA = new Set(['periodico-exploracion-y-ciencia', 'revist
 /**
  * Datos de presentación de un ítem según su sección.
  * esRecursos: la categoría visible es la colección (subgrupo); si un ítem
- * de RE no tuviera coleccion (no debería pasar con opción A), cae a categoria.
+ * de RE no tuviera coleccion (no debería pasar con opción A), cae a categorias.
+ * En libros/hemeroteca la categoría visible = `categorias` (todas las del ítem,
+ * unidas por " · "; normalmente una sola).
  */
 function infoSeccion(libro) {
   const esRecursos = libro.seccion === 'recursos';
+  const categorias = libro.categorias || [];
   return {
     esRecursos,
     emoji: SECCIONES_EMOJIS[libro.seccion] || '📚',
     nombre: SECCIONES_NOMBRES[libro.seccion] || 'Libros',
-    categoriaReal: esRecursos ? (libro.coleccion || libro.categoria || 'Desconocida') : (libro.categoria || 'Desconocida')
+    categoriaReal: esRecursos
+      ? (libro.coleccion || categorias.join(' · ') || 'Desconocida')
+      : (categorias.join(' · ') || 'Desconocida')
   };
 }
 
