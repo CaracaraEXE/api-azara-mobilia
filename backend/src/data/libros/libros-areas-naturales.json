@@ -9,6 +9,15 @@
     "fechaExtraccion": "2026-09-16T23:17:55.437Z"
   },
   {
+    "id": "lib-4lzmmrg0",
+    "titulo": "Centro de Interpretación de la Reserva Provincial Pichi Mahuida (La Pampa)",
+    "autor": null,
+    "anio": null,
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/centro-de-interpretacion-de-la-reserva-provincial-pichi-mahuida-la-pampa.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/centro-de-interpretacion-de-la-reserva-provincial-pichi-mahuida-la-pampa-300x258.jpg",
+    "fechaExtraccion": "2026-10-15T23:38:42.653Z"
+  },
+  {
     "titulo": "Chuanisin indómita",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/chuanisin-indomita.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/chuanisin-indomita.jpg",
@@ -129,6 +138,15 @@
     "anio": 2023,
     "id": "lib-bjdeol73",
     "fechaExtraccion": "2026-09-16T23:18:26.942Z"
+  },
+  {
+    "id": "lib-73s5v273",
+    "titulo": "Paisaje Protegido Delta Terra (Tigre - Buenos Aires)",
+    "autor": null,
+    "anio": null,
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/paisaje-protegido-delta-terra-tigre.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/paisaje-protegido-delta-terra-tigre-300x258.jpg",
+    "fechaExtraccion": "2026-10-15T23:39:29.604Z"
   },
   {
     "titulo": "Parque Costero del Sur, naturaleza, conservación y patrimonio cultural",

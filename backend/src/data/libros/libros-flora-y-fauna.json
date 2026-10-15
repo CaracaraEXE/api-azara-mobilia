@@ -195,7 +195,7 @@
     "autor": "Analía V. Dalia, Valeria Bauni, Marina Homberg y Adrián Giacchino (editores)",
     "anio": 2023,
     "id": "lib-9yl216n8",
-    "fechaExtraccion": "2026-09-16T04:23:34.920Z"
+    "fechaExtraccion": "2026-09-16T04:14:00.348Z"
   },
   {
     "titulo": "El aguará guazú (Chrysocyon brachyurus) en Argentina",
@@ -223,6 +223,15 @@
     "anio": 2016,
     "id": "lib-kxhxe9kf",
     "fechaExtraccion": "2026-09-16T04:23:45.119Z"
+  },
+  {
+    "titulo": "Embajadas de la naturaleza. Zoológicos, acuarios y oceanarios de Argentina en el siglo XXI",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/embajadas-de-la-naturaleza.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/01/embajadas-de-la-naturaleza-zoologicos-acuarios-y-oceanarios-de-argentina.jpg",
+    "autor": "Carlos Fernández Balboa (compilador)",
+    "anio": 2019,
+    "id": "lib-sy1a0gug",
+    "fechaExtraccion": "2026-09-16T04:19:34.551Z"
   },
   {
     "titulo": "Etimología de los nombres científicos de las aves de Argentina. Su significado y origen",
@@ -283,6 +292,15 @@
     "fechaExtraccion": "2026-09-16T04:23:55.394Z"
   },
   {
+    "titulo": "Guía de actuaciones en delitos contra la fauna silvestre",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/guia-de-actuaciones-en-delitos-contra-la-fauna-silvestre.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2020/07/guia-de-actuaciones-en-delitos-contra-la-fauna-silvestre.jpg",
+    "autor": "Karina N. Uribe y Hernán V. Ibáñez",
+    "anio": 2020,
+    "id": "lib-vyxcyqod",
+    "fechaExtraccion": "2026-09-16T04:19:42.525Z"
+  },
+  {
     "titulo": "Guía de huellas de los mamíferos de la Reserva Natural San Sebastián de la Selva y su área de influencia. Misiones, Argentina",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/guia-de-huellas-de-los-mamiferos-de-la-reserva-natural-san-sebastian-de-la-selva-y-su-area-de-influencia.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/06/guia-de-huellas-de-los-mamiferos-de-la-reserva-natural-san-sebastian-de-la-selva-300x258.jpg",
@@ -301,6 +319,24 @@
     "fechaExtraccion": "2026-09-16T04:24:01.837Z"
   },
   {
+    "id": "lib-5tk9bg1l",
+    "titulo": "Guía metodológica para la intervención en atropellamientos de fauna silvestre",
+    "linkPdf": "https://www.fundacionazara.org.ar/img/libros/guia-metodologica-para-la-intervencion-en-atropellamientos-de-fauna-silvestre.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/09/guia-metodologica-para-la-intervencion-en-atropellamientos-de-fauna-silvestre-300x258.jpg",
+    "autor": "Hernán Ibáñez, Karina Uribe y Néstor Vidal",
+    "anio": 2026,
+    "fechaExtraccion": "2026-09-16T04:19:45.908Z"
+  },
+  {
+    "titulo": "Guía para la detección de tráfico ilegal de vida silvestre en terminales aeroportuarias",
+    "linkPdf": "https://fundacionazara.org.ar/img/libros/guia-para-la-deteccion-de-trafico-ilegal-de-vida-silvestre-en-terminales-aeroportuarias.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/03/guia-para-la-deteccion-de-trafico-ilegal-de-vida-silvestre-en-terminales-aeroportuarias-300x258.jpg",
+    "autor": "Aníbal Onetto y Hernán V. Ibáñez",
+    "anio": 2026,
+    "id": "lib-3m4jke5x",
+    "fechaExtraccion": "2026-09-16T04:19:49.162Z"
+  },
+  {
     "titulo": "Guía para la identificación de huellas de mamíferos del Parque Provincial Presidente Sarmiento",
     "linkPdf": "http://www.fundacionazara.org.ar/img/libros/guia-para-la-identificacion-de-huellas-de-mamiferos-del-parque-provincial-presidente-sarmiento.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/05/guia-para-la-identificacion-de-huellas-de-mamiferos-del-parque-provincial-presidente-sarmiento-300x258.jpg",
@@ -308,6 +344,15 @@
     "anio": 2026,
     "id": "lib-5541xsfp",
     "fechaExtraccion": "2026-09-16T04:24:06.052Z"
+  },
+  {
+    "titulo": "Guía práctica para la formación de canes especializados en búsqueda y detección de fauna silvestre en situación de tráfico ilegal",
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/Guia-formacion-de-canes.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2022/04/Guia-formacion-de-canes.jpg",
+    "autor": "Laura Ratón y Hernán V. Ibáñez",
+    "anio": 2021,
+    "id": "lib-dv12rjt9",
+    "fechaExtraccion": "2026-09-16T04:19:52.264Z"
   },
   {
     "titulo": "Güirá Oga, Centro de Rescate, Rehabilitación y Recría de Fauna Silvestre",

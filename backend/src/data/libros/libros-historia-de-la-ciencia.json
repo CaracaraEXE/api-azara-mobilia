@@ -410,7 +410,7 @@
     "autor": "Adrián Giacchino, Bárbara Gasparri, José Athor y Mónica Ávila",
     "anio": 2022,
     "id": "lib-7dqxx37d",
-    "fechaExtraccion": "2026-09-16T04:42:41.653Z"
+    "fechaExtraccion": "2026-09-16T04:14:11.723Z"
   },
   {
     "titulo": "Guido Boggiani, entre la memoria y el olvido",
@@ -455,7 +455,7 @@
     "autor": "Guillermo M. López y Eduardo P. Tonni",
     "anio": 2026,
     "id": "lib-hm09dp53",
-    "fechaExtraccion": "2026-09-16T04:42:57.725Z"
+    "fechaExtraccion": "2026-09-16T04:15:40.099Z"
   },
   {
     "titulo": "La teoría de las membranas en la historia de la medicina. Marie François Xavier Bichat (1771-1802). Su segundo centenario",
@@ -492,6 +492,15 @@
     "anio": 2021,
     "id": "lib-19rclofj",
     "fechaExtraccion": "2026-09-16T04:43:12.966Z"
+  },
+  {
+    "id": "lib-hzjtp9pt",
+    "titulo": "Lucas Kraglievich: historias familiares y paleontología rioplatense",
+    "autor": "Stella Maris Alvarez y María Victoria Sarasa (editoras)",
+    "anio": 2026,
+    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/lucas-kraglievich-historias-familiares-y-paleontologia-rioplatense.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2026/10/lucas-kraglievich-historias-familiares-y-paleontologia-rioplatense-300x258.jpg",
+    "fechaExtraccion": "2026-10-15T23:29:26.111Z"
   },
   {
     "titulo": "Mikrokosmos, Christofredo Jakob y el inicio de la neurociencia argentina",
