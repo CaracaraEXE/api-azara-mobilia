@@ -10,7 +10,8 @@
     "scrape": "node scripts/scraper.js",
     "scrape-pw": "node scripts/scraper-playwright.js",
     "scrape-todas": "node scripts/scraper-playwright.js --todas",
-    "validar:data": "node scripts/validar-data.js"
+    "validar:data": "node scripts/validar-data.js",
+    "reporte:data": "node scripts/reportar-cambios.js"
   },
   "keywords": [
     "api",

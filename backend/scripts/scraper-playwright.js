@@ -1288,5 +1288,6 @@ module.exports = {
   normalizarHostUrl,
   normalizarTexto,
   parsearAutorAnio,
-  tituloDesdeFilename
+  tituloDesdeFilename,
+  clavesDeLibro // reutilizada por scripts/reportar-cambios.js (clave estable de obra)
 };
