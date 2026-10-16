@@ -26,28 +26,32 @@ Este proyecto permite:
 
 ## 📚 Categorías de la Fundación Azara
 
-Los libros están organizados en **13 categorías**. Actualmente **267 libros scrapeados**, **190 con PDF descargable (71.2%)**.
+Los libros están organizados en **13 categorías**. Actualmente **334 libros listados** (**322 obras únicas** — algunos figuran en más de una categoría), **218 con PDF descargable**.
+
+> El catálogo completo (libros + Recursos Educativos + hemeroteca: Periódico y Revista Azara) suma **448 ítems únicos** en **4 secciones**, **329 con PDF**. El desglose por sección está en `/api/catalogo/stats/general`.
 
 | # | Categoría | Libros | Con PDF | URL |
 |---|-----------|:------:|:-------:|-----|
 | 1 | Institucionales | 10 | 10 | `/libros/` |
 | 2 | Astronomía y Geología | 9 | 6 | `/libros/libros-de-astronomia-y-geologia/` |
-| 3 | Paleontología | 17 | 15 | `/libros/libros-de-paleontologia/` |
-| 4 | Evolución, genética, ecología y etología | 5 | 5 | `/libros/libros-de-evolucion-genetica-ecologia-y-etologia/` |
-| 5 | Divulgación científica | 1 | 0 | `/libros/libros-de-divulgacion-cientifica/` |
-| 6 | Exploraciones, historia de la ciencia y biografías | 35 | 30 | `/libros-de-exploraciones-historia-de-la-ciencia-y-biografias/` |
-| 7 | Ambiente | 12 | 12 | `/libros-de-ambiente/` |
-| 8 | Antropología | 29 | 27 | `/libros/libros-de-antropologia/` |
-| 9 | Flora y Fauna | **63** | 53 | `/libros/libros-de-flora-y-fauna/` |
-| 10 | Áreas naturales | 21 | 20 | `/libros/libros-de-areas-naturales/` |
-| 11 | Historia y patrimonio cultural | 5 | 5 | `/libros-de-historia-y-patrimonio-cultural/` |
-| 12 | Infantiles | 8 | 7 | `/libros/libros-infantiles/` |
-| 13 | Auspiciados | 52 | 0 | `/libros/libros-auspiciados/` |
-| | **TOTAL** | **267** | **190** | |
+| 3 | Paleontología | 20 | 18 | `/libros/libros-de-paleontologia/` |
+| 4 | Evolución, genética, ecología y etología | 6 | 6 | `/libros/libros-de-evolucion-genetica-ecologia-y-etologia/` |
+| 5 | Divulgación científica | 3 | 0 | `/libros/libros-de-divulgacion-cientifica/` |
+| 6 | Exploraciones, historia de la ciencia y biografías | 61 | 31 | `/libros-de-exploraciones-historia-de-la-ciencia-y-biografias/` |
+| 7 | Ambiente | 11 | 11 | `/libros-de-ambiente/` |
+| 8 | Antropología | 31 | 29 | `/libros/libros-de-antropologia/` |
+| 9 | Flora y Fauna | **71** | 60 | `/libros/libros-de-flora-y-fauna/` |
+| 10 | Áreas naturales | 28 | 23 | `/libros/libros-de-areas-naturales/` |
+| 11 | Historia y patrimonio cultural | 6 | 6 | `/libros-de-historia-y-patrimonio-cultural/` |
+| 12 | Infantiles | 19 | 18 | `/libros/libros-infantiles/` |
+| 13 | Auspiciados | 59 | 0 | `/libros/libros-auspiciados/` |
+| | **TOTAL** | **334** | **218** | |
+
+> **Nota:** algunos libros figuran en más de una categoría (comparten `id`), por eso la suma de la columna "Libros" (**334**) supera las obras únicas de libros (**322**).
 
 > ⚠️ **Nota sobre URLs:** Dos categorías tenían URLs incorrectas en la lista original. Fueron corregidas durante el desarrollo. Ver `PLAN.md` para detalles.
 
-> ⚠️ **Nota sobre PDFs:** Auspiciados (52 libros) no tiene ningún PDF descargable — solo metadata y portada.
+> ⚠️ **Nota sobre PDFs:** Auspiciados (59 libros) no tiene ningún PDF descargable — solo metadata y portada.
 
 ## 📦 Modelo de Datos
 
@@ -79,6 +83,8 @@ Los libros están organizados en **13 categorías**. Actualmente **267 libros sc
 
 > **Nota:** Los campos `descripcion` y `paginas` fueron eliminados del schema por no estar disponibles en el sitio.
 
+> **Campos de runtime (los agrega el backend, NO están en el archivo):** `seccion` (de la carpeta: `libros` \| `recursos` \| `periodico-exploracion-y-ciencia` \| `revista-azara`) y `categorias` (array con **todas** las categorías donde figura el ítem). Algunos ítems traen además `coleccion` (subgrupo, p. ej. en Recursos Educativos) y `titulares` (solo hemeroteca).
+
 ## 🏗️ Arquitectura del Proyecto
 
 ```
@@ -89,12 +95,12 @@ Los libros están organizados en **13 categorías**. Actualmente **267 libros sc
                              │ (scraping con Playwright)
                              ▼
 ┌────────────────────────────────────────────────────────────────┐
-│                        SCRAPER (Playwright)                     │
-│               scripts/scraper-playwright.js                     │
+│                        SCRAPER (Playwright)                    │
+│               scripts/scraper-playwright.js                    │
 │                                                                │
-│  Extrae: título, linkPdf, imagenPortada, autor, año           │
-│  Guarda: data/libros-[categoria].json (13 archivos)           │
-│  Soporta: --categoria=slug, --todas, guardado incremental     │
+│  Extrae: título, linkPdf, imagenPortada, autor, año            │
+│  Guarda: data/<seccion>/<archivo>.json                         │
+│  Soporta: --todas, --seccion=slug, --categoria=slug           │
 └────────────────────────────┬───────────────────────────────────┘
                              │
                              ▼
@@ -143,15 +149,19 @@ azara/
 │   ├── src/
 │   │   ├── index.js             ← entry point
 │   │   ├── routes/
-│   │   │   ├── libros.js        ← endpoints /api/catalogo
+│   │   │   ├── catalogo.js      ← endpoints /api/catalogo (+ stats, listas)
 │   │   │   └── categorias.js    ← endpoint /api/categorias
 │   │   └── data/
-│   │       ├── libros-*.json    ← 13 archivos (uno por categoría)
+│   │       ├── libros/                     ← 13 archivos (uno por categoría)
+│   │       ├── recursos/                   ← recursos-educativos.json (coleccion = subgrupo)
+│   │       ├── periodico-exploracion-y-ciencia/  ← Periódico (hemeroteca)
+│   │       └── revista-azara/              ← Revista Azara (hemeroteca)
 │   ├── scripts/
-│   │   ├── scraper-playwright.js   ← scraper activo
+│   │   ├── scraper-playwright.js   ← scraper activo (--todas / --seccion / --categoria)
 │   │   ├── scraper-cheerio-old.js  ← scraper retirado (referencia)
 │   │   ├── extraerLibros.js        ← extrae de páginas individuales
-│   │   └── combinarLibros.js       ← combina datos
+│   │   ├── validar-data.js         ← valida data/ (esqueletos, duplicados)
+│   │   └── reportar-cambios.js     ← reporte de cambios vs. snapshot
 │   └── package.json
 │
 ├── discord-bot/                  ← Bot de Discord / Frontend del proyecto (puerto 3001)
@@ -226,7 +236,7 @@ Respuesta de `GET /api/catalogo` (paginada):
   "data": [
     { "id": "lib-3zgddm8g", "titulo": "...", "categorias": ["Ambiente"], "seccion": "libros", "linkPdf": "..." }
   ],
-  "meta": { "total": 445, "pagina": 1, "limite": 20, "totalPaginas": 23 }
+  "meta": { "total": 448, "pagina": 1, "limite": 20, "totalPaginas": 23 }
 }
 ```
 
@@ -234,15 +244,15 @@ Respuesta de `GET /api/catalogo` (paginada):
 
 | Comando | Ejemplo | Descripción |
 |---------|---------|-------------|
-| `/buscar` | `/buscar paleontología` | Busca libros. Muestra 5 por página con botones ◀/▶ |
-| `/ficha` | `/ficha lib-abc123` | Muestra detalle de un libro específico |
-| `/categorias` | `/categorias` | Lista categorías con Select Menu. Al seleccionar una, muestra sus libros con paginación |
+| `/buscar` | `/buscar paleontología` | Busca en todo el catálogo (título, autor y titulares). Muestra 5 por página con botones ◀/▶ |
+| `/ficha` | `/ficha lib-abc123` | Detalle de un ítem. Si es hemeroteca, muestra el botón `📖 Ver titulares (N)` |
+| `/categorias` | `/categorias` | Navegación en 2 niveles: **sección** → **categoría** → ítems con paginación |
 
 ### Características interactivas
 
 - **Botones ◀ / ▶**: Navegación entre páginas de resultados (tanto en `/buscar` como en categorías)
-- **Select Menu ▼**: Menú desplegable con las 13 categorías al usar `/categorias`
-- **🔙 Volver**: Vuelve al listado general de categorías
+- **Select Menu ▼**: `/categorias` navega en 2 niveles: primero la **sección** (📚 Libros / 🎓 Recursos educativos / 🗞️ Periódico / 📰 Revista Azara) y después sus categorías
+- **🔙 Volver**: Vuelve a las categorías de la misma sección (en hemeroteca, al select de secciones)
 - **🆔 ID visible**: Cada libro muestra su ID para poder usarlo con `/ficha`
 
 ## ✅ Roadmap de Desarrollo
@@ -260,7 +270,7 @@ Respuesta de `GET /api/catalogo` (paginada):
 
 ### Fase 3: Scraping ✅
 - [x] Playwright funcionando (navegador real, evita CloudFlare)
-- [x] 13/13 categorías scrapeadas (267 libros)
+- [x] 13/13 categorías de libros scrapeadas (334 libros) + Recursos Educativos + hemeroteca (Periódico y Revista Azara)
 - [x] Schema simplificado
 - [x] Scraper optimizado (CLI, guardado incremental, fallback título)
 
@@ -375,9 +385,10 @@ DISCORD_CLIENT_ID=tu_client_id_aqui
 ## 📝 Notas de Desarrollo
 
 - **CloudFlare**: El sitio usa CloudFlare, lo que bloquea peticiones HTTP simples (Axios/Cheerio devuelven 403). Se usa **Playwright** con navegador real para evitarlo.
-- **Scraper optimizado**: Soporta argumentos CLI (`--categoria=X`, `--todas`), guardado incremental cada 5 libros, y fallback para páginas sin `<h4>`.
-- **Guardado incremental**: Si el scraper se corta en una categoría grande, el progreso se guarda en `libros-[slug].temp.json`. Al re-ejecutar, retoma desde donde quedó.
-- **Datos iniciales**: 267 libros extraídos, 190 con PDF descargable (71.2%).
+- **Scraper optimizado**: Soporta argumentos CLI (`--todas`, `--seccion=<slug>`, `--categoria=<slug>`), guardado incremental, y fallback para páginas sin `<h4>`.
+- **Guardado incremental**: Si el scraper se corta en una categoría grande, el progreso se guarda en un `.temp.json`. Al re-ejecutar, retoma desde donde quedó.
+- **Reporte de cambios**: `npm run reporte:data` compara el catálogo actual contra un snapshot (`scripts/reportar-cambios.js`) y avisa si un libro cambió de categoría — pensado para el cron en la nube.
+- **Datos**: 448 ítems únicos (322 libros + 109 recursos educativos + 3 del Periódico + 14 de Revista Azara), 329 con PDF descargable.
 - **Enfoque incremental**: JSON primero → PostgreSQL después.
 - **Bot sin discord.js**: Usa Express + HTTP Interactions + tweetnacl para verificar firmas. Más liviano y didáctico.
 - **Paginación**: Los resultados usan `DEFERRED_UPDATE_MESSAGE` (type 6) + PATCH vía webhook de Discord.
