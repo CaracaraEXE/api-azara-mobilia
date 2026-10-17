@@ -167,11 +167,90 @@ function normalizarCategoria(s) {
     .replace(/^-+|-+$/g, '');
 }
 
+// --- Validación de filtros enumerables (400 honesto) -------------------------
+// Un filtro con un valor que NO existe antes devolvía 200 con data:[]: una
+// mentira silenciosa (el catálogo SÍ tiene categorías, solo que no con ESE
+// nombre). Ahora devolvemos 400 + valores válidos + sugerencia. SOLO para
+// filtros enumerables (seccion/categoria/coleccion); `busqueda` es texto LIBRE
+// → 0 coincidencias sigue siendo un 200 con data:[].
+
+/** Secciones válidas = subcarpetas de data/ (mismo descubrimiento que la API). */
+function listarSeccionesValidas() {
+  return [...new Set(listarArchivosData().map(a => a.seccion))];
+}
+
+/** Categorías válidas = nombre Y slug de cada archivo (el filtro acepta ambos). */
+function categoriasValidas() {
+  const validos = [];
+  for (const cat of obtenerCategoriasYLibros()) {
+    validos.push(cat.nombre);
+    if (cat.slug && cat.slug !== cat.nombre) validos.push(cat.slug);
+  }
+  return [...new Set(validos)];
+}
+
+/** Colecciones válidas = nombres de colección (el filtro acepta match parcial). */
+function coleccionesValidas() {
+  return obtenerColecciones().map(c => c.nombre);
+}
+
+/** Sugerencia laxa: primer válido cuyo canónico contenga al buscado o viceversa. */
+function sugerir(valor, validos) {
+  const objetivo = normalizarCategoria(valor);
+  return validos.find(v => {
+    const c = normalizarCategoria(v);
+    return c.includes(objetivo) || objetivo.includes(c);
+  }) || null;
+}
+
+/**
+ * Construir el cuerpo de error 400 de un filtro enumerable inválido.
+ * `sugerenciaCustom` permite un mensaje a medida (p.ej. "es una SECCIÓN").
+ */
+function errorFiltro400(parametro, valor, valoresValidos, sugerenciaCustom) {
+  const sug = sugerir(valor, valoresValidos);
+  return {
+    error: `Valor inválido para "${parametro}": "${valor}"`,
+    parametro,
+    valor,
+    valoresValidos,
+    sugerencia: sugerenciaCustom
+      || (sug ? `¿Quisiste decir "${sug}"?` : 'Consultá los valores válidos en /api/categorias o /api/secciones')
+  };
+}
+
 // GET /api/catalogo - Lista todos los libros
 router.get('/', (req, res) => {
   try {
     const { seccion, categoria, coleccion, busqueda, pagina = 1, limite = 20 } = req.query;
-    
+
+    // Validación 400 de filtros enumerables (ANTES de paginar). Un valor
+    // inexistente no es "0 resultados": es un error del cliente.
+    const seccionesValidas = listarSeccionesValidas();
+    if (seccion && !listarSeccionesValidas().includes(normalizarCategoria(seccion))) {
+      return res.status(400).json({ success: false, ...errorFiltro400('seccion', seccion, listarSeccionesValidas()) });
+    }
+    if (categoria) {
+      const objetivo = normalizarCategoria(categoria);
+      const catsValidas = categoriasValidas();
+      if (!categoriasValidas().some(c => normalizarCategoria(c) === objetivo)) {
+        // Pista útil: si lo que pasaron es en realidad una SECCIÓN, decirlo.
+        const esSeccion = listarSeccionesValidas().includes(objetivo);
+        const hint = esSeccion
+          ? `"${categoria}" es una SECCIÓN, no una categoría. Usá ?seccion=${normalizarCategoria(categoria)}`
+          : null;
+        return res.status(400).json({ success: false, ...errorFiltro400('categoria', categoria, catsValidas, hint) });
+      }
+    }
+    if (coleccion) {
+      const colsValidas = coleccionesValidas();
+      const objetivo = normalizarCategoria(coleccion);
+      const hayParcial = colsValidas.some(c => normalizarCategoria(c).includes(objetivo));
+      if (!hayParcial) {
+        return res.status(400).json({ success: false, ...errorFiltro400('coleccion', coleccion, colsValidas) });
+      }
+    }
+
     let libros = obtenerTodosLosLibros();
     
     // Filtrar por SECCIÓN: 'libros' | 'recursos' | 'periodico-exploracion-y-ciencia' | 'revista-azara'

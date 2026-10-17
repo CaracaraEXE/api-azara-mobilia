@@ -68,12 +68,16 @@ function primeraPalabraLarga(texto, min = 6) {
   return words[0] || null;
 }
 
+// Categorías de Libros = nº de archivos de la sección 'libros'.
+const CATEGORIAS_LIBROS_ESPERADAS = archivosData.filter(a => a.seccion === 'libros').length;
+
 async function main() {
   const server = app.listen(0);
   await new Promise(r => server.once('listening', r));
   const base = `http://127.0.0.1:${server.address().port}`;
   const get = async (p) => (await fetch(base + p)).json();
   const status = async (p) => (await fetch(base + p)).status;
+  const getRaw = async (p) => { const res = await fetch(base + p); return { status: res.status, body: await res.json() }; };
 
   try {
     console.log(`\nAPI bajo prueba: ${base}${API_BASE}  (${TOTAL_ESPERADO} ítems en ${ARCHIVOS_ESPERADOS} archivos)`);
@@ -115,6 +119,37 @@ async function main() {
       check('están las 4 secciones', JSON.stringify(secciones) === JSON.stringify(seccionesEsperadas));
     }
 
+    // ── 3b. /api/secciones ────────────────────────────────
+    console.log('\n[3b] /api/secciones');
+    {
+      const r = await get('/api/secciones');
+      check('success', r.success === true);
+      igual('una entrada por sección', r.data.length, seccionesEsperadas.length);
+      check('cada sección trae slug/nombre/items/subdivision',
+        r.data.every(s => s.slug && s.nombre && typeof s.items === 'number' && 'subdivision' in s));
+      igual('orden: libros primero', r.data[0].slug, 'libros');
+      igual('suma de items === TOTAL_ESPERADO', r.data.reduce((a, s) => a + s.items, 0), TOTAL_ESPERADO);
+
+      // Libros se navega por CATEGORÍAS (una por archivo).
+      const libros = r.data.find(s => s.slug === 'libros');
+      check('libros → subdivision.tipo === "categorias"', libros.subdivision && libros.subdivision.tipo === 'categorias');
+      igual('libros → subdivision.total === nº archivos de libros', libros.subdivision.total, CATEGORIAS_LIBROS_ESPERADAS);
+      check('libros → cada unidad tiene nombre/slug/cantidad',
+        libros.subdivision.items.every(u => u.nombre && u.slug && typeof u.cantidad === 'number'));
+
+      // Recursos educativos se navega por COLECCIONES.
+      const rec = r.data.find(s => s.slug === 'recursos');
+      check('recursos → subdivision.tipo === "colecciones"', rec.subdivision && rec.subdivision.tipo === 'colecciones');
+      check('recursos → subdivision.total >= 1', rec.subdivision.total >= 1);
+      check('recursos → cada unidad tiene nombre/cantidad',
+        rec.subdivision.items.every(u => u.nombre && typeof u.cantidad === 'number'));
+
+      // Hemeroteca: la sección ES la publicación → sin subdivisión.
+      const hem = r.data.filter(s => s.slug === 'periodico-exploracion-y-ciencia' || s.slug === 'revista-azara');
+      igual('hemeroteca: 2 secciones', hem.length, 2);
+      check('hemeroteca → subdivision === null', hem.every(s => s.subdivision === null));
+    }
+
     // ── 4. Filtro por categoría ───────────────────────────
     console.log('\n[4] Filtro ?categoria=');
     {
@@ -132,12 +167,18 @@ async function main() {
         check(`"${nombre}" → todos de su sección`, r.data.every(i => i.seccion === seccion));
       }
 
-      // Semántica ESTRICTA (2026-10-14): un término PARCIAL ya NO matchea varias categorías.
-      // Antes `?categoria=ciencia` traía "Historia De La Ciencia" + "Periódico ... y Ciencia".
-      const rc = await get(`${API_BASE}?categoria=ciencia&limite=1000`);
-      igual('?categoria=ciencia (parcial) → 0 ítems', rc.data.length, 0);
-      const rp = await get(`${API_BASE}?categoria=paleonto&limite=1000`);
-      igual('?categoria=paleonto (parcial) → 0 ítems', rp.data.length, 0);
+      // Validación 400 (2026-10-17): un valor de categoría INEXISTENTE ya NO
+      // devuelve un 200 vacío (mentira silenciosa). Es un 400 con valores válidos.
+      // (`?categoria=ciencia`/`paleonto` son términos PARCIALES → no son categoría exacta.)
+      const rc = await getRaw(`${API_BASE}?categoria=ciencia&limite=1000`);
+      igual('?categoria=ciencia (inexistente) → 400', rc.status, 400);
+      check('...trae valoresValidos (array) y sugerencia', Array.isArray(rc.body.valoresValidos) && typeof rc.body.sugerencia === 'string');
+      const rp = await getRaw(`${API_BASE}?categoria=paleonto&limite=1000`);
+      igual('?categoria=paleonto (inexistente) → 400', rp.status, 400);
+      // Un nombre de SECCIÓN pasado como categoría → 400 con pista explícita.
+      const rl = await getRaw(`${API_BASE}?categoria=libros&limite=1000`);
+      igual('?categoria=libros (es SECCIÓN) → 400', rl.status, 400);
+      check('?categoria=libros → sugerencia menciona SECCIÓN', /secci[oó]n/i.test(rl.body.sugerencia || ''));
     }
 
     // ── 4b. Filtro por sección ────────────────────────────
@@ -149,8 +190,10 @@ async function main() {
           r.success === true && r.data.length > 0 && r.data.every(i => i.seccion === sec));
         igual(`seccion=${sec}: count === ids únicos de la sección`, r.data.length, idsUnicosPorSeccion.get(sec).size);
       }
-      const rMal = await get(`${API_BASE}?seccion=noexiste&limite=1000`);
-      igual('seccion inexistente → 0 ítems', rMal.data.length, 0);
+      const rMal = await getRaw(`${API_BASE}?seccion=noexiste&limite=1000`);
+      igual('seccion inexistente → 400', rMal.status, 400);
+      check('seccion inexistente → valoresValidos incluye las secciones reales',
+        Array.isArray(rMal.body.valoresValidos) && seccionesEsperadas.every(s => rMal.body.valoresValidos.includes(s)));
     }
 
     // ── 5. Filtro por colección (RE) ──────────────────────
@@ -160,6 +203,14 @@ async function main() {
       check('devuelve >= 1 ítem', r.data.length >= 1);
       check('todos tienen coleccion "Cuadernillos"',
         r.data.every(i => (i.coleccion || '').toLowerCase().includes('cuadernillo')));
+
+      // Colección inexistente → 400 (filtro enumerable).
+      const rMal = await getRaw(`${API_BASE}?coleccion=zzzz&limite=1000`);
+      igual('coleccion inexistente → 400', rMal.status, 400);
+
+      // `?busqueda=` es texto LIBRE → sin coincidencias sigue siendo 200 con data:[].
+      const rVacia = await get(`${API_BASE}?busqueda=zzzzqqqqxx&limite=1000`);
+      check('?busqueda= sin coincidencias → 200 con data:[]', rVacia.success === true && rVacia.data.length === 0);
     }
 
     // ── 6. Búsqueda por título + por titular (V3.6) ───────
