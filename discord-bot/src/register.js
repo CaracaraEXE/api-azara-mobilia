@@ -52,7 +52,7 @@ const comandos = [
     ]
   },
   {
-    name: 'categorias',
+    name: 'catalogo',
     description: 'Explorar el catálogo por sección y categoría'
   }
 ];

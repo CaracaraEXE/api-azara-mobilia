@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 3001;
 const API_URL = process.env.API_URL || 'http://localhost:3000';
 const formatos = require('./formatos');
 
-// Orden EXPLÍCITO del dropdown de secciones de /categorias (PLANV3 V3.6):
+// Orden EXPLÍCITO del dropdown de secciones de /catalogo (PLANV3 V3.6):
 // libros y RE primero (compat), después la hemeroteca (Periódico, Revista Azara).
 const ORDEN_SECCIONES = ['libros', 'recursos-educativos', 'periodico-exploracion-y-ciencia', 'revista-azara'];
 
@@ -112,8 +112,8 @@ app.post('/interactions', verifyDiscordRequest, async (req, res) => {
         case 'ficha':
           response = await comandoFicha(options);
           break;
-        case 'categorias':
-          response = await comandoCategorias();
+        case 'catalogo':
+          response = await comandoCatalogo();
           break;
         default:
           response = { content: '❌ Comando no reconocido.' };
@@ -229,11 +229,11 @@ async function comandoFicha(options) {
 }
 
 /**
- * /categorias — Muestra el Select de SECCIONES (paso 1).
+ * /catalogo — Muestra el Select de SECCIONES (paso 1).
  * RE ya no aparece mezclado con Libros: primero se elige la sección y después
  * las categorías de esa sección (ver manejarSeleccionSeccion).
  */
-async function comandoCategorias() {
+async function comandoCatalogo() {
   try {
     const respuesta = await fetch(`${API_URL}/api/categorias`);
     const datos = await respuesta.json();
@@ -348,8 +348,10 @@ async function manejarPaginacionBusqueda(interaction, res, payload) {
     );
     const datos = await respuesta.json();
 
-    if (datos.success) {
+    if (datos.success && datos.data.length > 0) {
       await patchMensajeOriginal(interaction, formatos.construirMensajeBusqueda(payload.q, datos.data, pagina, datos.meta.total));
+    } else if (datos.success && datos.data.length === 0) {
+      await patchError(interaction, `No encontré más resultados para "${payload.q}".`);
     } else {
       await patchError(interaction, '❌ Error al obtener resultados.');
     }
@@ -375,7 +377,7 @@ async function obtenerCategoriasDeSeccion(sec) {
 }
 
 /**
- * Select Menu de SECCIONES (paso 1 de /categorias) → muestra las categorías de la sección
+ * Select Menu de SECCIONES (paso 1 de /catalogo) → muestra las categorías de la sección
  */
 async function manejarSeleccionSeccion(interaction, res) {
   const sec = interaction.data.values?.[0];
@@ -417,7 +419,7 @@ async function manejarSeleccionSeccion(interaction, res) {
 }
 
 /**
- * Select Menu de categorías (paso 2 de /categorias) — muestra los ítems de la categoría.
+ * Select Menu de categorías (paso 2 de /catalogo) — muestra los ítems de la categoría.
  * Todos los ítems se filtran con ?categoria=<nombre> (nombres de la API).
  */
 async function manejarSeleccionCategoria(interaction, res, payload) {

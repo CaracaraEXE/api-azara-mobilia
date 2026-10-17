@@ -11,7 +11,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 - ✅ Scraper con CLI: `--todas` / `--seccion=<slug>` / `--categoria=<slug>` (mutuamente excluyentes)
 - ✅ **Discord Bot funcionando** — Express + HTTP Interactions (sin discord.js)
 - ✅ Botones de paginación ◀/▶ en `/buscar` y categorías
-- ✅ `/categorias` en 2 niveles: Select de SECCIONES → Select de categorías de esa sección
+- ✅ `/catalogo` en 2 niveles: Select de SECCIONES → Select de categorías de esa sección
 - ✅ Botón "Volver" a categorías de la MISMA sección
 - ✅ IDs de libros visibles (`🆔 \`lib-abc123\``) en resultados
 - ✅ Presentación del bot separada en `discord-bot/src/formatos.js` (pura, testeable sin servidor) — tests en `discord-bot/test-formatos.js` (44 checks, `npm test`)
@@ -36,7 +36,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 |---------|-------------|
 | `/buscar [termino]` | Busca por título, 5 por página, botones ◀/▶ |
 | `/ficha [id]` | Detalle de un ítem (Sección + Categoría real). Si es hemeroteca: titulares OCULTOS por defecto + botón `📖 Ver titulares (N)` / `🔽 Ocultar titulares` (solo ítems CON titulares) |
-| `/categorias` | Select de SECCIONES (📚 Libros / 🎓 Recursos educativos / 🗞️ Periódico Exploración y Ciencia / 📰 Revista Azara) |
+| `/catalogo` | Select de SECCIONES (📚 Libros / 🎓 Recursos educativos / 🗞️ Periódico Exploración y Ciencia / 📰 Revista Azara) |
 | → Select sección | Estadísticas + Select de categorías de ESA sección |
 | → Select categoría | Ítems de esa categoría + ◀/▶ + 🔙 Volver (a la misma sección) |
 
@@ -98,7 +98,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 
 ### Flujo de Select Menu (2 niveles)
 
-1. Usuario ejecuta `/categorias` → bot responde con type 4 (embed + Select de SECCIONES — `sec-select`)
+1. Usuario ejecuta `/catalogo` → bot responde con type 4 (embed + Select de SECCIONES — `sec-select`)
 2. Usuario elige sección (`libros` | `recursos-educativos` | `periodico-exploracion-y-ciencia` | `revista-azara`) → bot consulta las categorías de ESA sección:
    - libros → `GET /api/categorias` filtrado por `seccion === 'libros'` (13)
    - recursos-educativos → `GET /api/categorias` filtrado por `seccion === 'recursos-educativos'` (10 grupos: Cuadernillos, Posters de…, etc.)
@@ -154,7 +154,7 @@ Notas:
 - **Select Menu**: El valor seleccionado está en `interaction.data.values[0]`, NO en el `custom_id`
 - **Toggle de titulares**: el estado NO se guarda en el bot — viaja en el `custom_id` (`v`). Es estado COMPARTIDO del mensaje (Discord no tiene estado por-usuario en componentes): si dos personas clickean, el último gana. Aceptado por el usuario.
 - **Tests**: `npm test` en `discord-bot/` corre `test-formatos.js` (zero-deps, `node`). Los tests deben vivir en el REPO — los que se dejaron en temp se perdieron (2026-10-14).
-- **Command registration**: `register.js` registra comandos slash — se ejecuta una sola vez
+- **Command registration ≠ restart (dos sistemas desacoplados)**: `register.js` hace `PUT` a Discord (overwrite global) → cambia **qué comandos ve el usuario** (y borra el viejo al renombrar). El bot (`index.js`) NO lee la lista de Discord: matchea `interaction.data.name` contra su `switch`. Por eso renombrar/agregar un comando necesita **DOS pasos independientes**: (1) `npm run register` (cambia lo que se VE) y (2) REINICIAR el bot (cambia lo que puede ATENDER). Sin (2), el comando nuevo cae en `default` → "❌ Comando no reconocido". OJO: reiniciar el bot NO cambia la lista de comandos; ver "no pasa nada" al reiniciar es esperado. Los global commands pueden tardar en propagarse.
 
 ## Data Model
 

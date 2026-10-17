@@ -158,7 +158,7 @@ function construirMensajeBusqueda(termino, libros, pagina, total) {
 }
 
 /**
- * Paso 1 de /categorias: embed + Select Menu de SECCIONES.
+ * Paso 1 de /catalogo: embed + Select Menu de SECCIONES.
  * secciones: [{ seccion: 'libros'|'recursos-educativos'|…, nombre, cantidad, categorias }]
  */
 function construirMensajeSecciones(secciones, totalItems) {
@@ -170,7 +170,7 @@ function construirMensajeSecciones(secciones, totalItems) {
 
   return {
     embeds: [{
-      title: '📚 Categorías de la Fundación Azara',
+      title: '📚 Catálogo de la Fundación Azara',
       description: `**${secciones.length} secciones** — ${totalItems} ítems en total.\nElegí una sección para ver sus categorías:`,
       color: 0x00AE86
     }],
@@ -189,7 +189,7 @@ function construirMensajeSecciones(secciones, totalItems) {
 }
 
 /**
- * Paso 2 de /categorias: embed con estadísticas + Select Menu de categorías
+ * Paso 2 de /catalogo: embed con estadísticas + Select Menu de categorías
  * de UNA sección. Para libros las categorías vienen de /api/categorias; para
  * RE son las COLECCIONES (subgrupos) del archivo único.
  * categorias: [{ nombre, cantidad }]

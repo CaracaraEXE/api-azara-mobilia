@@ -135,7 +135,7 @@ Los libros están organizados en **13 categorías**. Actualmente **334 libros li
 │  ├─────────────────────────────────────────────────────────┤   │
 │  │  /ficha lib-abc123  → detalle del libro                │   │
 │  ├─────────────────────────────────────────────────────────┤   │
-│  │  /categorias        → lista + Select Menu ▼            │   │
+│  │  /catalogo          → lista + Select Menu ▼            │   │
 │  │    └─→ seleccionás  → libros + ◀/▶ + 🔙 Volver        │   │
 │  └─────────────────────────────────────────────────────────┘   │
 └────────────────────────────────────────────────────────────────┘
@@ -247,12 +247,12 @@ Respuesta de `GET /api/catalogo` (paginada):
 |---------|---------|-------------|
 | `/buscar` | `/buscar paleontología` | Busca en todo el catálogo (título, autor y titulares). Muestra 5 por página con botones ◀/▶ |
 | `/ficha` | `/ficha lib-abc123` | Detalle de un ítem. Si es hemeroteca, muestra el botón `📖 Ver titulares (N)` |
-| `/categorias` | `/categorias` | Navegación en 2 niveles: **sección** → **categoría** → ítems con paginación |
+| `/catalogo` | `/catalogo` | Navegación en 2 niveles: **sección** → **categoría** → ítems con paginación |
 
 ### Características interactivas
 
 - **Botones ◀ / ▶**: Navegación entre páginas de resultados (tanto en `/buscar` como en categorías)
-- **Select Menu ▼**: `/categorias` navega en 2 niveles: primero la **sección** (📚 Libros / 🎓 Recursos educativos / 🗞️ Periódico / 📰 Revista Azara) y después sus categorías
+- **Select Menu ▼**: `/catalogo` navega en 2 niveles: primero la **sección** (📚 Libros / 🎓 Recursos educativos / 🗞️ Periódico / 📰 Revista Azara) y después sus categorías
 - **🔙 Volver**: Vuelve a las categorías de la misma sección (en hemeroteca, al select de secciones)
 - **🆔 ID visible**: Cada libro muestra su ID para poder usarlo con `/ficha`
 
@@ -280,7 +280,7 @@ Respuesta de `GET /api/catalogo` (paginada):
 - [x] Verificación Ed25519 con tweetnacl
 - [x] Comando `/buscar` con paginación por botones
 - [x] Comando `/ficha`
-- [x] Comando `/categorias` con Select Menu + paginación + Volver
+- [x] Comando `/catalogo` con Select Menu + paginación + Volver
 - [x] IDs de libros visibles en resultados
 
 ### Fase 5: PostgreSQL (futuro) 🔲
