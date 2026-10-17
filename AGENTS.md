@@ -4,19 +4,20 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 
 ## Current State (Sep 2026)
 
-- ✅ **13/13 categorías scrapeadas** (data/libros/) + **Recursos Educativos** (data/recursos/) + **hemeroteca COMPLETA (2026-09-27): 3 ediciones** del Periódico (data/periodico-exploracion-y-ciencia/) + **14 ediciones** de Revista Azara (data/revista-azara/) — **460 FILAS** (suma cruda: 334 libros + 109 RE + 3 + 14) = **448 ÍTEMS ÚNICOS** que la API devuelve (dedup por id: 12 libros están en 2 categorías de libros → 322 libros únicos; 1 esqueleto en revisión: postal Guacamayo Militar). ⚠️ El "460" histórico es la suma de filas; `stats/general` y la búsqueda global reportan **448** (uno por obra). En `/categorias` la suma de cantidades da 460 (un libro multi-categoría cuenta en CADA categoría) — ambos números son correctos en su contexto (PLANV2 §10).
+- ✅ **13/13 categorías scrapeadas** (data/libros/) + **Recursos Educativos** (data/recursos-educativos/) + **hemeroteca COMPLETA (2026-09-27): 3 ediciones** del Periódico (data/periodico-exploracion-y-ciencia/) + **14 ediciones** de Revista Azara (data/revista-azara/) — **460 FILAS** (suma cruda: 334 libros + 109 RE + 3 + 14) = **448 ÍTEMS ÚNICOS** que la API devuelve (dedup por id: 12 libros están en 2 categorías de libros → 322 libros únicos; 1 esqueleto en revisión: postal Guacamayo Militar). ⚠️ El "460" histórico es la suma de filas; `stats/general` y la búsqueda global reportan **448** (uno por obra). En `/categorias` la suma de cantidades da 460 (un libro multi-categoría cuenta en CADA categoría) — ambos números son correctos en su contexto (PLANV2 §10).
 - ✅ **PLANV3 V3.6 — Hemeroteca (2026-09-27)**: scraper + API + bot listos y EN PRODUCCIÓN para las SECCIONES `periodico-exploracion-y-ciencia` (Periódico Exploración y Ciencia, 🗞️) y `revista-azara` (Revista Azara, 📰). **Piloto + E2E COMPLETO + FASE 2 COMPLETA** (validado por el usuario en Discord): búsqueda por titulares con titular coincidente, salto directo a ediciones (sin título duplicado), `/ficha` con campo 🗞️ Titulares, regresión libros/RE limpia. Estructura de Revista Azara VERIFICADA antes de correr (grilla v4 con `h5.portfolio_title`, PDF único `a.qodef-qi-button[href$=".pdf"]` por edición, titulares mixtos modernas `<p>` / viejas `<br>` — todo cubierto sin cambios). El cortafuegos `revisionPendiente` quedó disponible como red de seguridad (no se disparó en Fase 2: los PDFs de Normas para Autores viven en la página de SECCIÓN, fuera de `article.mix`). El scraper lo corre SIEMPRE el usuario: `node scripts/scraper-playwright.js --seccion=<slug>`.
-- ✅ Datos en carpetas por sección: `data/libros/libros-*.json` (13) + `data/recursos/recursos-educativos.json` (1 archivo, campo `coleccion` = subgrupo)
-- ✅ API Express.js funcionando con endpoints GET (respuestas con campo `seccion: 'libros'|'recursos'`)
+- ✅ Datos en carpetas por sección: `data/libros/libros-*.json` (13) + `data/recursos-educativos/recursos-educativos.json` (1 archivo, campo `categoria` = grupo de navegación y `coleccion` = serie hiperespecífica)
+- ✅ API Express.js funcionando con endpoints GET (respuestas con campo `seccion`)
 - ✅ Scraper con CLI: `--todas` / `--seccion=<slug>` / `--categoria=<slug>` (mutuamente excluyentes)
 - ✅ **Discord Bot funcionando** — Express + HTTP Interactions (sin discord.js)
 - ✅ Botones de paginación ◀/▶ en `/buscar` y categorías
 - ✅ `/categorias` en 2 niveles: Select de SECCIONES → Select de categorías de esa sección
 - ✅ Botón "Volver" a categorías de la MISMA sección
 - ✅ IDs de libros visibles (`🆔 \`lib-abc123\``) en resultados
-- ✅ Presentación del bot separada en `discord-bot/src/formatos.js` (pura, testeable sin servidor) — tests en `discord-bot/test-formatos.js` (42 checks, `npm test`)
-- ✅ **Red de seguridad de tests (2026-10-14)**: `backend` → `npm test` = `test-integracion.js` (52 checks, 0 deps): monta el app REAL en puerto efímero, verifica `?categoria=` ESTRICTA (parciales → 0), nuevo filtro `?seccion=`, totales dedup, paginación, búsqueda por titulares, detalle, stats y sub-listas. Valores auto-calculados desde `data/`. `API_BASE` pasa a `/api/catalogo`, `index.js` exporta `app` + guard `require.main`, `GET /` anuncia `/api/catalogo`.
+- ✅ Presentación del bot separada en `discord-bot/src/formatos.js` (pura, testeable sin servidor) — tests en `discord-bot/test-formatos.js` (44 checks, `npm test`)
+- ✅ **Red de seguridad de tests (2026-10-14)**: `backend` → `npm test` = `test-integracion.js` (**72 checks**, 0 deps): monta el app REAL en puerto efímero y verifica integridad global, paginación, `/api/categorias` (**25** = 13 libros + 10 RE + periódico + revista), `/api/secciones` (4, con `subdivision.tipo='categorias'` y colecciones anidadas), filtros `?categoria=` (nombre O slug) / `?seccion=` / `?coleccion=`, 400 con `valoresValidos`, búsqueda, detalle, stats y sub-listas. Valores auto-calculados desde `data/`. `index.js` exporta `app` + guard `require.main`; `GET /` devuelve `endpoints[]` (arrays) + `secciones[]`.
 - ✅ **`/ficha` con TOGGLE de titulares (2026-10-14)**: ítems de hemeroteca muestran los titulares OCULTOS por defecto + botón `📖 Ver titulares (N)` que los muestra/oculta re-renderizando (PATCH). Ver "Flujo del toggle" abajo.
+- ✅ **RE = sección propia en 2 niveles (2026-10-17)**: `data/recursos-educativos/recursos-educativos.json` (109 ítems). Cada ítem trae `categoria` = los **10 grupos** (Cuadernillos, Cartillas, Postales, Posters de…, Folletos de…) y opcionalmente `coleccion` = serie hiperespecífica (hoy solo `Miradas de la Argentina`, 7 ítems dentro de Cuadernillos). Así RE se navega como Libros: **sección → categoría → (colección)**. Se ELIMINÓ `data/recursos/` y el valor `'recursos'`: ahora la sección es `'recursos-educativos'`. `/api/categorias` pasó de 16 a **25** entradas (13 libros + 10 RE + periódico + revista); RE entra en `?categoria=`, no en `?coleccion=` (que queda para el match PARCIAL de la serie). El catálogo sigue en **448 ítems únicos** (329 con PDF).
 
 ## Stack
 
@@ -61,15 +62,14 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 // Búsqueda con paginación
 { cmd: 'buscar', q: 'mamiferos', p: 1 }
 
-// Paginación de categoría (sec: 'libros'|'recursos'|'periodico-exploracion-y-ciencia'|'revista-azara'
-// — define ?categoria= vs ?coleccion=)
+// Paginación de categoría (sec: slug de sección; SIEMPRE se filtra con ?categoria=)
 { cmd: 'cat-page', sec: 'libros', cat: 'Mastozoologia', p: 1 }
-{ cmd: 'cat-page', sec: 'recursos', cat: 'Cuadernillos', p: 1 }
+{ cmd: 'cat-page', sec: 'recursos-educativos', cat: 'Cuadernillos', p: 1 }
 { cmd: 'cat-page', sec: 'periodico-exploracion-y-ciencia', cat: 'Periódico Exploración y Ciencia', p: 1 }
 
 // Volver a categorías de la MISMA sección (hemeroteca → vuelve al PASO 1, salto directo)
 { cmd: 'cat-back', sec: 'libros' }
-{ cmd: 'cat-back', sec: 'recursos' }
+{ cmd: 'cat-back', sec: 'recursos-educativos' }
 { cmd: 'cat-back', sec: 'revista-azara' }
 
 // Select de secciones (paso 1; el valor está en interaction.data.values[0])
@@ -77,7 +77,7 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 
 // Select Menu de categorías (paso 2; el valor está en interaction.data.values[0])
 { cmd: 'cat-select', sec: 'libros' }
-{ cmd: 'cat-select', sec: 'recursos' }
+{ cmd: 'cat-select', sec: 'recursos-educativos' }
 
 // TOGGLE de titulares de /ficha (SOLO hemeroteca con titulares; v = ¿visibles AHORA?)
 // El estado viaja en el custom_id → el bot no guarda estado. El nuevo estado es !v.
@@ -99,12 +99,12 @@ API REST + Discord Bot para catalogar libros de la Fundación Azara (fundacionaz
 ### Flujo de Select Menu (2 niveles)
 
 1. Usuario ejecuta `/categorias` → bot responde con type 4 (embed + Select de SECCIONES — `sec-select`)
-2. Usuario elige sección (`libros` | `recursos` | `periodico-exploracion-y-ciencia` | `revista-azara`) → bot consulta las categorías de ESA sección:
-   - libros → `GET /api/categorias` filtrado por `seccion === 'libros'`
-   - recursos → `GET /api/categorias` + `GET /api/catalogo/colecciones/lista` (las colecciones cuyos `categorias` pertenecen a la sección RE)
+2. Usuario elige sección (`libros` | `recursos-educativos` | `periodico-exploracion-y-ciencia` | `revista-azara`) → bot consulta las categorías de ESA sección:
+   - libros → `GET /api/categorias` filtrado por `seccion === 'libros'` (13)
+   - recursos-educativos → `GET /api/categorias` filtrado por `seccion === 'recursos-educativos'` (10 grupos: Cuadernillos, Posters de…, etc.)
    - hemeroteca → `GET /api/categorias` filtrado por su sección: 1 sola categoría (la publicación)
 3. **Salto directo de hemeroteca (PLANV3 V3.6)**: si la sección tiene `categorias.length === 1`, el bot saltea el select de categorías y muestra DIRECTAMENTE las ediciones (`GET /api/catalogo?categoria=<nombre>` + `construirMensajeCategoriaLibros`) — con ◀/▶ y 🔙 que vuelve al PASO 1 (select de secciones).
-4. Usuario elige categoría → bot consulta `?categoria=` (libros Y hemeroteca) o `?coleccion=` (recursos) y hace PATCH con ítems + ◀/▶ + 🔙 Volver
+4. Usuario elige categoría → el bot consulta `?categoria=` (match por nombre o slug: vale para libros, RE y hemeroteca) y hace PATCH con ítems + ◀/▶ + 🔙 Volver
 5. Usuario clickea 🔙 → bot vuelve al paso 3 (select de categorías) en libros/RE; en hemeroteca vuelve al paso 1 (select de secciones)
 
 ### Flujo del toggle de titulares (/ficha)
@@ -125,11 +125,11 @@ Notas:
 
 - Emoji de SECCIÓN primero: `📚 Libros` | `🎓 Recursos educativos` | `🗞️ Periódico Exploración y Ciencia` | `📰 Revista Azara`
 - Emoji de CATEGORÍA segundo: `📁` (la categoría REAL de navegación)
-- En RE la categoría real = `coleccion` (subgrupo: 'Cuadernillos', ...); 'Recursos Educativos' es la SECCIÓN, no una categoría
+- En RE la categoría = `categorias[0]` (el grupo: 'Cuadernillos', 'Cartillas', 'Posters de…'); `coleccion` es la SERIE hiperespecífica (hoy solo 'Miradas de la Argentina'); 'Recursos Educativos' es la SECCIÓN, no una categoría
 - Enlace de PDF SIEMPRE al final del value del campo
 - En HEMEROTECA el título del embed de ítems de categoría NO repite la categoría (la única categoría ES la publicación): `🗞️ Periódico Exploración y Ciencia` — sin `: Categoría` (fix E2E piloto 2026-09-27; `construirMensajeCategoriaLibros` usa `SECCIONES_HEMEROTECA.has(sec)`)
 - Ítems bilingües (`linkPdfEn`, p.ej. folleto El Shincal de Quimivil): dos enlaces `📄 [Descargar PDF]` (ES) + `📄 [Descargar PDF (EN)]` — EN siempre como última línea (helper `enlacesPdf` en formatos.js)
-- `🗂️ Colección` como línea extra SOLO en libros (desambigua series "Tomo NN"); en RE ya está en la categoría
+- `🗂️ Colección` como línea extra SI el ítem trae `coleccion` (desambigua series "Tomo NN" en libros, y 'Miradas de la Argentina' en RE)
 - **`/ficha`**: el embed se arma con `construirMensajeLibro(libro, mostrarTitulares)` (NO inline en index.js — refactor 2026-10-14). El field `🗞️ Titulares` se incluye solo si el ítem tiene titulares Y `mostrarTitulares` es true; el listado es `• ` + titular, truncado a ~1000 chars con contador `(mostrando X de N titulares)` (límite de field: 1024). El botón del toggle solo existe para ítems CON titulares.
 
 ## Gotchas
@@ -173,9 +173,9 @@ Notas:
 }
 ```
 
-Los archivos JSON no tienen campo `categoria` — el backend asigna en tiempo real desde el slug del archivo, y agrega `seccion` ('libros' | 'recursos' | 'periodico-exploracion-y-ciencia' | 'revista-azara') según la carpeta, y `categorias` (ARRAY con TODAS las categorías donde figura el ítem — normalmente una sola; un libro multi-categoría comparte id y las acumula). **El ítem expuesto NO lleva `categoria` singular** (redundancia eliminada 2026-10-15): los consumidores leen `categorias`.
-**EXCEPCIÓN — hemeroteca (PLANV3 V3.6)**: los ítems de `data/periodico-exploracion-y-ciencia/*.json` y `data/revista-azara/*.json` SÍ llevan `categoria` en el archivo (con acentos: "Periódico Exploración y Ciencia") — el backend lo usa como FUENTE del nombre de categoría (`libros[0].categoria`, catalogo.js L98-99) pero lo DESCARTA del ítem expuesto, que sale con `categorias`; el resto de los archivos no la tienen → cero cambio.
-Los ítems de RE (`data/recursos/recursos-educativos.json`) tienen además `coleccion` (subgrupo: 'Cuadernillos', 'Posters de Biodiversidad', ...) — es la categoría visible de esa sección. La hemeroteca NO lleva `coleccion` (la categoría única YA es la publicación).
+Los archivos de libros (`data/libros/*.json`) NO tienen campo `categoria`: el backend la asigna en tiempo real desde el SLUG DEL ARCHIVO (por eso 13 archivos = 13 categorías de libros), agrega `seccion` según la CARPETA, y `categorias` (ARRAY con TODAS las categorías donde figura el ítem — normalmente una sola; un libro multi-categoría comparte id y las acumula). **El ítem expuesto NO lleva `categoria` singular** (redundancia eliminada 2026-10-15): los consumidores leen `categorias`.
+**EXCEPCIÓN — hemeroteca (PLANV3 V3.6)**: los ítems de `data/periodico-exploracion-y-ciencia/*.json` y `data/revista-azara/*.json` SÍ llevan `categoria` en el archivo (con acentos: "Periódico Exploración y Ciencia") — el backend lo usa como FUENTE del nombre de categoría (lo agrupa por `item.categoria` en `listarCategorias`, `src/lib/datos.js`) pero lo DESCARTA del ítem expuesto, que sale con `categorias`.
+**EXCEPCIÓN — Recursos Educativos (`data/recursos-educativos/recursos-educativos.json`)**: cada ítem lleva `categoria` en el archivo (el grupo: 'Cuadernillos', 'Cartillas', 'Posters de Biodiversidad', ...) = la categoría de navegación de la sección; es el MISMO caso que la hemeroteca (la categoría viaja en el archivo, no en el nombre). El backend lo descarta y expone `categorias`. Además, algunos ítems traen `coleccion` (serie hiperespecífica: 'Miradas de la Argentina') que SÍ se conserva en el ítem expuesto. La hemeroteca NO lleva `coleccion` (la categoría única YA es la publicación).
 Los esqueletos (`linkPdf: null` + `revisionPendiente: true`) quedan listados por `scripts/validar-data.js` en el "Portal de revisión humana" para completar vía PR (política: la cura manual no se re-scrapea).
 
 ## Branches

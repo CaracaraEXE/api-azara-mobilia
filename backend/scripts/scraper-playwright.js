@@ -57,8 +57,9 @@ const CATEGORIAS_RECURSOS = [
  * educativos comparten la MISMA estructura — sección → categorías planas → grilla →
  * página individual — y se scrapean con EL MISMO flujo (scrapearSeccion) y EL MISMO
  * extractor (obtenerDatosItem). La diferencia entre secciones es declarativa:
- *   - prefijoArchivo: base de los nombres de archivo ('libros' → libros-*.json,
- *     'recursos' → recursos-*.json, 'periodico-exploracion-y-ciencia' → su carpeta).
+ *   - prefijoArchivo: base de los nombres de archivo y de la CARPETA de la sección
+ *     ('libros' → libros-*.json, 'recursos-educativos' → recursos-educativos.json,
+ *     'periodico-exploracion-y-ciencia' → su carpeta).
  *   - archivoUnico: false (Libros) → 1 archivo por categoría; true (Recursos educativos
  *     y Hemeroteca) → 1 archivo por sección ({slug}.json, fix V3.6).
  * HEMEROTECA (PLANV3 V3.6, 2026-09-27): la ÚNICA excepción con extractores propios —
@@ -79,8 +80,8 @@ const SECCIONES = [
     tipo: 'recursos',
     nombre: 'Recursos educativos',
     slug: 'recursos-educativos',
-    prefijoArchivo: 'recursos',
-    archivoUnico: true, // 1 archivo recursos-educativos.json con coleccion = categoría
+    prefijoArchivo: 'recursos-educativos', // carpeta + archivo homónimos (data/recursos-educativos/)
+    archivoUnico: true, // 1 archivo recursos-educativos.json con categoria = grupo
     categorias: CATEGORIAS_RECURSOS,
   },
   // Hemeroteca (PLANV3 V3.6, 2026-09-27): cada publicación periódica es una SECCIÓN
@@ -863,9 +864,9 @@ async function obtenerDatosColeccion(page, coleccion) {
  * estables entre re-scrapes y para que un ítem publicado en 2 categorías comparta UN id.
  *
  * prefijo: 'libros' → solo libros-*.json (las categorías de libros se deduplican entre
- * sí, PLANV2 §10). 'recursos' → SOLO recursos-*.json: un recurso NUNCA se consolida
- * contra un libro automáticamente (PLANV3 §6); si comparte linkPdf/portada con un libro,
- * validar-data lo reporta y la verificación/decisión es humana.
+ * sí, PLANV2 §10). 'recursos-educativos' → SOLO recursos-educativos.json: un recurso
+ * NUNCA se consolida contra un libro automáticamente (PLANV3 §6); si comparte
+ * linkPdf/portada con un libro, validar-data lo reporta y la verificación es humana.
  */
 function construirIndiceGlobal(librosActuales, categoriaSlug, prefijo = 'libros') {
   const indice = new Map();
@@ -879,8 +880,8 @@ function construirIndiceGlobal(librosActuales, categoriaSlug, prefijo = 'libros'
   // y el re-scrape rompía el dedup "existente gana").
   const esDePrefijo = new RegExp(`^${prefijo}(-.+)?\\.json$`);
   const quitarPrefijo = new RegExp(`^${prefijo}-`);
-  // Cada sección vive en su propia carpeta (src/data/libros/, src/data/recursos/):
-  // el índice escanea SOLO la de la sección en curso.
+  // Cada sección vive en su propia carpeta (src/data/libros/,
+  // src/data/recursos-educativos/): el índice escanea SOLO la de la sección en curso.
   const dirSeccion = path.join(DATA_DIR, prefijo);
   if (fs.existsSync(dirSeccion)) {
     for (const f of fs.readdirSync(dirSeccion)) {
@@ -975,8 +976,8 @@ function registrarOConsolidar(indiceGlobal, datos) {
  *    categoría, con progreso incremental por categoría (temp .temp.json + reanudación
  *    desde N ítems).
  *  - archivoUnico: true (Recursos educativos) → 1 archivo {prefijo}-{slug}.json para
- *    toda la sección; `coleccion` de cada ítem = nombre de su categoría; el temp
- *    guarda las categorías completadas + los ítems acumulados (al retomar salta las
+ *    toda la sección; `categoria` de cada ítem = su grupo; el temp guarda las
+ *    categorías completadas + los ítems acumulados (al retomar salta las
  *    completadas y re-scrapea la categoría en curso — sus ítems se consolidan por id).
  */
 async function scrapearSeccion(browser, seccion) {
@@ -984,7 +985,7 @@ async function scrapearSeccion(browser, seccion) {
   
   const page = await browser.newPage();
   const prefijo = seccion.prefijoArchivo;
-  // Cada sección vive en su propia carpeta (libros/, recursos/, y las de hemeroteca:
+  // Cada sección vive en su propia carpeta (libros/, recursos-educativos/, y las de hemeroteca:
   // periodico-exploracion-y-ciencia/, revista-azara/); se crea al arrancar para que
   // la primera corrida no rompa el índice.
   const carpetaSeccion = path.join(DATA_DIR, prefijo);
@@ -1071,8 +1072,9 @@ async function scrapearSeccion(browser, seccion) {
       // queda INCOMPLETA → no se publica (ver cierre) y la corrida sale con exit code 1.
       const urlsSinItem = [];
 
-      // Registrar un ítem individual (dedup + overrides). En modo archivo único,
-      // `coleccion` = categoría (la API agrupa por ?coleccion=).
+      // Registrar un ítem individual (dedup + overrides). En modo archivo único
+      // (RE), `categoria` = el grupo (la API agrupa por ?categoria= y el desglose
+      // deja las series en `coleccion`).
       const registrarItem = (datos) => {
         if (!datos || !datos.titulo) {
           console.log('         ⚠️ Sin título (verificar URL)');
@@ -1084,7 +1086,7 @@ async function scrapearSeccion(browser, seccion) {
         // libros[0].categoria y el nombre visible no sea el slug capitalizado.
         const contexto = seccion.tipo === 'hemeroteca'
           ? { ...datos, categoria: seccion.nombre }
-          : (seccion.archivoUnico ? { ...datos, coleccion: categoria.nombre } : datos);
+          : (seccion.archivoUnico ? { ...datos, categoria: categoria.nombre } : datos);
         const { _duplicadoDe, ...item } = registrarOConsolidar(indiceGlobal, contexto);
         items.push(aplicarOverrides(item));
         console.log(_duplicadoDe
@@ -1114,7 +1116,11 @@ async function scrapearSeccion(browser, seccion) {
           if (itemsColeccion.length >= 1) {
             let reutilizados = 0;
             for (const item of itemsColeccion) {
-              const { _duplicadoDe, ...limpio } = registrarOConsolidar(indiceGlobal, item);
+              // En modo archivo único el GRUPO va en `categoria` (igual que un ítem
+              // suelto): el desglose de "Miradas de la Argentina" queda en Cuadernillos,
+              // con la serie en su propio `coleccion`.
+              const conGrupo = seccion.archivoUnico ? { ...item, categoria: categoria.nombre } : item;
+              const { _duplicadoDe, ...limpio } = registrarOConsolidar(indiceGlobal, conGrupo);
               items.push(aplicarOverrides(limpio));
               if (_duplicadoDe) reutilizados++;
             }

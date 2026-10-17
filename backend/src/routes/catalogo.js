@@ -4,167 +4,68 @@
  * Lee dinámicamente TODAS las secciones de data/ (data/<seccion>/<archivo>.json):
  * libros, recursos educativos y hemeroteca (periódico + Revista Azara). El término
  * "catálogo" es neutro: la API sirve más que libros.
+ *
+ * La carga y derivación de categorías vive en ../lib/datos (compartida con
+ * /api/categorias y /api/secciones).
  */
 
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
 
-// Carpeta de datos
-const DATA_DIR = path.join(__dirname, '../data');
+const {
+  listarArchivosData,
+  listarItems,
+  listarCategorias,
+  normalizarBusqueda,
+  normalizarCategoria,
+  slugificarCategoria
+} = require('../lib/datos');
 
-/**
- * Listar los archivos de datos de TODAS las secciones (todas las subcarpetas de data/).
- * Descubrimiento AUTOMÁTICO (PLANV3 V3.6): toda subcarpeta de data/ es una SECCIÓN;
- * los archivos válidos son los que EMPIEZAN con el nombre de la carpeta:
- *   libros/libros-*.json (13), recursos/recursos-educativos.json,
- *   periodico-exploracion-y-ciencia/periodico-exploracion-y-ciencia.json, ...
- * Se devuelve la ruta completa + la sección para derivar los campos en runtime.
- */
-function listarArchivosData() {
-  const archivos = [];
-  if (!fs.existsSync(DATA_DIR)) return archivos;
-  for (const carpeta of fs.readdirSync(DATA_DIR, { withFileTypes: true })) {
-    if (!carpeta.isDirectory()) continue;
-    const dir = path.join(DATA_DIR, carpeta.name);
-    const re = new RegExp(`^${carpeta.name}(-.+)?\\.json$`);
-    for (const f of fs.readdirSync(dir)) {
-      if (re.test(f)) {
-        archivos.push({ ruta: path.join(dir, f), seccion: carpeta.name });
-      }
-    }
-  }
-  return archivos;
+/** ¿El nombre de categoría coincide con el valor pedido (por nombre o por slug)? */
+function coincideCategoria(nombreCat, valorCanonico) {
+  return normalizarCategoria(nombreCat) === valorCanonico
+    || slugificarCategoria(nombreCat) === valorCanonico;
+}
+
+/** Secciones válidas = subcarpetas de data/ (cada una es una SECCIÓN). */
+function listarSeccionesValidas() {
+  return [...new Set(listarArchivosData().map(a => a.seccion))];
+}
+
+/** Categorías válidas (para el 400): nombres + slugs, sin repetir. */
+function categoriasValidas() {
+  const set = new Set();
+  for (const c of listarCategorias()) { set.add(c.nombre); set.add(c.slug); }
+  return [...set];
 }
 
 /**
- * Obtener todas las categorías y sus libros desde archivos individuales
- */
-function obtenerCategoriasYLibros() {
-  const categorias = [];
-  
-  for (const { ruta, seccion } of listarArchivosData()) {
-    try {
-      const libros = JSON.parse(fs.readFileSync(ruta, 'utf8'));
-      
-      // Extraer slug del nombre del archivo: libros-paleontologia.json → paleontologia; recursos-educativos.json → recursos-educativos
-      const nombreArchivo = path.basename(ruta);
-      const slug = (nombreArchivo.startsWith('libros-') ? nombreArchivo.replace('libros-', '') : nombreArchivo).replace('.json', '');
-      
-      // Determinar nombre de la categoría desde el primer libro o el slug
-      const nombre = libros.length > 0 && libros[0].categoria 
-        ? libros[0].categoria 
-        : slug.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
-      
-      // Agregar categoría a cada libro
-      const librosConCategoria = libros.map(libro => ({
-        ...libro,
-        categoria: nombre
-      }));
-      
-      categorias.push({
-        nombre,
-        slug,
-        seccion,
-        url: `/libros/libros-de-${slug}/`,
-        libros: librosConCategoria
-      });
-    } catch (error) {
-      console.error(`Error al leer ${ruta}:`, error.message);
-    }
-  }
-  
-  return categorias;
-}
-
-/**
- * Obtener todos los libros (flatten) con deduplicación por ID y categorías.
- *
- * PLANV2 §10: un libro publicado en 2 categorías comparte UN id (el scraper
- * reutiliza el id ya registrado). El dedup evita inflar la búsqueda global y
- * los stats, PERO cada ítem expone `categorias` (array con TODAS las categorías
- * donde figura, no una sola 'principal'). Sin esto, un libro multi-categoría
- * desaparece de la navegación de las categorías no-principales.
- */
-function obtenerTodosLosLibros() {
-  const porId = new Map();
-
-  for (const { ruta, seccion } of listarArchivosData()) {
-    try {
-      const nombreArchivo = path.basename(ruta);
-      const slug = (nombreArchivo.startsWith('libros-') ? nombreArchivo.replace('libros-', '') : nombreArchivo).replace('.json', '');
-      const librosArr = JSON.parse(fs.readFileSync(ruta, 'utf8'));
-      const nombre = librosArr.length > 0 && librosArr[0].categoria
-        ? librosArr[0].categoria
-        : slug.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
-      for (const libro of librosArr) {
-        if (!libro || !libro.id) continue;
-        const existente = porId.get(libro.id);
-        if (existente) {
-          if (!existente.categorias.includes(nombre)) existente.categorias.push(nombre);
-        } else {
-          // Se descarta `categoria` del archivo (fuente del nombre): el ítem
-          // expuesto lleva SOLO `categorias` (array, todas donde figura).
-          const { categoria: _categoriaArchivo, ...resto } = libro;
-          porId.set(libro.id, { ...resto, seccion, categorias: [nombre] });
-        }
-      }
-    } catch (error) {
-      console.error(`Error al leer ${ruta}:`, error.message);
-    }
-  }
-  return [...porId.values()];
-}
-
-/**
- * Agrupar libros por `coleccion` (series/desgloses). Un consumidor cualquiera
- * (web, CLI, bot) puede navegar las series sin conocer el scraper.
+ * Colecciones/series agrupadas (metadata, sin ítems). Se deriva del campo
+ * `coleccion` de cada ítem: series de Libros (Trazos nativos, ...) y de RE
+ * ("Miradas de la Argentina"). `categorias` = a qué categorías pertenece.
  */
 function obtenerColecciones() {
-  const mapa = new Map();
-  for (const libro of obtenerTodosLosLibros()) {
-    if (!libro.coleccion) continue;
-    let c = mapa.get(libro.coleccion);
+  const porNombre = new Map();
+  for (const item of listarItems()) {
+    const nombre = item.coleccion;
+    if (!nombre) continue;
+    let c = porNombre.get(nombre);
     if (!c) {
-      c = { nombre: libro.coleccion, cantidad: 0, conPdf: 0, categorias: new Set() };
-      mapa.set(libro.coleccion, c);
+      c = { nombre, cantidad: 0, conPdf: 0, categorias: new Set() };
+      porNombre.set(nombre, c);
     }
     c.cantidad++;
-    if (libro.linkPdf) c.conPdf++;
-    (libro.categorias || [])
-      .forEach(n => c.categorias.add(n));
+    if (item.linkPdf) c.conPdf++;
+    (item.categorias || []).forEach(n => c.categorias.add(n));
   }
-  return [...mapa.values()]
+  return [...porNombre.values()]
     .map(c => ({ nombre: c.nombre, cantidad: c.cantidad, conPdf: c.conPdf, categorias: [...c.categorias] }))
     .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
 }
 
-/**
- * Normalizar texto para búsquedas laxas: quita ACENTOS (áéíóúü) y pasa a
- * minúsculas, pero CONSERVA la ñ (carácter propio del español, no un acento):
- * NFD → eliminar combining marks (menos U+0303, el de la ñ) → NFC → lowercase.
- * Así "felix" encuentra "Félix" y "diaz" encuentra "Díaz"; "nandu" NO
- * encuentra "ñandú" (eso sería cambiar la fonética, no normalizar tildes).
- */
-function normalizarBusqueda(s) {
-  return (s || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, c => (c === '\u0303' ? '\u0303' : ''))
-    .normalize('NFC')
-    .toLowerCase();
-}
-
-/**
- * Normalizar nombre/slug de categoría a una MISMA forma canónica para comparar.
- * "Areas Naturales" y "areas-naturales" → "areas-naturales"; "Evolución, Genética,
- * Ecología y Etología" → "evolucion-genetica-ecologia-y-etologia" (coincide con el slug
- * del archivo). Así el filtro acepta nombre O slug, con o sin tildes/comas.
- */
-function normalizarCategoria(s) {
-  return normalizarBusqueda(s)
-    .replace(/[^a-z0-9ñ]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+/** Colecciones válidas (para el 400). */
+function coleccionesValidas() {
+  return obtenerColecciones().map(c => c.nombre);
 }
 
 // --- Validación de filtros enumerables (400 honesto) -------------------------
@@ -174,27 +75,7 @@ function normalizarCategoria(s) {
 // filtros enumerables (seccion/categoria/coleccion); `busqueda` es texto LIBRE
 // → 0 coincidencias sigue siendo un 200 con data:[].
 
-/** Secciones válidas = subcarpetas de data/ (mismo descubrimiento que la API). */
-function listarSeccionesValidas() {
-  return [...new Set(listarArchivosData().map(a => a.seccion))];
-}
-
-/** Categorías válidas = nombre Y slug de cada archivo (el filtro acepta ambos). */
-function categoriasValidas() {
-  const validos = [];
-  for (const cat of obtenerCategoriasYLibros()) {
-    validos.push(cat.nombre);
-    if (cat.slug && cat.slug !== cat.nombre) validos.push(cat.slug);
-  }
-  return [...new Set(validos)];
-}
-
-/** Colecciones válidas = nombres de colección (el filtro acepta match parcial). */
-function coleccionesValidas() {
-  return obtenerColecciones().map(c => c.nombre);
-}
-
-/** Sugerencia laxa: primer válido cuyo canónico contenga al buscado o viceversa. */
+/** Sugerencia de "¿quisiste decir X?": primer valor con forma similar. */
 function sugerir(valor, validos) {
   const objetivo = normalizarCategoria(valor);
   return validos.find(v => {
@@ -227,19 +108,19 @@ router.get('/', (req, res) => {
     // Validación 400 de filtros enumerables (ANTES de paginar). Un valor
     // inexistente no es "0 resultados": es un error del cliente.
     const seccionesValidas = listarSeccionesValidas();
-    if (seccion && !listarSeccionesValidas().includes(normalizarCategoria(seccion))) {
-      return res.status(400).json({ success: false, ...errorFiltro400('seccion', seccion, listarSeccionesValidas()) });
+    const seccionCanonica = seccion ? normalizarCategoria(seccion) : null;
+    if (seccion && !seccionesValidas.includes(seccionCanonica)) {
+      return res.status(400).json({ success: false, ...errorFiltro400('seccion', seccion, seccionesValidas) });
     }
     if (categoria) {
       const objetivo = normalizarCategoria(categoria);
-      const catsValidas = categoriasValidas();
-      if (!categoriasValidas().some(c => normalizarCategoria(c) === objetivo)) {
+      if (!listarCategorias().some(c => coincideCategoria(c.nombre, objetivo))) {
         // Pista útil: si lo que pasaron es en realidad una SECCIÓN, decirlo.
-        const esSeccion = listarSeccionesValidas().includes(objetivo);
+        const esSeccion = seccionesValidas.includes(objetivo);
         const hint = esSeccion
-          ? `"${categoria}" es una SECCIÓN, no una categoría. Usá ?seccion=${normalizarCategoria(categoria)}`
+          ? `"${categoria}" es una SECCIÓN, no una categoría. Usá ?seccion=${objetivo}`
           : null;
-        return res.status(400).json({ success: false, ...errorFiltro400('categoria', categoria, catsValidas, hint) });
+        return res.status(400).json({ success: false, ...errorFiltro400('categoria', categoria, categoriasValidas(), hint) });
       }
     }
     if (coleccion) {
@@ -251,50 +132,45 @@ router.get('/', (req, res) => {
       }
     }
 
-    let libros = obtenerTodosLosLibros();
-    
-    // Filtrar por SECCIÓN: 'libros' | 'recursos' | 'periodico-exploracion-y-ciencia' | 'revista-azara'
+    let libros = listarItems();
+
+    // Filtrar por SECCIÓN: 'libros' | 'recursos-educativos' | 'periodico-...' | 'revista-azara'
     // (el campo `seccion` se deriva de la carpeta de data/). Match exacto por slug.
     if (seccion) {
-      libros = libros.filter(l => l.seccion === seccion);
+      libros = libros.filter(l => l.seccion === seccionCanonica);
     }
 
-    // Filtrar por categoría: acepta NOMBRE ("Areas Naturales") o SLUG ("areas-naturales"),
-    // con o sin tildes — la comparación se hace en forma canónica (normalizarCategoria).
-    // MATCH EXACTO (2026-10-14): un término PARCIAL ya NO matchea varias categorías (antes
-    // `?categoria=ciencia` traía "Historia De La Ciencia" + "Periódico ... y Ciencia").
-    // Para búsqueda parcial usar `?busqueda=`. Usa TODAS las categorías del libro
-    // (un libro multi-categoría figura en cada una, sin repetir el registro).
+    // Filtrar por categoría: acepta NOMBRE ("Areas Naturales", "Cuadernillos") o
+    // SLUG ("areas-naturales", "posters-biodiversidad"), con o sin tildes. MATCH
+    // EXACTO; para parcial usar `?busqueda=`. Usa TODAS las categorías del ítem.
     if (categoria) {
       const objetivo = normalizarCategoria(categoria);
-      libros = libros.filter(l => {
-        return (l.categorias || []).some(c => normalizarCategoria(c) === objetivo);
-      });
+      libros = libros.filter(l => (l.categorias || []).some(c => coincideCategoria(c, objetivo)));
     }
 
-    // Filtrar por colección: acepta el nombre exacto o parcial, en forma canónica
-    // (sin tildes/mayúsculas). `?coleccion=trazos` → toda la serie Trazos nativos.
+    // Filtrar por colección: acepta el nombre exacto o parcial, en forma canónica.
+    // `?coleccion=trazos` → toda la serie Trazos nativos; `?coleccion=miradas`.
     if (coleccion) {
       const objetivo = normalizarCategoria(coleccion);
       libros = libros.filter(l => l.coleccion && normalizarCategoria(l.coleccion).includes(objetivo));
     }
-    
+
     // Filtrar por búsqueda (título, autor, titulares de hemeroteca) — sin acentos ni mayúsculas
     if (busqueda) {
       const termino = normalizarBusqueda(busqueda);
-      libros = libros.filter(l => 
+      libros = libros.filter(l =>
         normalizarBusqueda(l.titulo).includes(termino) ||
         (l.autor && normalizarBusqueda(l.autor).includes(termino)) ||
         (Array.isArray(l.titulares) && l.titulares.some(t => normalizarBusqueda(t).includes(termino)))
       );
     }
-    
+
     // Paginación
     const total = libros.length;
     const inicio = (pagina - 1) * limite;
     const fin = inicio + parseInt(limite);
     const librosPaginados = libros.slice(inicio, fin);
-    
+
     res.json({
       success: true,
       data: librosPaginados,
@@ -315,15 +191,12 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   try {
     const { id } = req.params;
-    const libros = obtenerTodosLosLibros();
-    
+    const libros = listarItems();
+
     const libro = libros.find(l => l.id === id);
-    
+
     if (libro) {
-      res.json({
-        success: true,
-        data: libro
-      });
+      res.json({ success: true, data: libro });
     } else {
       res.status(404).json({ success: false, error: 'Libro no encontrado' });
     }
@@ -354,15 +227,16 @@ router.get('/colecciones/lista', (req, res) => {
 // GET /api/catalogo/categorias/lista - Lista todas las categorías
 router.get('/categorias/lista', (req, res) => {
   try {
-    const categorias = obtenerCategoriasYLibros();
-    
+    const categorias = listarCategorias();
+
     const lista = categorias.map(cat => ({
       nombre: cat.nombre,
       slug: cat.slug,
-      cantidad: cat.libros.length,
+      seccion: cat.seccion,
+      cantidad: cat.cantidad,
       url: cat.url
     }));
-    
+
     res.json({
       success: true,
       data: lista,
@@ -394,21 +268,20 @@ function resumirItems(items) {
 
 // GET /api/catalogo/stats/general - Estadísticas del catálogo completo Y por
 // SECCIÓN (deduplicadas por id, PLANV2 §10). Sin claves "libros*": el catálogo
-// sirve 4 secciones (libros | recursos | periodico-... | revista-azara).
+// sirve 4 secciones (libros | recursos-educativos | periodico-... | revista-azara).
 router.get('/stats/general', (req, res) => {
   try {
-    const categorias = obtenerCategoriasYLibros();
-    const todos = obtenerTodosLosLibros();
+    const categorias = listarCategorias();
+    const todos = listarItems();
 
-    // Categorías (archivos) por sección → alimenta `categorias` de cada sección.
+    // Categorías (una por archivo o grupo) por sección.
     const categoriasPorSeccion = new Map();
     for (const cat of categorias) {
       const sec = cat.seccion || 'libros';
       categoriasPorSeccion.set(sec, (categoriasPorSeccion.get(sec) || 0) + 1);
     }
 
-    // Ítems únicos por sección (mismo dedup por id que la API: un ítem
-    // multi-categoría cuenta UNA vez por sección).
+    // Ítems únicos por sección (mismo dedup por id que la API).
     const itemsPorSeccion = new Map();
     for (const item of todos) {
       const sec = item.seccion;

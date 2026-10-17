@@ -71,6 +71,15 @@ function primeraPalabraLarga(texto, min = 6) {
 // Categorías de Libros = nº de archivos de la sección 'libros'.
 const CATEGORIAS_LIBROS_ESPERADAS = archivosData.filter(a => a.seccion === 'libros').length;
 
+// Categorías TOTALES = por archivo, las categorías DISTINTAS que declaran sus
+// ítems (los libros no traen `categoria` → 1 por archivo; RE agrupa 10 grupos
+// en su archivo único). Es lo que /api/categorias y stats.totalCategorias cuentan.
+const CATEGORIAS_TOTALES_ESPERADAS = archivosData.reduce((acc, { ruta }) => {
+  const items = itemsPorArchivo.get(ruta) || [];
+  const distintas = new Set(items.filter(i => i && i.categoria).map(i => i.categoria));
+  return acc + (distintas.size || 1);
+}, 0);
+
 async function main() {
   const server = app.listen(0);
   await new Promise(r => server.once('listening', r));
@@ -112,7 +121,7 @@ async function main() {
     const cats = await get('/api/categorias');
     {
       check('success', cats.success === true);
-      igual('total === nº de archivos', cats.meta.total, ARCHIVOS_ESPERADOS);
+      igual('total === categorías (una por archivo o grupo)', cats.meta.total, CATEGORIAS_TOTALES_ESPERADAS);
       check('cada categoría tiene nombre/slug/seccion/cantidad',
         cats.data.every(c => c.nombre && c.slug && c.seccion && typeof c.cantidad === 'number'));
       const secciones = [...new Set(cats.data.map(c => c.seccion))].sort();
@@ -137,12 +146,14 @@ async function main() {
       check('libros → cada unidad tiene nombre/slug/cantidad',
         libros.subdivision.items.every(u => u.nombre && u.slug && typeof u.cantidad === 'number'));
 
-      // Recursos educativos se navega por COLECCIONES.
-      const rec = r.data.find(s => s.slug === 'recursos');
-      check('recursos → subdivision.tipo === "colecciones"', rec.subdivision && rec.subdivision.tipo === 'colecciones');
-      check('recursos → subdivision.total >= 1', rec.subdivision.total >= 1);
-      check('recursos → cada unidad tiene nombre/cantidad',
-        rec.subdivision.items.every(u => u.nombre && typeof u.cantidad === 'number'));
+      // Recursos educativos se navega por CATEGORÍAS (los 10 grupos), igual que libros;
+      // cada categoría expone sus COLECCIONES (series) anidadas.
+      const rec = r.data.find(s => s.slug === 'recursos-educativos');
+      const recCats = cats.data.filter(c => c.seccion === 'recursos-educativos');
+      check('recursos-educativos → subdivision.tipo === "categorias"', rec.subdivision && rec.subdivision.tipo === 'categorias');
+      igual('recursos-educativos → subdivision.total === nº categorías de RE', rec.subdivision.total, recCats.length);
+      check('recursos-educativos → cada unidad nombre/slug/cantidad/colecciones',
+        rec.subdivision.items.every(u => u.nombre && u.slug && typeof u.cantidad === 'number' && Array.isArray(u.colecciones)));
 
       // Hemeroteca: la sección ES la publicación → sin subdivisión.
       const hem = r.data.filter(s => s.slug === 'periodico-exploracion-y-ciencia' || s.slug === 'revista-azara');
@@ -196,13 +207,15 @@ async function main() {
         Array.isArray(rMal.body.valoresValidos) && seccionesEsperadas.every(s => rMal.body.valoresValidos.includes(s)));
     }
 
-    // ── 5. Filtro por colección (RE) ──────────────────────
+    // ── 5. Filtro por colección ───────────────────────────
     console.log('\n[5] Filtro ?coleccion=');
     {
-      const r = await get(`${API_BASE}?coleccion=cuadernillos&limite=1000`);
+      // ?coleccion= es PARCIAL y matchea el nombre de la serie: "Miradas de la
+      // Argentina" (7 ítems de RE) es la colección DENTRO de la categoría Cuadernillos.
+      const r = await get(`${API_BASE}?coleccion=miradas&limite=1000`);
       check('devuelve >= 1 ítem', r.data.length >= 1);
-      check('todos tienen coleccion "Cuadernillos"',
-        r.data.every(i => (i.coleccion || '').toLowerCase().includes('cuadernillo')));
+      check('todos tienen coleccion "Miradas de la Argentina"',
+        r.data.every(i => (i.coleccion || '').toLowerCase().includes('miradas')));
 
       // Colección inexistente → 400 (filtro enumerable).
       const rMal = await getRaw(`${API_BASE}?coleccion=zzzz&limite=1000`);
@@ -245,7 +258,7 @@ async function main() {
     {
       const s = await get(`${API_BASE}/stats/general`);
       igual('stats.totalItems === ids únicos', s.data.totalItems, TOTAL_ESPERADO);
-      igual('stats.totalCategorias === nº de archivos', s.data.totalCategorias, ARCHIVOS_ESPERADOS);
+      igual('stats.totalCategorias === categorías (archivo o grupo)', s.data.totalCategorias, CATEGORIAS_TOTALES_ESPERADAS);
       check('stats: itemsConPdf + itemsSinPdf === totalItems',
         s.data.itemsConPdf + s.data.itemsSinPdf === s.data.totalItems);
       check('stats: sin claves "libros*" (terminología neutra)',
@@ -271,11 +284,13 @@ async function main() {
         check('stats.secciones: cada sección con items y PDF consistentes', seccionesOk);
       }
 
-      igual('categorias/lista total', (await get(`${API_BASE}/categorias/lista`)).meta.total, ARCHIVOS_ESPERADOS);
+      igual('categorias/lista total', (await get(`${API_BASE}/categorias/lista`)).meta.total, CATEGORIAS_TOTALES_ESPERADAS);
       check('colecciones/lista success', (await get(`${API_BASE}/colecciones/lista`)).success === true);
 
       const home = await get('/');
-      check('GET / anuncia /api/catalogo', home.endpoints && home.endpoints.catalogo === '/api/catalogo');
+      const rutas = (home.endpoints || []).map(e => e.ruta);
+      check('GET / lista los endpoints', Array.isArray(home.endpoints) && rutas.includes('/api/catalogo') && rutas.includes('/api/secciones'));
+      check('GET / declara las secciones', Array.isArray(home.secciones) && home.secciones.includes('recursos-educativos'));
     }
   } finally {
     server.close();

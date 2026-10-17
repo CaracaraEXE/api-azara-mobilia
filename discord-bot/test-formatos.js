@@ -59,12 +59,20 @@ const libroNormal = {
 const reCurso = {
   id: 'lib-re01',
   titulo: 'Cuadernillo X',
-  seccion: 'recursos',
-  categorias: ['Recursos Educativos'],
-  coleccion: 'Cuadernillos',
+  seccion: 'recursos-educativos',
+  categorias: ['Cuadernillos'],
   autor: 'Autor RE',
   anio: 2021,
   linkPdf: 'http://ejemplo/r.pdf'
+};
+
+// Ítem de RE que PERTENECE a una colección ("Miradas de la Argentina" dentro de
+// la categoría Cuadernillos): muestra la categoría Y el field Colección.
+const reColeccion = {
+  ...reCurso,
+  id: 'lib-re02',
+  titulo: 'Miradas de la Argentina N° 1',
+  coleccion: 'Miradas de la Argentina'
 };
 
 // ── 1. /ficha con titulares, estado OCULTO (default) ─────
@@ -124,13 +132,18 @@ console.log('\n[3] /ficha sin titulares — sin botón, con Colección');
   igual('Colección', e.fields.find(f => f.name === '\uD83D\uDDC2\uFE0F Colección')?.value, 'Serie Ñandú');
 }
 
-// ── 4. RE: coleccion es la CATEGORÍA, no Colección ───────
-console.log('\n[4] RE — la colección es la categoría (sin field Colección)');
+// ── 4. RE: categoría = grupo; colección propia como field ─
+console.log('\n[4] RE — categoría = grupo; colección (Miradas) como field');
 {
   const e = formatos.construirMensajeLibro(reCurso, false).embeds[0];
-  check('NO hay field Colección', !e.fields.some(f => f.name === '\uD83D\uDDC2\uFE0F Colección'));
-  igual('Categoría = coleccion', e.fields[1].value, 'Cuadernillos');
   igual('Sección', e.fields[0].value, 'Recursos educativos');
+  igual('Categoría = grupo', e.fields[1].value, 'Cuadernillos');
+  check('sin `coleccion` → NO hay field Colección',
+    !e.fields.some(f => f.name === '\uD83D\uDDC2\uFE0F Colección'));
+
+  const em = formatos.construirMensajeLibro(reColeccion, false).embeds[0];
+  igual('Categoría (Miradas)', em.fields[1].value, 'Cuadernillos');
+  igual('Colección (Miradas)', em.fields.find(f => f.name === '\uD83D\uDDC2\uFE0F Colección')?.value, 'Miradas de la Argentina');
 }
 
 // ── 5. PDF bilingüe + sin PDF ────────────────────────────

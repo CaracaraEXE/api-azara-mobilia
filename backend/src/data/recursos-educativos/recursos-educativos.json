@@ -6,7 +6,7 @@
     "anio": 2017,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/25-experiencias-de-fisica-quimica-y-biologia.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/11/25-experiencias-de-fisica-quimica-y-biologia-450.jpg",
-    "coleccion": "Cuadernillos",
+    "categoria": "Cuadernillos",
     "fechaExtraccion": "2026-09-27T03:29:59.040Z"
   },
   {
@@ -16,7 +16,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/animales-de-las-islas-del-delta-del-parana-para-colorear.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/animales-de-las-islas-del-delta-del-parana-para-colorear.jpg",
-    "coleccion": "Cuadernillos",
+    "categoria": "Cuadernillos",
     "fechaExtraccion": "2026-09-27T03:30:02.353Z"
   },
   {
@@ -26,7 +26,7 @@
     "anio": 2025,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/area-protegida-parque-provincial-presidente-sarmiento.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/05/area-protegida-parque-provincial-presidente-sarmiento.jpg",
-    "coleccion": "Cuadernillos",
+    "categoria": "Cuadernillos",
     "fechaExtraccion": "2026-09-27T03:30:05.275Z"
   },
   {
@@ -36,7 +36,7 @@
     "anio": 2016,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/manual-sobre-dunas-costeras.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2016/11/dunas-costeras-de-la-pampa-austral-450-1.jpg",
-    "coleccion": "Cuadernillos",
+    "categoria": "Cuadernillos",
     "fechaExtraccion": "2026-09-27T03:30:08.204Z"
   },
   {
@@ -46,7 +46,7 @@
     "anio": 2016,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/cuadernillo-de-actividades-sobre-dunas-y-playas.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2016/11/dunas-costeras-de-la-pampa-austral-450.jpg",
-    "coleccion": "Cuadernillos",
+    "categoria": "Cuadernillos",
     "fechaExtraccion": "2026-09-27T03:30:12.884Z"
   },
   {
@@ -56,7 +56,7 @@
     "anio": 2016,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/shincal-quimivil-chicos.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2016/11/shincal-quimivil-chicos-450.jpg",
-    "coleccion": "Cuadernillos",
+    "categoria": "Cuadernillos",
     "fechaExtraccion": "2026-09-27T03:30:15.948Z"
   },
   {
@@ -66,6 +66,7 @@
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2016/11/La-historia-de-la-Tierra-Geologia-de-la-Argentina.jpg",
     "autor": null,
     "anio": null,
+    "categoria": "Cuadernillos",
     "coleccion": "Miradas de la Argentina",
     "fechaExtraccion": "2026-09-27T03:30:18.982Z"
   },
@@ -76,6 +77,7 @@
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2016/11/Los-que-aqui-vivieron-Paleontolog%C3%ADa-de-la-Argentina.jpg",
     "autor": null,
     "anio": null,
+    "categoria": "Cuadernillos",
     "coleccion": "Miradas de la Argentina",
     "fechaExtraccion": "2026-09-27T03:30:18.982Z"
   },
@@ -86,6 +88,7 @@
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2016/11/La-naturaleza-de-la-patria-Biodiversidad-de-la-Argentina.jpg",
     "autor": null,
     "anio": null,
+    "categoria": "Cuadernillos",
     "coleccion": "Miradas de la Argentina",
     "fechaExtraccion": "2026-09-27T03:30:18.982Z"
   },
@@ -96,6 +99,7 @@
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2016/11/Desde-adentro-Comunidades-originarias-de-la-Argentina.jpg",
     "autor": null,
     "anio": null,
+    "categoria": "Cuadernillos",
     "coleccion": "Miradas de la Argentina",
     "fechaExtraccion": "2026-09-27T03:30:18.982Z"
   },
@@ -106,6 +110,7 @@
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2016/11/Casas-de-cosas.jpg",
     "autor": null,
     "anio": null,
+    "categoria": "Cuadernillos",
     "coleccion": "Miradas de la Argentina",
     "fechaExtraccion": "2026-09-27T03:30:18.982Z"
   },
@@ -116,6 +121,7 @@
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2016/11/De-pinceles-y-acuarelas.jpg",
     "autor": null,
     "anio": null,
+    "categoria": "Cuadernillos",
     "coleccion": "Miradas de la Argentina",
     "fechaExtraccion": "2026-09-27T03:30:18.982Z"
   },
@@ -126,6 +132,7 @@
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2016/11/Aunque-no-la-veamos-la-cultura-siempre-esta.jpg",
     "autor": null,
     "anio": null,
+    "categoria": "Cuadernillos",
     "coleccion": "Miradas de la Argentina",
     "fechaExtraccion": "2026-09-27T03:30:18.982Z"
   },
@@ -136,7 +143,7 @@
     "anio": 2023,
     "linkPdf": "https://fundacionazara.org.ar/img/campamentos-de-aventura/capamentos-de-aventura-numero-1-2017.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2016/11/campamentos-de-aventura-450.jpg",
-    "coleccion": "Cuadernillos",
+    "categoria": "Cuadernillos",
     "fechaExtraccion": "2026-09-27T03:30:22.329Z"
   },
   {
@@ -146,7 +153,7 @@
     "anio": 2019,
     "linkPdf": "https://fundacionazara.org.ar/img/sedes/museo-almeida-suplemento-Diario-El-Dia-de-Gualeguaychu.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2019/08/museo-almeida-suplemento-Diario-El-Dia-de-Gualeguaychu-450.jpg",
-    "coleccion": "Cuadernillos",
+    "categoria": "Cuadernillos",
     "fechaExtraccion": "2026-09-27T03:30:25.539Z"
   },
   {
@@ -156,7 +163,7 @@
     "anio": 2023,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/Astroalfabeto.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/astroalfabeto-450.jpg",
-    "coleccion": "Posters de Geología",
+    "categoria": "Posters de Geología",
     "fechaExtraccion": "2026-09-27T03:30:33.023Z"
   },
   {
@@ -166,7 +173,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-geologia-minerales-rocas.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Minerales-y-rocas-450.jpg",
-    "coleccion": "Posters de Geología",
+    "categoria": "Posters de Geología",
     "fechaExtraccion": "2026-09-27T03:30:36.379Z"
   },
   {
@@ -176,7 +183,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-geologia-volcanes.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Volcanes-450.jpg",
-    "coleccion": "Posters de Geología",
+    "categoria": "Posters de Geología",
     "fechaExtraccion": "2026-09-27T03:30:40.330Z"
   },
   {
@@ -186,7 +193,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/buenos-aires-hace-12-mil.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/buenos-aires-hace-12-mil.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:30:48.030Z"
   },
   {
@@ -196,7 +203,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-darwin.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Darwin-450.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:30:51.645Z"
   },
   {
@@ -206,7 +213,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-paleontologia-dinosaurios.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Dinosaurios-de-la-Argentina-2013-450.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:30:55.059Z"
   },
   {
@@ -216,7 +223,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/dinosaurios-argentina.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Dinosaurios-de-la-Argentina-2014-450.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:30:58.433Z"
   },
   {
@@ -226,7 +233,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/dinosaurios-de-la-patagonia.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/dinosaurios-de-la-patagonia.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:01.739Z"
   },
   {
@@ -236,7 +243,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/Dinosaurios-del-mundo.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/10/Dinosaurios-del-mundo.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:05.697Z"
   },
   {
@@ -246,7 +253,7 @@
     "anio": 2025,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/especies-fosiles-descubiertas-por-la-fundacion-azara-2024.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/especies-fosiles-descubiertas-por-la-fundacion-azara-2024.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:09.195Z"
   },
   {
@@ -256,7 +263,7 @@
     "anio": 2017,
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/04/Evolucion-de-las-aves-450-ok.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:12.719Z"
   },
   {
@@ -266,7 +273,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-paleontologia-evolucion-humana-01.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/evolucion-humana-450.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:18.537Z"
   },
   {
@@ -276,7 +283,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/fauna-extinta-del-terciario-de-la-patagonia.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/fauna-extinta-del-terciario-de-la-patagonia.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:21.899Z"
   },
   {
@@ -286,7 +293,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-paleontologia-evolucion-humana-02.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/haciendonos-humanos-450.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:25.083Z"
   },
   {
@@ -296,7 +303,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/los-fosiles.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Los-fosiles-450.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:28.792Z"
   },
   {
@@ -306,7 +313,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/mamiferos-extintos-del-pleistoceno-pampeano.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/mamiferos-extintos-del-pleistoceno-pampeano.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:32.078Z"
   },
   {
@@ -316,7 +323,7 @@
     "anio": 2017,
     "linkPdf": null,
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/04/megafauna-sudamericana-450-ok.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:35.889Z"
   },
   {
@@ -326,7 +333,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/megafauna-sudamericana.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/megafauna-sudamericana-450.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:39.004Z"
   },
   {
@@ -336,7 +343,7 @@
     "anio": 2022,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/mi-alfabeto.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/mi-alfabeto-450.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:42.213Z"
   },
   {
@@ -346,7 +353,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/Neuquen-hace-85-millones.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/Neuquen-hace-85-millones-450.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:45.485Z"
   },
   {
@@ -356,7 +363,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/patagonia-hace-15-millones.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/patagonia-hace-15-millones-450.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:48.467Z"
   },
   {
@@ -366,7 +373,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/pterosaurios-sudamericanos.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/pterosaurios-sudamericanos.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:52.305Z"
   },
   {
@@ -376,7 +383,7 @@
     "anio": 2025,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/rio-negro-hace-100-millones-de-anos-la-buitrera-ok.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/07/rio-negro-hace-100-millones-de-anos-la-buitrera.jpg",
-    "coleccion": "Posters de Paleontología",
+    "categoria": "Posters de Paleontología",
     "fechaExtraccion": "2026-09-27T03:31:55.925Z"
   },
   {
@@ -386,7 +393,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/acciones-cuidar-ambiente.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/04/10-acciones-para-cuidar-el-ambiente-450.jpg",
-    "coleccion": "Posters de Ambiente",
+    "categoria": "Posters de Ambiente",
     "fechaExtraccion": "2026-09-27T03:32:02.614Z"
   },
   {
@@ -396,7 +403,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/agua-dulce.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Agua-dulce-recurso-vital-y-escaso-450.jpg",
-    "coleccion": "Posters de Ambiente",
+    "categoria": "Posters de Ambiente",
     "fechaExtraccion": "2026-09-27T03:32:06.203Z"
   },
   {
@@ -406,7 +413,7 @@
     "anio": 2020,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/afiche-coronavirus-azara.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Coronavirus-un-problema-ambiental-con-efecto-sanitario-450.jpg",
-    "coleccion": "Posters de Ambiente",
+    "categoria": "Posters de Ambiente",
     "fechaExtraccion": "2026-09-27T03:32:11.223Z"
   },
   {
@@ -416,7 +423,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/naturaleza-sin-basura.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/naturaleza-sin-basura-450.jpg",
-    "coleccion": "Posters de Ambiente",
+    "categoria": "Posters de Ambiente",
     "fechaExtraccion": "2026-09-27T03:32:14.183Z"
   },
   {
@@ -426,7 +433,7 @@
     "anio": 2017,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/trafico-de-fauna.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Trafico-ilegal-de-fauna-silvestre-450.jpg",
-    "coleccion": "Posters de Ambiente",
+    "categoria": "Posters de Ambiente",
     "fechaExtraccion": "2026-09-27T03:32:17.213Z"
   },
   {
@@ -436,7 +443,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/aguilas.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/aguilas-misioneras-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:32:24.777Z"
   },
   {
@@ -446,7 +453,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/artropodos-argentina.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Artropodos-de-la-Argentina-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:32:27.812Z"
   },
   {
@@ -456,7 +463,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/aves-sur-misionero.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Aves-del-sur-de-Misionero-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:32:31.442Z"
   },
   {
@@ -466,7 +473,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/mamiferos-marinos-ballenas.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/04/ballena-franca-austral-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:32:34.457Z"
   },
   {
@@ -476,7 +483,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/biodiversidad-de-los-talares-bonaerenses.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/biodiversidad-de-los-talares-bonaerenses.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:32:37.479Z"
   },
   {
@@ -486,7 +493,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/biodiversidad-del-bosque-andino-patagonico-ok.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/biodiversidad-del-bosque-andino-patagonico.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:32:40.624Z"
   },
   {
@@ -496,7 +503,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/campos-malezales.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Campos-y-malezales-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:32:44.124Z"
   },
   {
@@ -506,7 +513,7 @@
     "anio": 2019,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-Cauquenes-o-avutardas.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Cauquenes-o-avutardas-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:32:47.584Z"
   },
   {
@@ -516,7 +523,7 @@
     "anio": 2019,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-circuito-del-trafico-ilegal-de-fauna-silvestre.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/circuito-del-trafico-ilegal-de-fauna-silvestre-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:32:51.145Z"
   },
   {
@@ -526,7 +533,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-conservacion-manchones-de-pino-parana.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Conservacion-de-los-ultimos-manchones-de-pino-parana-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:32:54.617Z"
   },
   {
@@ -536,7 +543,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-delfines.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/delfines-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:32:58.169Z"
   },
   {
@@ -546,7 +553,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-ecorregiones.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Ecorregiones-de-la-Argentina-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:01.099Z"
   },
   {
@@ -556,7 +563,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/el-nandu.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/el-nandu-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:04.597Z"
   },
   {
@@ -566,7 +573,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/especies-amenazadas.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/especies-amenazadas.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:07.505Z"
   },
   {
@@ -576,7 +583,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/especies-en-peligro-poster.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Especies-en-peligro-de-la-Argentina-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:10.974Z"
   },
   {
@@ -586,7 +593,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/fauna-alrededores-buenos-aires.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Fauna-de-los-alrededores-de-Buenos-Aires-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:14.852Z"
   },
   {
@@ -596,7 +603,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/delta-parana.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/La-naturaleza-del-bajo-delta-del-Parana-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:20.239Z"
   },
   {
@@ -606,7 +613,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/las-pampas.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/las-pampas-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:23.712Z"
   },
   {
@@ -616,7 +623,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/mamiferos-misiones.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Mamiferos-de-Misiones-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:27.282Z"
   },
   {
@@ -626,7 +633,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/Poster-Mariscos-Marea-Roja.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Mariscos-del-golfo-San-Matias-y-la-marea-roja-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:30.289Z"
   },
   {
@@ -636,7 +643,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/peces-apipe.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Peces-de-Apipe-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:33.833Z"
   },
   {
@@ -646,7 +653,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/peces-del-delta.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Peces-del-delta-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:37.459Z"
   },
   {
@@ -656,7 +663,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/peces-del-lago-urugua-i.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Peces-del-lago-Urugua-i-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:40.806Z"
   },
   {
@@ -666,7 +673,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/peces-del-parana.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/04/peces-parana-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:43.845Z"
   },
   {
@@ -676,7 +683,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/puma-de-las-pampas.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/04/puma-de-las-pampas-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:47.365Z"
   },
   {
@@ -686,7 +693,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-refugios-del-pastizal.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Refugios-del-pastizal-450.jpg",
-    "coleccion": "Posters de Biodiversidad",
+    "categoria": "Posters de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:33:50.391Z"
   },
   {
@@ -696,7 +703,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-arqueologia-general.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Arqueologia-en-la-Argentina-450.jpg",
-    "coleccion": "Posters de Antropología, Historia y Patrimonio",
+    "categoria": "Posters de Antropología, Historia y Patrimonio",
     "fechaExtraccion": "2026-09-27T03:33:56.262Z"
   },
   {
@@ -706,7 +713,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-sociedades-originarias.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Arqueologia-Sociedades-originarias-450.jpg",
-    "coleccion": "Posters de Antropología, Historia y Patrimonio",
+    "categoria": "Posters de Antropología, Historia y Patrimonio",
     "fechaExtraccion": "2026-09-27T03:33:59.808Z"
   },
   {
@@ -716,7 +723,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/shincal-quimivil.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/El-Shincal-de-Quimivil-un-sitio-incaico-en-Catamarca-450.jpg",
-    "coleccion": "Posters de Antropología, Historia y Patrimonio",
+    "categoria": "Posters de Antropología, Historia y Patrimonio",
     "fechaExtraccion": "2026-09-27T03:34:03.127Z"
   },
   {
@@ -726,7 +733,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/felix-de-azara.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/felix-de-azara.jpg",
-    "coleccion": "Posters de Antropología, Historia y Patrimonio",
+    "categoria": "Posters de Antropología, Historia y Patrimonio",
     "fechaExtraccion": "2026-09-27T03:34:05.991Z"
   },
   {
@@ -736,7 +743,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-etnografia-mascaras.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Mascaras-de-pueblos-originarios-450.jpg",
-    "coleccion": "Posters de Antropología, Historia y Patrimonio",
+    "categoria": "Posters de Antropología, Historia y Patrimonio",
     "fechaExtraccion": "2026-09-27T03:34:12.522Z"
   },
   {
@@ -746,7 +753,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/patrimonio-catamarca.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Patrimonio-natural-y-cultural-de-Catamarca-450.jpg",
-    "coleccion": "Posters de Antropología, Historia y Patrimonio",
+    "categoria": "Posters de Antropología, Historia y Patrimonio",
     "fechaExtraccion": "2026-09-27T03:34:16.011Z"
   },
   {
@@ -756,7 +763,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/poster-etnografia-vestimenta.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Vestimenta-y-accesorios-de-los-pueblos-originarios-450.jpg",
-    "coleccion": "Posters de Antropología, Historia y Patrimonio",
+    "categoria": "Posters de Antropología, Historia y Patrimonio",
     "fechaExtraccion": "2026-09-27T03:34:19.619Z"
   },
   {
@@ -766,7 +773,7 @@
     "anio": 2021,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/Aves-de-Centinela-del-Mar.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/09/Aves-de-Centinela-del-Mar-420-450.jpg",
-    "coleccion": "Cartillas",
+    "categoria": "Cartillas",
     "fechaExtraccion": "2026-09-27T03:34:28.299Z"
   },
   {
@@ -776,7 +783,7 @@
     "anio": 2021,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/Aves-de-Utracan.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Aves-de-Utracan-450.jpg",
-    "coleccion": "Cartillas",
+    "categoria": "Cartillas",
     "fechaExtraccion": "2026-09-27T03:34:32.549Z"
   },
   {
@@ -786,7 +793,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/aves-pastizales-dunas.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/09/Aves-de-los-pastizales-de-dunas-420-450.jpg",
-    "coleccion": "Cartillas",
+    "categoria": "Cartillas",
     "fechaExtraccion": "2026-09-27T03:34:36.774Z"
   },
   {
@@ -796,7 +803,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/Aves-del-jardin-del-Museo-Jacobacci.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/aves-del-jardin-del-museo-jacobacci-450.jpg",
-    "coleccion": "Cartillas",
+    "categoria": "Cartillas",
     "fechaExtraccion": "2026-09-27T03:34:40.246Z"
   },
   {
@@ -806,7 +813,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/fauna-golfo-san-matias-01.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/aves-marinas-y-playeras-del-golfo-san-matias-450.jpg",
-    "coleccion": "Cartillas",
+    "categoria": "Cartillas",
     "fechaExtraccion": "2026-09-27T03:34:44.480Z"
   },
   {
@@ -816,7 +823,7 @@
     "anio": 2022,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/cauquenes-migratorios-buenas-practicas-para-productores.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/cauquenes-migratorios-buenas-practicas-para-productores-450.jpg",
-    "coleccion": "Cartillas",
+    "categoria": "Cartillas",
     "fechaExtraccion": "2026-09-27T03:34:48.850Z"
   },
   {
@@ -826,7 +833,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/cauquenes-o-avutardas-migratorias.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/cauquenes-o-avutardas-migratorias-450.jpg",
-    "coleccion": "Cartillas",
+    "categoria": "Cartillas",
     "fechaExtraccion": "2026-09-27T03:34:53.145Z"
   },
   {
@@ -836,7 +843,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/cartilla-isla-mejillon.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/isla-mejillon-cartilla-de-identificacion-de-invertebrado-450.jpg",
-    "coleccion": "Cartillas",
+    "categoria": "Cartillas",
     "fechaExtraccion": "2026-09-27T03:34:56.756Z"
   },
   {
@@ -846,7 +853,7 @@
     "anio": 2024,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/lechuzon-de-campo-cartilla.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2024/11/lechuzon-de-campo-cartilla.jpg",
-    "coleccion": "Cartillas",
+    "categoria": "Cartillas",
     "fechaExtraccion": "2026-09-27T03:35:00.813Z"
   },
   {
@@ -856,7 +863,7 @@
     "anio": 2021,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/lista-de-aves-del-parque-don-tomas.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/lista-de-aves-del-parque-don-tomas-450.jpg",
-    "coleccion": "Cartillas",
+    "categoria": "Cartillas",
     "fechaExtraccion": "2026-09-27T03:35:04.869Z"
   },
   {
@@ -866,7 +873,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/fauna-golfo-san-matias-02.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/mamiferos-marinos-del-golfo-san-matias-450.jpg",
-    "coleccion": "Cartillas",
+    "categoria": "Cartillas",
     "fechaExtraccion": "2026-09-27T03:35:09.087Z"
   },
   {
@@ -876,7 +883,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/folleto-aguila-coronada.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/aguila-coronada-guardiana-del-monte-450.jpg",
-    "coleccion": "Folletos de Biodiversidad",
+    "categoria": "Folletos de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:35:18.704Z"
   },
   {
@@ -886,7 +893,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/folleto-dunas-costeras.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/dunas-costeras-de-buenos-aires-450.jpg",
-    "coleccion": "Folletos de Biodiversidad",
+    "categoria": "Folletos de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:35:22.023Z"
   },
   {
@@ -896,8 +903,18 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/animales-silvestres.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Los-animales-silvestres-no-son-mascotas-450.jpg",
-    "coleccion": "Folletos de Biodiversidad",
+    "categoria": "Folletos de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:35:25.592Z"
+  },
+  {
+    "id": "lib-y3i527hr",
+    "titulo": "Mariscos del golfo San Matías y la marea roja",
+    "autor": null,
+    "anio": 2017,
+    "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/Poster-Mariscos-Marea-Roja.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/07/Mariscos-del-golfo-San-Matias-y-la-marea-roja-450.jpg",
+    "categoria": "Posters de Biodiversidad",
+    "fechaExtraccion": "2026-09-27T03:33:30.289Z"
   },
   {
     "id": "lib-asjjqzca",
@@ -906,7 +923,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/folleto-tatu-carreta.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/04/tatu-carreta-un-gigante-del-pasado-450-ok.jpg",
-    "coleccion": "Folletos de Biodiversidad",
+    "categoria": "Folletos de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:35:32.854Z"
   },
   {
@@ -916,7 +933,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/triptico-yaguarete.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Yaguarete-450.jpg",
-    "coleccion": "Folletos de Biodiversidad",
+    "categoria": "Folletos de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:35:36.508Z"
   },
   {
@@ -926,7 +943,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/triptico-yaguaret-monumento.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/yaguarete-monumento-natural-450.jpg",
-    "coleccion": "Folletos de Biodiversidad",
+    "categoria": "Folletos de Biodiversidad",
     "fechaExtraccion": "2026-09-27T03:35:40.046Z"
   },
   {
@@ -936,7 +953,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/shincal-quimivil-2015.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/El-Shincal-de-Quimivil-450.jpg",
-    "coleccion": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
+    "categoria": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
     "fechaExtraccion": "2026-09-27T03:35:48.222Z",
     "linkPdfEn": "http://www.fundacionazara.org.ar/img/recursos-educativos/shincal-quimivil-english.pdf"
   },
@@ -947,7 +964,7 @@
     "anio": 2023,
     "linkPdf": "https://fundacionazara.org.ar/img/sedes/Folleto-Museo-Miramar.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/09/folleto-miramar-420-450.jpg",
-    "coleccion": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
+    "categoria": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
     "fechaExtraccion": "2026-09-27T03:35:51.951Z"
   },
   {
@@ -957,7 +974,7 @@
     "anio": 2019,
     "linkPdf": "https://fundacionazara.org.ar/img/sedes/museo-almeida-folleto.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/09/Museo-Almeida-420-450.jpg",
-    "coleccion": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
+    "categoria": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
     "fechaExtraccion": "2026-09-27T03:35:55.493Z"
   },
   {
@@ -967,7 +984,7 @@
     "anio": 2018,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/Museo-Folklorico.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/09/Museo-Folklorico-420-450.jpg",
-    "coleccion": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
+    "categoria": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
     "fechaExtraccion": "2026-09-27T03:35:58.282Z"
   },
   {
@@ -977,7 +994,7 @@
     "anio": 2017,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/Folleto-Museo-Jacobacci.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2021/09/Museo-Jacobacci-420-450.jpg",
-    "coleccion": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
+    "categoria": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
     "fechaExtraccion": "2026-09-27T03:36:01.806Z"
   },
   {
@@ -987,7 +1004,7 @@
     "anio": 2017,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/delta-terra.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Paisaje-Protegido-Delta-Terra-450.jpg",
-    "coleccion": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
+    "categoria": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
     "fechaExtraccion": "2026-09-27T03:36:05.159Z"
   },
   {
@@ -997,7 +1014,7 @@
     "anio": 2023,
     "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/punta-bermeja.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Reserva-Faunistica-Punta-Bermeja-450.jpg",
-    "coleccion": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
+    "categoria": "Folletos de Museos, Sitios Arqueológicos y Áreas Naturales Protegidas",
     "fechaExtraccion": "2026-09-27T03:36:11.314Z"
   },
   {
@@ -1007,7 +1024,7 @@
     "anio": 2025,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/franciscana-o-delfin-del-plata.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/08/franciscana-o-delfin-del-plata.jpg",
-    "coleccion": "Postales",
+    "categoria": "Postales",
     "fechaExtraccion": "2026-09-27T03:36:17.999Z"
   },
   {
@@ -1017,7 +1034,7 @@
     "anio": 2025,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/postal-margarita-de-las-dunas.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/postal-margarita-de-las-dunas.jpg",
-    "coleccion": "Postales",
+    "categoria": "Postales",
     "fechaExtraccion": "2026-09-27T03:36:21.697Z"
   },
   {
@@ -1027,8 +1044,18 @@
     "anio": 2025,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/postal-guitarra-grande.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/12/guitarra-grande.jpg",
-    "coleccion": "Postales",
+    "categoria": "Postales",
     "fechaExtraccion": "2026-09-27T03:36:25.265Z"
+  },
+  {
+    "id": "lib-dke4qv14",
+    "titulo": "Margarita de las dunas",
+    "autor": null,
+    "anio": 2025,
+    "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/postal-margarita-de-las-dunas.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/postal-margarita-de-las-dunas.jpg",
+    "categoria": "Postales",
+    "fechaExtraccion": "2026-09-27T03:36:21.697Z"
   },
   {
     "id": "lib-5mye8ppq",
@@ -1037,7 +1064,7 @@
     "anio": 2023,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/postal-mariposa-bandera-argentina.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/postal-mariposa-bandera-argentina-450.jpg",
-    "coleccion": "Postales",
+    "categoria": "Postales",
     "fechaExtraccion": "2026-09-27T03:36:32.304Z"
   },
   {
@@ -1047,7 +1074,7 @@
     "anio": 2023,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/postal-mojarra-desnuda.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/postal-mojarra-desnuda-450.jpg",
-    "coleccion": "Postales",
+    "categoria": "Postales",
     "fechaExtraccion": "2026-09-27T03:36:35.895Z"
   },
   {
@@ -1057,7 +1084,7 @@
     "anio": 2023,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/postal-ombusillo.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/postal-ombusillo-450.jpg",
-    "coleccion": "Postales",
+    "categoria": "Postales",
     "fechaExtraccion": "2026-09-27T03:36:39.494Z"
   },
   {
@@ -1067,8 +1094,18 @@
     "anio": 2025,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/postal-gatopardo-pintarroja.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/04/postal-gatopardo-pintarroja.jpg",
-    "coleccion": "Postales",
+    "categoria": "Postales",
     "fechaExtraccion": "2026-09-27T03:36:43.083Z"
+  },
+  {
+    "id": "lib-nipbt1x3",
+    "titulo": "Yaguareté",
+    "autor": null,
+    "anio": 2017,
+    "linkPdf": "http://www.fundacionazara.org.ar/img/recursos-educativos/triptico-yaguarete.pdf",
+    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/03/Yaguarete-450.jpg",
+    "categoria": "Folletos de Biodiversidad",
+    "fechaExtraccion": "2026-09-27T03:35:36.508Z"
   },
   {
     "id": "lib-i1l50v91",
@@ -1077,17 +1114,7 @@
     "anio": 2023,
     "linkPdf": "https://fundacionazara.org.ar/img/recursos-educativos/postal-zorro-malvinero.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2023/05/postal-zorro-malvinero-450-ok.jpg",
-    "coleccion": "Postales",
+    "categoria": "Postales",
     "fechaExtraccion": "2026-09-27T03:36:50.314Z"
-  },
-  {
-    "id": "lib-abb07550",
-    "titulo": "Guacamayo Militar",
-    "autor": null,
-    "anio": 2025,
-    "linkPdf": null,
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/postal-guacamayo-militar-300x199.jpg",
-    "coleccion": "Postales",
-    "fechaExtraccion": "2026-09-27T03:53:17.966Z"
   }
 ]

@@ -83,7 +83,7 @@ Los libros están organizados en **13 categorías**. Actualmente **334 libros li
 
 > **Nota:** Los campos `descripcion` y `paginas` fueron eliminados del schema por no estar disponibles en el sitio.
 
-> **Campos de runtime (los agrega el backend, NO están en el archivo):** `seccion` (de la carpeta: `libros` \| `recursos` \| `periodico-exploracion-y-ciencia` \| `revista-azara`) y `categorias` (array con **todas** las categorías donde figura el ítem). Algunos ítems traen además `coleccion` (subgrupo, p. ej. en Recursos Educativos) y `titulares` (solo hemeroteca).
+> **`seccion`** (de la carpeta: `libros` \| `recursos-educativos` \| `periodico-exploracion-y-ciencia` \| `revista-azara`) y **`categorias`** (array con **todas** las categorías donde figura el ítem) los agrega el backend en runtime: NO están en el archivo. En **Recursos Educativos** el archivo trae `categoria` (los 10 grupos) y opcionalmente `coleccion` (serie hiperespecífica). En hemeroteca, `categoria` viaja en el archivo y `titulares` es opcional.
 
 ## 🏗️ Arquitectura del Proyecto
 
@@ -153,7 +153,7 @@ azara/
 │   │   │   └── categorias.js    ← endpoint /api/categorias
 │   │   └── data/
 │   │       ├── libros/                     ← 13 archivos (uno por categoría)
-│   │       ├── recursos/                   ← recursos-educativos.json (coleccion = subgrupo)
+│   │       ├── recursos-educativos/        ← Recursos Educativos (categoria = grupo; coleccion = serie)
 │   │       ├── periodico-exploracion-y-ciencia/  ← Periódico (hemeroteca)
 │   │       └── revista-azara/              ← Revista Azara (hemeroteca)
 │   ├── scripts/
@@ -188,9 +188,10 @@ azara/
 | GET | `/api/catalogo/stats/general` | Estadísticas: totales + desglose por sección |
 | GET | `/api/catalogo/categorias/lista` | Categorías (metadata: nombre, slug, cantidad, url) |
 | GET | `/api/catalogo/colecciones/lista` | Colecciones/series (metadata, sin ítems) |
-| GET | `/api/categorias` | Categorías con su `seccion` (la usa el bot para navegar) |
+| GET | `/api/secciones` | Las 4 secciones: naturaleza y subdivisiones (categorías; cada categoría con sus colecciones) |
+| GET | `/api/categorias` | Todas las categorías con su `seccion` (la usa el bot para navegar) |
 
-> ⚠️ **No existe** un endpoint `/api/secciones`. Las secciones se obtienen del campo `seccion` de `/api/categorias`, o del array `secciones[]` de `/api/catalogo/stats/general`.
+> Cada categoría de `/api/categorias` trae su `seccion` (el bot filtra por ahí). `/api/secciones` da la vista anidada (sección → categorías → colecciones) para el bot y para descubrir la API.
 
 ### Parámetros de Query (GET /api/catalogo)
 
@@ -198,8 +199,8 @@ azara/
 |-----------|---------|-------------|
 | `busqueda` | `?busqueda=dinosaurio` | Busca en título, autor y titulares (ignora acentos/mayúsculas) |
 | `categoria` | `?categoria=Paleontologia` | Filtra por categoría (match EXACTO de nombre o slug) |
-| `coleccion` | `?coleccion=Cuadernillos` | Filtra por colección/serie (match parcial) |
-| `seccion` | `?seccion=revista-azara` | Filtra por sección (`libros` \| `recursos` \| `periodico-exploracion-y-ciencia` \| `revista-azara`) |
+| `coleccion` | `?coleccion=miradas` | Filtra por colección/serie (match parcial) |
+| `seccion` | `?seccion=revista-azara` | Filtra por sección (`libros` \| `recursos-educativos` \| `periodico-exploracion-y-ciencia` \| `revista-azara`) |
 | `pagina` | `?pagina=2` | Número de página (default `1`) |
 | `limite` | `?limite=20` | Ítems por página (default `20`) |
 
@@ -309,6 +310,9 @@ npx playwright install chromium
 
 # Scrapear categoría por defecto
 npm run scrape-pw
+
+# Scrapear una sección especifica
+npm run scrape-pw -- -seccion=recursos-educativos
 
 # Scrapear una categoría específica
 npm run scrape-pw -- --categoria=flora-y-fauna

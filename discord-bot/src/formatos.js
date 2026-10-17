@@ -5,17 +5,20 @@
  * de mensaje de Discord. Separadas de index.js para poder testear los
  * formatos sin levantar el servidor de interacciones.
  *
- * Convención de etiquetas (acordada con el usuario 2026-09-27):
+ * Convención de etiquetas:
  *   - Emoji de SECCIÓN primero: 📚 Libros | 🎓 Recursos educativos
  *   - Emoji de CATEGORÍA segundo: 📁 (la categoría REAL de navegación)
- *   - En RE la categoría real = coleccion (subgrupo: 'Cuadernillos', ...);
- *     'Recursos Educativos' es la SECCIÓN, no una categoría.
+ *   - La categoría visible = `categorias` (todas las del ítem), para TODAS las
+ *     secciones. En RE son los 10 grupos ('Cuadernillos', 'Posters de …', …).
+ *   - 🗂️ Colección = serie/desglose (p.ej. "Miradas de la Argentina", que es una
+ *     colección DENTRO de la categoría 'Cuadernillos'). Se muestra si el ítem
+ *     trae `coleccion`.
  *   - El enlace de PDF SIEMPRE al final del value del campo.
  */
 
 const SECCIONES_NOMBRES = {
   libros: 'Libros',
-  recursos: 'Recursos educativos',
+  'recursos-educativos': 'Recursos educativos',
   // Hemeroteca (PLANV3 V3.6): cada publicación periódica es una SECCIÓN.
   'periodico-exploracion-y-ciencia': 'Periódico Exploración y Ciencia',
   'revista-azara': 'Revista Azara'
@@ -23,7 +26,7 @@ const SECCIONES_NOMBRES = {
 
 const SECCIONES_EMOJIS = {
   libros: '📚',
-  recursos: '🎓',
+  'recursos-educativos': '🎓',
   'periodico-exploracion-y-ciencia': '🗞️',
   'revista-azara': '📰'
 };
@@ -36,21 +39,15 @@ const SECCIONES_HEMEROTECA = new Set(['periodico-exploracion-y-ciencia', 'revist
 
 /**
  * Datos de presentación de un ítem según su sección.
- * esRecursos: la categoría visible es la colección (subgrupo); si un ítem
- * de RE no tuviera coleccion (no debería pasar con opción A), cae a categorias.
- * En libros/hemeroteca la categoría visible = `categorias` (todas las del ítem,
- * unidas por " · "; normalmente una sola).
+ * categoriaReal = `categorias` del ítem (todas, unidas por " · "; normalmente una
+ * sola). En RE la categoría es el grupo del ítem ('Cuadernillos', 'Posters de …').
  */
 function infoSeccion(libro) {
-  const esRecursos = libro.seccion === 'recursos';
   const categorias = libro.categorias || [];
   return {
-    esRecursos,
     emoji: SECCIONES_EMOJIS[libro.seccion] || '📚',
     nombre: SECCIONES_NOMBRES[libro.seccion] || 'Libros',
-    categoriaReal: esRecursos
-      ? (libro.coleccion || categorias.join(' · ') || 'Desconocida')
-      : (categorias.join(' · ') || 'Desconocida')
+    categoriaReal: categorias.join(' · ') || 'Desconocida'
   };
 }
 
@@ -107,9 +104,9 @@ function construirMensajeBusqueda(termino, libros, pagina, total) {
   const fields = libros.map(libro => {
     const sec = infoSeccion(libro);
     let value = `${sec.emoji} ${sec.nombre} · 📁 ${sec.categoriaReal} · 🆔 \`${libro.id}\``;
-    // Colección de LIBROS (series/desgloses: desambigua "Tomo 02"); en RE la
-    // colección YA es la categoría mostrada arriba, no se repite.
-    if (!sec.esRecursos && libro.coleccion) value += `\n🗂️ ${libro.coleccion}`;
+    // Colección (serie/desglose: desambigua "Tomo 02"; en RE, "Miradas de la
+    // Argentina" dentro de Cuadernillos).
+    if (libro.coleccion) value += `\n🗂️ ${libro.coleccion}`;
     // Contexto del match de HEMEROTECA: "• " + titular(es) coincidente(s) (misma
     // convención que /ficha). Solo si el término está en algún titular; si el
     // match vino por el título de la edición, no se agrega línea extra.
@@ -162,7 +159,7 @@ function construirMensajeBusqueda(termino, libros, pagina, total) {
 
 /**
  * Paso 1 de /categorias: embed + Select Menu de SECCIONES.
- * secciones: [{ seccion: 'libros'|'recursos', nombre, cantidad, categorias }]
+ * secciones: [{ seccion: 'libros'|'recursos-educativos'|…, nombre, cantidad, categorias }]
  */
 function construirMensajeSecciones(secciones, totalItems) {
   const options = secciones.map(sec => ({
@@ -200,7 +197,7 @@ function construirMensajeSecciones(secciones, totalItems) {
 function construirMensajeCategoriasSeccion(sec, categorias, totalItems) {
   const emoji = SECCIONES_EMOJIS[sec] || '📚';
   const nombre = SECCIONES_NOMBRES[sec] || 'Libros';
-  const unidad = SECCIONES_HEMEROTECA.has(sec) ? 'ediciones' : (sec === 'recursos' ? 'ítems' : 'libros');
+  const unidad = SECCIONES_HEMEROTECA.has(sec) ? 'ediciones' : (sec === 'recursos-educativos' ? 'ítems' : 'libros');
   const options = categorias.map(cat => ({
     label: cat.nombre,
     value: cat.nombre,
@@ -234,7 +231,7 @@ function construirMensajeCategoriasSeccion(sec, categorias, totalItems) {
 
 /**
  * Embed + botones de paginación + volver para los ítems de una categoría.
- * sec: sección de origen ('libros' | 'recursos') — se usa en los custom_ids
+ * sec: sección de origen ('libros' | 'recursos-educativos' | …) — se usa en los custom_ids
  * del botón Volver (cat-back) y de la paginación (cat-page).
  */
 function construirMensajeCategoriaLibros(sec, nombreCategoria, libros, pagina, total) {
@@ -243,11 +240,10 @@ function construirMensajeCategoriaLibros(sec, nombreCategoria, libros, pagina, t
   const nombreSeccion = SECCIONES_NOMBRES[sec] || 'Libros';
 
   const fields = libros.map(libro => {
-    const info = infoSeccion(libro);
     let value = `🆔 \`${libro.id}\``;
-    // En el listado de una categoría de LIBROS, los ítems de serie muestran su
-    // colección (desambigua "Tomo NN"); en RE la colección es la categoría visitada.
-    if (!info.esRecursos && libro.coleccion) value += `\n🗂️ ${libro.coleccion}`;
+    // Ítems de serie/desglose muestran su colección (desambigua "Tomo NN");
+    // aplica igual a "Miradas de la Argentina" dentro de Cuadernillos (RE).
+    if (libro.coleccion) value += `\n🗂️ ${libro.coleccion}`;
     value += '\n' + enlacesPdf(libro);
     return { name: libro.titulo.substring(0, 256), value };
   });
@@ -325,8 +321,8 @@ function construirMensajeLibro(libro, mostrarTitulares) {
     { name: '📅 Año', value: libro.anio ? libro.anio.toString() : 'Desconocido', inline: true }
   ];
 
-  // Colección de LIBROS (series/desgloses "Tomo 02"); en RE ya está en Categoría.
-  if (!sec.esRecursos && libro.coleccion) {
+  // Colección (serie/desglose: "Tomo 02"; en RE, "Miradas de la Argentina").
+  if (libro.coleccion) {
     fields.push({ name: '🗂️ Colección', value: libro.coleccion, inline: false });
   }
 

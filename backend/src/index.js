@@ -26,16 +26,16 @@ app.get('/', (req, res) => {
   res.json({
     nombre: 'API Azara',
     descripcion: 'Catálogo de la Fundación Azara: libros, recursos educativos y hemeroteca.',
-    secciones: ['libros', 'recursos', 'periodico-exploracion-y-ciencia', 'revista-azara'],
+    secciones: ['libros', 'recursos-educativos', 'periodico-exploracion-y-ciencia', 'revista-azara'],
     endpoints: [
       {
         metodo: 'GET',
         ruta: '/api/catalogo',
         descripcion: 'Lista y filtra ítems de TODAS las secciones (paginado).',
         params: {
-          seccion: "slug de sección (ej. 'libros'); valor inexistente → 400",
-          categoria: "categoría temática — SOLO sección 'libros' (ej. 'ambiente')",
-          coleccion: "colección/serie — SOLO sección 'recursos' (ej. 'cuadernillos')",
+          seccion: "slug de sección (ej. 'libros', 'recursos-educativos'); inexistente → 400",
+          categoria: "categoría temática de CUALQUIER sección (ej. 'ambiente', 'cuadernillos'); nombre o slug; inexistente → 400",
+          coleccion: "colección/serie (ej. 'miradas', 'trazos'); parcial, inexistente → 400",
           busqueda: 'texto libre en título, autor y titulares (sin coincidencias → 200 vacío)',
           pagina: 'nº de página (def. 1)',
           limite: 'ítems por página (def. 20)'
@@ -43,10 +43,10 @@ app.get('/', (req, res) => {
       },
       { metodo: 'GET', ruta: '/api/catalogo/:id', descripcion: 'Detalle de un ítem por id (404 si no existe).' },
       { metodo: 'GET', ruta: '/api/catalogo/stats/general', descripcion: 'Totales globales y desglose por sección.' },
-      { metodo: 'GET', ruta: '/api/catalogo/categorias/lista', descripcion: 'Unidades de navegación (una por archivo) con cantidad y url.' },
-      { metodo: 'GET', ruta: '/api/catalogo/colecciones/lista', descripcion: 'Colecciones/series (subgrupos de Recursos educativos).' },
-      { metodo: 'GET', ruta: '/api/secciones', descripcion: 'Las 4 secciones: naturaleza y subdivisiones (categorías vs colecciones).' },
-      { metodo: 'GET', ruta: '/api/categorias', descripcion: 'Unidades de navegación por sección (categorías de Libros, etc.).' }
+      { metodo: 'GET', ruta: '/api/catalogo/categorias/lista', descripcion: 'Categorías de todas las secciones, con cantidad y url.' },
+      { metodo: 'GET', ruta: '/api/catalogo/colecciones/lista', descripcion: 'Colecciones/series (con su metadata), de todas las secciones.' },
+      { metodo: 'GET', ruta: '/api/secciones', descripcion: 'Las 4 secciones: naturaleza y subdivisiones (categorías con sus colecciones).' },
+      { metodo: 'GET', ruta: '/api/categorias', descripcion: 'Unidades de navegación por sección.' }
     ]
   });
 });
