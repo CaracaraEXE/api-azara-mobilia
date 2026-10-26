@@ -57,8 +57,9 @@ const CATEGORIAS_RECURSOS = [
  * educativos comparten la MISMA estructura — sección → categorías planas → grilla →
  * página individual — y se scrapean con EL MISMO flujo (scrapearSeccion) y EL MISMO
  * extractor (obtenerDatosItem). La diferencia entre secciones es declarativa:
- *   - prefijoArchivo: base de los nombres de archivo ('libros' → libros-*.json,
- *     'recursos' → recursos-*.json, 'periodico-exploracion-y-ciencia' → su carpeta).
+ *   - prefijoArchivo: base de los nombres de archivo y de la CARPETA de la sección
+ *     ('libros' → libros-*.json, 'recursos-educativos' → recursos-educativos.json,
+ *     'periodico-exploracion-y-ciencia' → su carpeta).
  *   - archivoUnico: false (Libros) → 1 archivo por categoría; true (Recursos educativos
  *     y Hemeroteca) → 1 archivo por sección ({slug}.json, fix V3.6).
  * HEMEROTECA (PLANV3 V3.6, 2026-09-27): la ÚNICA excepción con extractores propios —
@@ -79,8 +80,8 @@ const SECCIONES = [
     tipo: 'recursos',
     nombre: 'Recursos educativos',
     slug: 'recursos-educativos',
-    prefijoArchivo: 'recursos',
-    archivoUnico: true, // 1 archivo recursos-educativos.json con coleccion = categoría
+    prefijoArchivo: 'recursos-educativos', // carpeta + archivo homónimos (data/recursos-educativos/)
+    archivoUnico: true, // 1 archivo recursos-educativos.json con categoria = grupo
     categorias: CATEGORIAS_RECURSOS,
   },
   // Hemeroteca (PLANV3 V3.6, 2026-09-27): cada publicación periódica es una SECCIÓN
@@ -192,7 +193,11 @@ async function obtenerUrlsLibros(page, urlCategoria) {
   const urls = await page.$$eval('article a[href*="fundacionazara.org.ar"]', 
     links => links
       .map(a => a.href)
-      .filter(h => h.match(/https:\/\/fundacionazara\.org\.ar\/[a-z0-9-]+\/$/))
+      // FIX 2026-10-16: tolerar `www.` y slash final opcional. Antes exigía el host
+      // pelado `https://fundacionazara.org.ar/` → toda ficha enlazada con `www.`
+      // (el sitio mezcla hosts) quedaba DESCARTADA en silencio. Anclado a ambos
+      // lados → NO acepta subdominios (p.ej. educacion.fundacionazara.org.ar).
+      .filter(h => h.match(/^(?:https?:\/\/)(?:www\.)?fundacionazara\.org\.ar\/[a-z0-9-]+\/?$/))
   );
   
   const urlsUnicas = [...new Set(urls)];
@@ -859,9 +864,9 @@ async function obtenerDatosColeccion(page, coleccion) {
  * estables entre re-scrapes y para que un ítem publicado en 2 categorías comparta UN id.
  *
  * prefijo: 'libros' → solo libros-*.json (las categorías de libros se deduplican entre
- * sí, PLANV2 §10). 'recursos' → SOLO recursos-*.json: un recurso NUNCA se consolida
- * contra un libro automáticamente (PLANV3 §6); si comparte linkPdf/portada con un libro,
- * validar-data lo reporta y la verificación/decisión es humana.
+ * sí, PLANV2 §10). 'recursos-educativos' → SOLO recursos-educativos.json: un recurso
+ * NUNCA se consolida contra un libro automáticamente (PLANV3 §6); si comparte
+ * linkPdf/portada con un libro, validar-data lo reporta y la verificación es humana.
  */
 function construirIndiceGlobal(librosActuales, categoriaSlug, prefijo = 'libros') {
   const indice = new Map();
@@ -875,8 +880,8 @@ function construirIndiceGlobal(librosActuales, categoriaSlug, prefijo = 'libros'
   // y el re-scrape rompía el dedup "existente gana").
   const esDePrefijo = new RegExp(`^${prefijo}(-.+)?\\.json$`);
   const quitarPrefijo = new RegExp(`^${prefijo}-`);
-  // Cada sección vive en su propia carpeta (src/data/libros/, src/data/recursos/):
-  // el índice escanea SOLO la de la sección en curso.
+  // Cada sección vive en su propia carpeta (src/data/libros/,
+  // src/data/recursos-educativos/): el índice escanea SOLO la de la sección en curso.
   const dirSeccion = path.join(DATA_DIR, prefijo);
   if (fs.existsSync(dirSeccion)) {
     for (const f of fs.readdirSync(dirSeccion)) {
@@ -971,8 +976,8 @@ function registrarOConsolidar(indiceGlobal, datos) {
  *    categoría, con progreso incremental por categoría (temp .temp.json + reanudación
  *    desde N ítems).
  *  - archivoUnico: true (Recursos educativos) → 1 archivo {prefijo}-{slug}.json para
- *    toda la sección; `coleccion` de cada ítem = nombre de su categoría; el temp
- *    guarda las categorías completadas + los ítems acumulados (al retomar salta las
+ *    toda la sección; `categoria` de cada ítem = su grupo; el temp guarda las
+ *    categorías completadas + los ítems acumulados (al retomar salta las
  *    completadas y re-scrapea la categoría en curso — sus ítems se consolidan por id).
  */
 async function scrapearSeccion(browser, seccion) {
@@ -980,7 +985,7 @@ async function scrapearSeccion(browser, seccion) {
   
   const page = await browser.newPage();
   const prefijo = seccion.prefijoArchivo;
-  // Cada sección vive en su propia carpeta (libros/, recursos/, y las de hemeroteca:
+  // Cada sección vive en su propia carpeta (libros/, recursos-educativos/, y las de hemeroteca:
   // periodico-exploracion-y-ciencia/, revista-azara/); se crea al arrancar para que
   // la primera corrida no rompa el índice.
   const carpetaSeccion = path.join(DATA_DIR, prefijo);
@@ -998,6 +1003,7 @@ async function scrapearSeccion(browser, seccion) {
   // Progreso previo (modo archivo único): categorías completadas + ítems acumulados
   let categoriasCompletadas = new Set();
   let items = [];
+  let fallos = 0; // Fix A (2026-10-16): URLs listadas que NO produjeron ítem en la sección
   if (seccion.archivoUnico && fs.existsSync(rutaTemp)) {
     try {
       const previo = JSON.parse(fs.readFileSync(rutaTemp, 'utf-8'));
@@ -1061,8 +1067,14 @@ async function scrapearSeccion(browser, seccion) {
         continue;
       }
       
-      // Registrar un ítem individual (dedup + overrides). En modo archivo único,
-      // `coleccion` = categoría (la API agrupa por ?coleccion=).
+      // Fix A (2026-10-16): URLs del listado que NO produjeron ningún ítem en esta
+      // categoría (ficha con error de red, o "sin título"). Si hay alguna, la categoría
+      // queda INCOMPLETA → no se publica (ver cierre) y la corrida sale con exit code 1.
+      const urlsSinItem = [];
+
+      // Registrar un ítem individual (dedup + overrides). En modo archivo único
+      // (RE), `categoria` = el grupo (la API agrupa por ?categoria= y el desglose
+      // deja las series en `coleccion`).
       const registrarItem = (datos) => {
         if (!datos || !datos.titulo) {
           console.log('         ⚠️ Sin título (verificar URL)');
@@ -1074,7 +1086,7 @@ async function scrapearSeccion(browser, seccion) {
         // libros[0].categoria y el nombre visible no sea el slug capitalizado.
         const contexto = seccion.tipo === 'hemeroteca'
           ? { ...datos, categoria: seccion.nombre }
-          : (seccion.archivoUnico ? { ...datos, coleccion: categoria.nombre } : datos);
+          : (seccion.archivoUnico ? { ...datos, categoria: categoria.nombre } : datos);
         const { _duplicadoDe, ...item } = registrarOConsolidar(indiceGlobal, contexto);
         items.push(aplicarOverrides(item));
         console.log(_duplicadoDe
@@ -1104,7 +1116,11 @@ async function scrapearSeccion(browser, seccion) {
           if (itemsColeccion.length >= 1) {
             let reutilizados = 0;
             for (const item of itemsColeccion) {
-              const { _duplicadoDe, ...limpio } = registrarOConsolidar(indiceGlobal, item);
+              // En modo archivo único el GRUPO va en `categoria` (igual que un ítem
+              // suelto): el desglose de "Miradas de la Argentina" queda en Cuadernillos,
+              // con la serie en su propio `coleccion`.
+              const conGrupo = seccion.archivoUnico ? { ...item, categoria: categoria.nombre } : item;
+              const { _duplicadoDe, ...limpio } = registrarOConsolidar(indiceGlobal, conGrupo);
               items.push(aplicarOverrides(limpio));
               if (_duplicadoDe) reutilizados++;
             }
@@ -1144,11 +1160,14 @@ async function scrapearSeccion(browser, seccion) {
           ? `      📄 [${i + 1}/${urls.length}] ${nombreUrl}`
           : `      📖 [${i + 1}/${urls.length}]`);
         
+        const itemsAntes = items.length;
         try {
           await procesarUrl(url);
         } catch (error) {
           console.log(`      ❌ Error: ${error.message}`);
         }
+        // Fix A: si la URL no aportó ningún ítem (excepción o ficha vacía), quedó sin registrar.
+        if (items.length === itemsAntes) urlsSinItem.push(nombreUrl || '(sin nombre)');
         
         // Guardado incremental
         if (seccion.archivoUnico) {
@@ -1160,6 +1179,9 @@ async function scrapearSeccion(browser, seccion) {
         
         await esperar(800);
       }
+
+      // Fix A: acumular las URLs sin ítem de esta categoría (define si se publica).
+      fallos += urlsSinItem.length;
       
       // Cierre de categoría
       if (seccion.archivoUnico) {
@@ -1168,9 +1190,16 @@ async function scrapearSeccion(browser, seccion) {
         console.log(`      ✅ Categoría completada: ${categoria.nombre} — ${items.length} ítems acumulados`);
       } else {
         console.log(`   📊 Total extraídos en ${categoria.nombre}: ${items.length}`);
-        fs.writeFileSync(rutaCategoriaFinal, JSON.stringify(items, null, 2));
-        if (fs.existsSync(rutaCategoriaTemp)) fs.unlinkSync(rutaCategoriaTemp);
-        console.log(`   💾 Guardado en: ${path.basename(rutaCategoriaFinal)}`);
+        if (urlsSinItem.length > 0) {
+          // Fix A: la categoría quedó incompleta → NO sobrescribir (se perderían libros).
+          console.log(`   🛑 ${urlsSinItem.length} URL(s) listadas sin ítem — NO se sobrescribe ${path.basename(rutaCategoriaFinal)}`);
+          urlsSinItem.forEach(n => console.log(`      ⚠️  ${n}`));
+          if (fs.existsSync(rutaCategoriaTemp)) fs.unlinkSync(rutaCategoriaTemp);
+        } else {
+          fs.writeFileSync(rutaCategoriaFinal, JSON.stringify(items, null, 2));
+          if (fs.existsSync(rutaCategoriaTemp)) fs.unlinkSync(rutaCategoriaTemp);
+          console.log(`   💾 Guardado en: ${path.basename(rutaCategoriaFinal)}`);
+        }
         items = []; // reiniciar para la próxima categoría (modo por categoría)
       }
     }
@@ -1178,12 +1207,18 @@ async function scrapearSeccion(browser, seccion) {
     // Cierre de sección (modo archivo único)
     if (seccion.archivoUnico) {
       console.log(`   📊 Total en sección ${seccion.nombre}: ${items.length}`);
-      fs.writeFileSync(rutaFinal, JSON.stringify(items, null, 2));
-      if (fs.existsSync(rutaTemp)) fs.unlinkSync(rutaTemp);
-      console.log(`   💾 Guardado en: ${path.basename(rutaFinal)}`);
+      if (fallos > 0) {
+        // Fix A: hubo URL(s) sin ítem → NO publicar la data incompleta de la sección.
+        console.log(`   🛑 ${fallos} URL(s) sin ítem en la sección — NO se sobrescribe ${path.basename(rutaFinal)}`);
+        if (fs.existsSync(rutaTemp)) fs.unlinkSync(rutaTemp);
+      } else {
+        fs.writeFileSync(rutaFinal, JSON.stringify(items, null, 2));
+        if (fs.existsSync(rutaTemp)) fs.unlinkSync(rutaTemp);
+        console.log(`   💾 Guardado en: ${path.basename(rutaFinal)}`);
+      }
     }
     
-    return { ...seccion, items };
+    return { ...seccion, items, fallos };
     
   } finally {
     await page.close();
@@ -1246,13 +1281,22 @@ async function run() {
   const browser = await chromium.launch({ headless: true });
   
   try {
+    let fallosTotales = 0; // Fix A: URLs sin ítem en toda la corrida (define el exit code)
     for (const seccion of objetivo) {
-      await scrapearSeccion(browser, seccion);
+      const resultado = await scrapearSeccion(browser, seccion);
+      fallosTotales += resultado.fallos || 0;
       await esperar(2000);
     }
     
     console.log('\n═══════════════════════════════════════════════════════════');
-    console.log('✅ Scraping completado!');
+    if (fallosTotales > 0) {
+      // Fix A: falló al menos una ficha → data NO sobrescrita donde hubo fallos.
+      console.log(`⚠️  Scraping completado CON FALLOS: ${fallosTotales} URL(s) sin ítem.`);
+      console.log('    Los archivos de las categorías afectadas NO se sobrescribieron (ver arriba).');
+      process.exitCode = 1;
+    } else {
+      console.log('✅ Scraping completado!');
+    }
     console.log('═══════════════════════════════════════════════════════════');
     
   } finally {
@@ -1288,5 +1332,6 @@ module.exports = {
   normalizarHostUrl,
   normalizarTexto,
   parsearAutorAnio,
-  tituloDesdeFilename
+  tituloDesdeFilename,
+  clavesDeLibro // reutilizada por scripts/reportar-cambios.js (clave estable de obra)
 };

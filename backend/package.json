@@ -1,15 +1,17 @@
 {
   "name": "azara-backend",
-  "version": "1.0.0",
-  "description": "API REST para libros de la Fundación Azara",
+  "version": "2.0.0",
+  "description": "API REST del catálogo (libros + recursos educativos + hemeroteca) de la Fundación Azara",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
+    "test": "node test-integracion.js",
     "scrape": "node scripts/scraper.js",
     "scrape-pw": "node scripts/scraper-playwright.js",
     "scrape-todas": "node scripts/scraper-playwright.js --todas",
-    "validar:data": "node scripts/validar-data.js"
+    "validar:data": "node scripts/validar-data.js",
+    "reporte:data": "node scripts/reportar-cambios.js"
   },
   "keywords": [
     "api",

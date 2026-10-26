@@ -1,14 +1,5 @@
 [
   {
-    "titulo": "Centro de Interpretación de la Reserva Provincial Pichi Mahuida (La Pampa)",
-    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/centro-de-interpretacion-de-la-reserva-provincial-pichi-mahuida-la-pampa.pdf",
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/centro-de-interpretacion-de-la-reserva-provincial-pichi-mahuida-la-pampa-300x258.jpg",
-    "autor": null,
-    "anio": null,
-    "id": "lib-3zgddm8g",
-    "fechaExtraccion": "2026-09-16T04:19:26.654Z"
-  },
-  {
     "titulo": "El desafío de vivir con lo que produce un único planeta",
     "linkPdf": "https://fundacionazara.org.ar/img/libros/un-planeta.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/El-desaf%C3%ADo-de-vivir-con-lo-que-produce-un-%C3%BAnico-planeta.jpg",
@@ -81,15 +72,6 @@
     "fechaExtraccion": "2026-09-16T04:19:58.602Z"
   },
   {
-    "titulo": "Paisaje Protegido Delta Terra (Tigre – Buenos Aires)",
-    "linkPdf": "http://www.fundacionazara.org.ar/img/libros/paisaje-protegido-delta-terra-tigre.pdf",
-    "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2025/01/paisaje-protegido-delta-terra-tigre-300x258.jpg",
-    "autor": null,
-    "anio": null,
-    "id": "lib-9kq0tw1a",
-    "fechaExtraccion": "2026-09-16T04:20:01.633Z"
-  },
-  {
     "titulo": "Reflexiones en tiempos de la pandemia de COVID-19",
     "linkPdf": "https://fundacionazara.org.ar/img/libros/reflexiones-en-tiempos-de-pandemia-2020.pdf",
     "imagenPortada": "https://fundacionazara.org.ar/wp-content/uploads/2017/03/reflexiones-en-tiempos-de-pandemia-2020.jpg",
@@ -114,6 +96,6 @@
     "autor": "Claudio Bertonatti",
     "anio": 2021,
     "id": "lib-z2bt70zr",
-    "fechaExtraccion": "2026-09-16T04:20:15.911Z"
+    "fechaExtraccion": "2026-09-16T23:19:11.694Z"
   }
 ]

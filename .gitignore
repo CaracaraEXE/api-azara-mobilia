@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# estado local del reporte de cambios (snapshot, no se versiona)
+backend/scripts/.cache/

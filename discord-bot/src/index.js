@@ -21,9 +21,9 @@ const PORT = process.env.PORT || 3001;
 const API_URL = process.env.API_URL || 'http://localhost:3000';
 const formatos = require('./formatos');
 
-// Orden EXPLÍCITO del dropdown de secciones de /categorias (PLANV3 V3.6):
+// Orden EXPLÍCITO del dropdown de secciones de /catalogo (PLANV3 V3.6):
 // libros y RE primero (compat), después la hemeroteca (Periódico, Revista Azara).
-const ORDEN_SECCIONES = ['libros', 'recursos', 'periodico-exploracion-y-ciencia', 'revista-azara'];
+const ORDEN_SECCIONES = ['libros', 'recursos-educativos', 'periodico-exploracion-y-ciencia', 'revista-azara'];
 
 // ──────────────────────────────────────────────
 //  Tipos de interacción de Discord
@@ -109,11 +109,11 @@ app.post('/interactions', verifyDiscordRequest, async (req, res) => {
         case 'buscar':
           response = await comandoBuscar(options);
           break;
-        case 'libro':
-          response = await comandoLibro(options);
+        case 'ficha':
+          response = await comandoFicha(options);
           break;
-        case 'categorias':
-          response = await comandoCategorias();
+        case 'catalogo':
+          response = await comandoCatalogo();
           break;
         default:
           response = { content: '❌ Comando no reconocido.' };
@@ -176,7 +176,7 @@ app.get('/', (req, res) => {
 // ──────────────────────────────────────────────
 
 /**
- * /buscar [termino] — Busca libros por título
+ * /buscar [termino] — Busca en el catálogo por título, autor o titulares
  */
 async function comandoBuscar(options) {
   const termino = options?.find(o => o.name === 'termino')?.value;
@@ -186,11 +186,11 @@ async function comandoBuscar(options) {
   }
 
   try {
-    const respuesta = await fetch(`${API_URL}/api/libros?busqueda=${encodeURIComponent(termino)}&limite=5&pagina=1`);
+    const respuesta = await fetch(`${API_URL}/api/catalogo?busqueda=${encodeURIComponent(termino)}&limite=5&pagina=1`);
     const datos = await respuesta.json();
 
     if (!datos.success || datos.data.length === 0) {
-      return { content: `No encontré libros para "${termino}".` };
+      return { content: `No encontré resultados para "${termino}".` };
     }
 
     return formatos.construirMensajeBusqueda(termino, datos.data, 0, datos.meta.total);
@@ -201,39 +201,39 @@ async function comandoBuscar(options) {
 }
 
 /**
- * /libro [id] — Muestra un libro específico
+ * /ficha [id] — Muestra el detalle de un ítem del catálogo
  */
-async function comandoLibro(options) {
+async function comandoFicha(options) {
   const id = options?.find(o => o.name === 'id')?.value;
 
   if (!id) {
-    return { content: '❌ Necesitás especificar un ID de libro.' };
+    return { content: '❌ Necesitás especificar un ID.' };
   }
 
   try {
-    const respuesta = await fetch(`${API_URL}/api/libros/${id}`);
+    const respuesta = await fetch(`${API_URL}/api/catalogo/${id}`);
     const datos = await respuesta.json();
 
     if (!datos.success) {
-      return { content: `No encontré un libro con ID "${id}".` };
+      return { content: `No encontré un ítem con ID "${id}".` };
     }
 
     // Presentación movida a formatos.js (pura, testeable). El 2º argumento es el
-    // estado INICIAL del toggle de titulares: ocultos por defecto → /libro
+    // estado INICIAL del toggle de titulares: ocultos por defecto → /ficha
     // compacto; el botón 📖 los muestra re-renderizando vía 'tits-toggle'.
     return formatos.construirMensajeLibro(datos.data, false);
   } catch (error) {
-    console.error('Error al obtener libro:', error);
+    console.error('Error al obtener el ítem:', error);
     return { content: '❌ Error al conectar con la API.' };
   }
 }
 
 /**
- * /categorias — Muestra el Select de SECCIONES (paso 1).
+ * /catalogo — Muestra el Select de SECCIONES (paso 1).
  * RE ya no aparece mezclado con Libros: primero se elige la sección y después
  * las categorías de esa sección (ver manejarSeleccionSeccion).
  */
-async function comandoCategorias() {
+async function comandoCatalogo() {
   try {
     const respuesta = await fetch(`${API_URL}/api/categorias`);
     const datos = await respuesta.json();
@@ -309,10 +309,10 @@ async function patchError(interaction, texto) {
 }
 
 /**
- * Toggle de titulares de /libro (hemeroteca): alterna mostrar/ocultar el campo
+ * Toggle de titulares de /ficha (hemeroteca): alterna mostrar/ocultar el campo
  * 🗞️ Titulares RE-RENDERIZANDO el mensaje completo (Discord no tiene colapso).
  * El estado viene en el custom_id (v = ¿visibles AHORA?); el nuevo es !v.
- * Solo /libro lleva este botón — /buscar y los listados no lo usan.
+ * Solo /ficha lleva este botón — /buscar y los listados no lo usan.
  */
 async function manejarToggleTitulares(interaction, res, payload) {
   const { id, v } = payload;
@@ -320,7 +320,7 @@ async function manejarToggleTitulares(interaction, res, payload) {
   res.json({ type: InteractionResponseType.DEFERRED_UPDATE_MESSAGE });
 
   try {
-    const respuesta = await fetch(`${API_URL}/api/libros/${id}`);
+    const respuesta = await fetch(`${API_URL}/api/catalogo/${id}`);
     const datos = await respuesta.json();
 
     if (datos.success) {
@@ -344,12 +344,14 @@ async function manejarPaginacionBusqueda(interaction, res, payload) {
 
   try {
     const respuesta = await fetch(
-      `${API_URL}/api/libros?busqueda=${encodeURIComponent(payload.q)}&limite=5&pagina=${pagina + 1}`
+      `${API_URL}/api/catalogo?busqueda=${encodeURIComponent(payload.q)}&limite=5&pagina=${pagina + 1}`
     );
     const datos = await respuesta.json();
 
-    if (datos.success) {
+    if (datos.success && datos.data.length > 0) {
       await patchMensajeOriginal(interaction, formatos.construirMensajeBusqueda(payload.q, datos.data, pagina, datos.meta.total));
+    } else if (datos.success && datos.data.length === 0) {
+      await patchError(interaction, `No encontré más resultados para "${payload.q}".`);
     } else {
       await patchError(interaction, '❌ Error al obtener resultados.');
     }
@@ -361,32 +363,13 @@ async function manejarPaginacionBusqueda(interaction, res, payload) {
 
 /**
  * Categorías navegables de una sección + total de ítems.
- * - libros: las categorías de /api/categorias con seccion === 'libros'.
- * - recursos: las COLECCIONES (subgrupos) del archivo único RE, detectadas por
- *   pertenecer a las categorías de la sección 'recursos' (hoy 'Recursos Educativos').
+ * La API ya devuelve las categorías de TODAS las secciones (Libros 13, RE 10,
+ * hemeroteca 1 c/u) en `/api/categorias`; acá solo se filtran por `seccion`.
+ * El default cubre ítems legados sin campo `seccion` → 'libros'.
  */
 async function obtenerCategoriasDeSeccion(sec) {
-  if (sec === 'recursos') {
-    const [resCat, resCol] = await Promise.all([
-      fetch(`${API_URL}/api/categorias`),
-      fetch(`${API_URL}/api/libros/colecciones/lista`)
-    ]);
-    const datosCat = await resCat.json();
-    const datosCol = await resCol.json();
-    const nombresSeccion = (datosCat.data || [])
-      .filter(c => c.seccion === 'recursos')
-      .map(c => c.nombre);
-    const categorias = (datosCol.data || [])
-      .filter(c => (c.categorias || []).some(n => nombresSeccion.includes(n)))
-      .map(c => ({ nombre: c.nombre, cantidad: c.cantidad }))
-      .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
-    return { categorias, total: categorias.reduce((s, c) => s + c.cantidad, 0) };
-  }
-
   const respuesta = await fetch(`${API_URL}/api/categorias`);
   const datos = await respuesta.json();
-  // FIX V3.6: el default filtra por la SECCIÓN recibida (antes hardcodeado
-  // 'libros') → cubre la hemeroteca con su categoría única sin rama especial.
   const categorias = (datos.data || [])
     .filter(c => (c.seccion || 'libros') === sec)
     .map(c => ({ nombre: c.nombre, cantidad: c.cantidad }));
@@ -394,7 +377,7 @@ async function obtenerCategoriasDeSeccion(sec) {
 }
 
 /**
- * Select Menu de SECCIONES (paso 1 de /categorias) → muestra las categorías de la sección
+ * Select Menu de SECCIONES (paso 1 de /catalogo) → muestra las categorías de la sección
  */
 async function manejarSeleccionSeccion(interaction, res) {
   const sec = interaction.data.values?.[0];
@@ -417,7 +400,7 @@ async function manejarSeleccionSeccion(interaction, res) {
     if (categorias.length === 1) {
       const nombreCategoria = categorias[0].nombre;
       const respuesta = await fetch(
-        `${API_URL}/api/libros?categoria=${encodeURIComponent(nombreCategoria)}&limite=5&pagina=1`
+        `${API_URL}/api/catalogo?categoria=${encodeURIComponent(nombreCategoria)}&limite=5&pagina=1`
       );
       const datos = await respuesta.json();
       if (datos.success && datos.data.length > 0) {
@@ -436,8 +419,8 @@ async function manejarSeleccionSeccion(interaction, res) {
 }
 
 /**
- * Select Menu de categorías (paso 2 de /categorias) — muestra los ítems de la categoría.
- * sec: 'libros' → ?categoria=; 'recursos' → ?coleccion= (la navegación fina de RE).
+ * Select Menu de categorías (paso 2 de /catalogo) — muestra los ítems de la categoría.
+ * Todos los ítems se filtran con ?categoria=<nombre> (nombres de la API).
  */
 async function manejarSeleccionCategoria(interaction, res, payload) {
   const values = interaction.data.values;
@@ -455,8 +438,7 @@ async function manejarSeleccionCategoria(interaction, res, payload) {
   res.json({ type: InteractionResponseType.DEFERRED_UPDATE_MESSAGE });
 
   try {
-    const filtro = sec === 'recursos' ? 'coleccion' : 'categoria';
-    const url = `${API_URL}/api/libros?${filtro}=${encodeURIComponent(categoria)}&limite=5&pagina=1`;
+    const url = `${API_URL}/api/catalogo?categoria=${encodeURIComponent(categoria)}&limite=5&pagina=1`;
     console.log(`🌐 Fetching: ${url}`);
 
     const respuesta = await fetch(url);
@@ -489,9 +471,8 @@ async function manejarPaginacionCategoria(interaction, res, payload) {
   res.json({ type: InteractionResponseType.DEFERRED_UPDATE_MESSAGE });
 
   try {
-    const filtro = sec === 'recursos' ? 'coleccion' : 'categoria';
     const respuesta = await fetch(
-      `${API_URL}/api/libros?${filtro}=${encodeURIComponent(categoria)}&limite=5&pagina=${pagina + 1}`
+      `${API_URL}/api/catalogo?categoria=${encodeURIComponent(categoria)}&limite=5&pagina=${pagina + 1}`
     );
     const datos = await respuesta.json();
 

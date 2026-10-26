@@ -4,7 +4,7 @@
  * Zero-deps: se corre con `node test-formatos.js` (o `npm test`). Vive en el
  * REPO a propósito: los tests en temp se pierden y no sirven de red de seguridad.
  *
- * Cubre el helper construirMensajeLibro y el TOGGLE de titulares de /libro:
+ * Cubre el helper construirMensajeLibro y el TOGGLE de titulares de /ficha:
  *   - estado oculto (default): sin field 🗞️, botón "📖 Ver titulares (N)"
  *   - estado visible: field 🗞️ con "• " + titulares, botón "🔽 Ocultar titulares"
  *   - el estado viaja en el custom_id ({cmd:'tits-toggle', id, v})
@@ -36,7 +36,7 @@ const conTitulares = {
   id: 'lib-test01',
   titulo: 'Edición de prueba',
   seccion: 'revista-azara',
-  categoria: 'Revista Azara',
+  categorias: ['Revista Azara'],
   autor: 'Autor X',
   anio: 2020,
   linkPdf: 'http://ejemplo/x.pdf',
@@ -48,7 +48,7 @@ const libroNormal = {
   id: 'lib-test02',
   titulo: 'Libro de prueba',
   seccion: 'libros',
-  categoria: 'Mastozoología',
+  categorias: ['Mastozoología'],
   autor: null,
   anio: 2019,
   coleccion: 'Serie Ñandú',
@@ -59,16 +59,24 @@ const libroNormal = {
 const reCurso = {
   id: 'lib-re01',
   titulo: 'Cuadernillo X',
-  seccion: 'recursos',
-  categoria: 'Recursos Educativos',
-  coleccion: 'Cuadernillos',
+  seccion: 'recursos-educativos',
+  categorias: ['Cuadernillos'],
   autor: 'Autor RE',
   anio: 2021,
   linkPdf: 'http://ejemplo/r.pdf'
 };
 
-// ── 1. /libro con titulares, estado OCULTO (default) ─────
-console.log('\n[1] /libro con titulares — estado OCULTO');
+// Ítem de RE que PERTENECE a una colección ("Miradas de la Argentina" dentro de
+// la categoría Cuadernillos): muestra la categoría Y el field Colección.
+const reColeccion = {
+  ...reCurso,
+  id: 'lib-re02',
+  titulo: 'Miradas de la Argentina N° 1',
+  coleccion: 'Miradas de la Argentina'
+};
+
+// ── 1. /ficha con titulares, estado OCULTO (default) ─────
+console.log('\n[1] /ficha con titulares — estado OCULTO');
 {
   const m = formatos.construirMensajeLibro(conTitulares, false);
   const e = m.embeds[0];
@@ -93,8 +101,8 @@ console.log('\n[1] /libro con titulares — estado OCULTO');
   igual('custom_id', b?.custom_id, JSON.stringify({ cmd: 'tits-toggle', id: 'lib-test01', v: false }));
 }
 
-// ── 2. /libro con titulares, estado VISIBLE ──────────────
-console.log('\n[2] /libro con titulares — estado VISIBLE');
+// ── 2. /ficha con titulares, estado VISIBLE ──────────────
+console.log('\n[2] /ficha con titulares — estado VISIBLE');
 {
   const m = formatos.construirMensajeLibro(conTitulares, true);
   const e = m.embeds[0];
@@ -109,7 +117,7 @@ console.log('\n[2] /libro con titulares — estado VISIBLE');
 }
 
 // ── 3. Ítem SIN titulares (libro normal): sin botón ──────
-console.log('\n[3] /libro sin titulares — sin botón, con Colección');
+console.log('\n[3] /ficha sin titulares — sin botón, con Colección');
 {
   const m = formatos.construirMensajeLibro(libroNormal, false);
   const e = m.embeds[0];
@@ -124,13 +132,18 @@ console.log('\n[3] /libro sin titulares — sin botón, con Colección');
   igual('Colección', e.fields.find(f => f.name === '\uD83D\uDDC2\uFE0F Colección')?.value, 'Serie Ñandú');
 }
 
-// ── 4. RE: coleccion es la CATEGORÍA, no Colección ───────
-console.log('\n[4] RE — la colección es la categoría (sin field Colección)');
+// ── 4. RE: categoría = grupo; colección propia como field ─
+console.log('\n[4] RE — categoría = grupo; colección (Miradas) como field');
 {
   const e = formatos.construirMensajeLibro(reCurso, false).embeds[0];
-  check('NO hay field Colección', !e.fields.some(f => f.name === '\uD83D\uDDC2\uFE0F Colección'));
-  igual('Categoría = coleccion', e.fields[1].value, 'Cuadernillos');
   igual('Sección', e.fields[0].value, 'Recursos educativos');
+  igual('Categoría = grupo', e.fields[1].value, 'Cuadernillos');
+  check('sin `coleccion` → NO hay field Colección',
+    !e.fields.some(f => f.name === '\uD83D\uDDC2\uFE0F Colección'));
+
+  const em = formatos.construirMensajeLibro(reColeccion, false).embeds[0];
+  igual('Categoría (Miradas)', em.fields[1].value, 'Cuadernillos');
+  igual('Colección (Miradas)', em.fields.find(f => f.name === '\uD83D\uDDC2\uFE0F Colección')?.value, 'Miradas de la Argentina');
 }
 
 // ── 5. PDF bilingüe + sin PDF ────────────────────────────
