@@ -3,12 +3,12 @@
  * 
  * Usa navegador real para evitar CloudFlare
  * 
- * Uso:
- *   node scripts/scraper-playwright.js                        (usa SCRAPEAR_CATEGORIA por defecto)
+ * Uso (el objetivo es OBLIGATORIO: sin argumentos no se scrapea nada):
  *   node scripts/scraper-playwright.js --categoria=slug       (UNA categoría puntual de una sección por-categoría, ej. 'paleontologia'; SOLO secciones por-categoría = libros)
  *   node scripts/scraper-playwright.js --seccion=slug         (UNA sección completa: 'libros', 'recursos-educativos', 'periodico-exploracion-y-ciencia' o 'revista-azara')
  *   node scripts/scraper-playwright.js --todas                (todas las secciones: libros + recursos educativos + hemeroteca)
  *   --seccion y --categoria son mutuamente excluyentes; --todas es prioritario.
+ *   Sin NINGÚN objetivo el CLI aborta con exit 1 (no hay default).
  */
 
 const { chromium } = require('playwright');
@@ -135,11 +135,6 @@ const COLECCIONES_CONOCIDAS = [
   { url: 'https://fundacionazara.org.ar/miradas-de-la-argentina/', patron: 'pares-h4-pdf', coleccion: 'Miradas de la Argentina' },
 ];
 
-// === CONFIGURACIÓN ===
-// Categoría por defecto (se puede sobreescribir con --categoria= o --todas)
-const SCRAPEAR_CATEGORIA = 'auspiciados';
-// ====================
-
 // --- Parsear argumentos CLI ---
 const args = process.argv.slice(2);
 const ARG_TODAS = args.includes('--todas');
@@ -156,14 +151,25 @@ if (ARG_SECCION && ARG_CATEGORIA) {
   process.exit(1);
 }
 
-// MODO: 'todas' | 'seccion' | 'categoria' — el objetivo explícito gana sobre el
-// default histórico (SCRAPEAR_CATEGORIA = una categoría puntual).
+// Sin objetivo explícito NO se scrapea: el scraper PISA el archivo de la
+// categoría/sección objetivo, así que un default silencioso reescribiría datos
+// sin que nadie lo haya pedido. Fail-loud, igual que el guard anti-borrado.
+// OJO: SOLO cuando el scraper es el módulo principal. reportar-cambios.js lo
+// requiere para reutilizar clavesDeLibro y NO debe abortar por no tener args.
+if (require.main === module && !ARG_TODAS && !ARG_SECCION && !ARG_CATEGORIA) {
+  console.error('❌ Falta el objetivo: indicá --todas, --seccion=<slug> o --categoria=<slug>.');
+  console.error('   Ej.: node scripts/scraper-playwright.js --seccion=libros');
+  process.exit(1);
+}
+
+// MODO: 'todas' | 'seccion' | 'categoria' — SIEMPRE explícito al correr el CLI
+// (el guard de arriba lo garantiza). Al importar el módulo no hay objetivo.
 const MODO = ARG_TODAS ? 'todas' : ARG_SECCION ? 'seccion' : 'categoria';
 const OBJETIVO_SLUG = ARG_SECCION
   ? ARG_SECCION.split('=')[1]
   : ARG_CATEGORIA
     ? ARG_CATEGORIA.split('=')[1]
-    : SCRAPEAR_CATEGORIA;
+    : null;
 // -----------------------------
 
 const DATA_DIR = path.join(__dirname, '../src/data');
@@ -1263,7 +1269,7 @@ function resolverObjetivo(modo, slug) {
 
 /**
  * Función principal. El objetivo se resuelve por MODO (--todas / --seccion /
- * --categoria) con fallback al default histórico SCRAPEAR_CATEGORIA.
+ * --categoria). No hay default: sin objetivo el CLI aborta antes de llegar acá.
  */
 async function run() {
   console.log('═══════════════════════════════════════════════════════════');

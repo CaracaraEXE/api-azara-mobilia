@@ -307,12 +307,11 @@ npm install
 npx playwright install chromium
 
 # ─── SCRAPING ─────────────────────────────────────
+# El objetivo es OBLIGATORIO: sin argumentos el scraper aborta (no hay
+# categoría por defecto, porque el scrape PISA el archivo objetivo).
 
-# Scrapear categoría por defecto
-npm run scrape-pw
-
-# Scrapear una sección especifica
-npm run scrape-pw -- -seccion=recursos-educativos
+# Scrapear una sección específica
+npm run scrape-pw -- --seccion=recursos-educativos
 
 # Scrapear una categoría específica
 npm run scrape-pw -- --categoria=flora-y-fauna
