@@ -297,6 +297,8 @@ Respuesta de `GET /api/catalogo` (paginada):
 
 ### Backend (API)
 
+> ⚠️ **Todos los comandos de esta sección se ejecutan desde `backend/`.** La raíz del repo NO tiene `package.json`: si los corrés desde ahí, `npm run` no imprime **nada** y `npm run <script>` falla con `Missing script: "<script>"`.
+
 ```bash
 cd backend
 
@@ -305,8 +307,10 @@ npm install
 
 # Instalar Chromium para Playwright (para scraping)
 npx playwright install chromium
+# Si esa descarga falla, el scraper usa Chrome/Edge ya instalados (--browser=chrome|msedge)
 
 # ─── SCRAPING ─────────────────────────────────────
+# ⚠️ Estás en backend/. Desde la raíz del repo estos scripts NO existen.
 # El objetivo es OBLIGATORIO: sin argumentos el scraper aborta (no hay
 # categoría por defecto, porque el scrape PISA el archivo objetivo).
 

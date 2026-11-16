@@ -1119,6 +1119,15 @@ async function scrapearSeccion(browser, seccion) {
           ? { ...datos, categoria: seccion.nombre }
           : (seccion.archivoUnico ? { ...datos, categoria: categoria.nombre } : datos);
         const { _duplicadoDe, ...item } = registrarOConsolidar(indiceGlobal, contexto);
+        // FIX (2026-11-16): en archivo único (RE) el archivo final es ENTRADA y SALIDA.
+        // construirIndiceGlobal() lo indexa desde disco, así que un ítem ya presente
+        // vuelve como duplicado: empujarlo otra vez lo clona (mismo id, fecha vieja).
+        // En libros es inocuo: `items` se reinicia por categoría y la multi-categoría
+        // necesita que el id se repita en OTROS archivos, no en el mismo.
+        if (items.some(x => x.id === item.id)) {
+          console.log(`         ⏭️ Ya presente en este archivo: id ${item.id}`);
+          return;
+        }
         items.push(aplicarOverrides(item));
         console.log(_duplicadoDe
           ? `         🔗 Reutilizado id ${_duplicadoDe.id} (${_duplicadoDe.categoria})`
@@ -1152,8 +1161,10 @@ async function scrapearSeccion(browser, seccion) {
               // con la serie en su propio `coleccion`.
               const conGrupo = seccion.archivoUnico ? { ...item, categoria: categoria.nombre } : item;
               const { _duplicadoDe, ...limpio } = registrarOConsolidar(indiceGlobal, conGrupo);
-              items.push(aplicarOverrides(limpio));
+              // Mismo criterio que registrarItem: no clonar un id ya acumulado en items.
               if (_duplicadoDe) reutilizados++;
+              if (items.some(x => x.id === limpio.id)) continue;
+              items.push(aplicarOverrides(limpio));
             }
             console.log(`         🗂️ ${coleccion.coleccion}: ${itemsColeccion.length} ítems desglosados` + (reutilizados ? ` (${reutilizados} compartían id)` : ''));
           } else {

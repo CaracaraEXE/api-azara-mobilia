@@ -56,6 +56,7 @@ const idsGlobales = new Map();      // id → { categoria, libro }
 const linkPdfs = new Map();         // linkPdf → [{ categoria, titulo, id }]
 const portadas = new Map();         // imagenPortada → [{ categoria, titulo, id }]
 const multiCategoria = new Set();   // ids que figuran en 2+ categorías (intencional, PLANV2 §10)
+const crucesAceptados = [];         // linkPdf compartido entre secciones, revisado a mano
 
 const resumenGeneral = { total: 0, conPdf: 0, conRevision: 0, sinTitulo: 0 };
 
@@ -88,6 +89,27 @@ function leerArchivo(archivo) {
  */
 function normalizarUrlDup(url) {
   return (url || '').trim().replace(/^https?:\/\/www\./i, 'https://').replace(/\/+$/, '');
+}
+
+/**
+ * Cruces de PDF entre categorías de SECCIONES distintas, revisados y aceptados a mano
+ * (2026-11-16). Caso real: "La vida de los objetos…" figura en el sitio como libro de
+ * Antropología y como Cuadernillo de Recursos Educativos. El modelo JSON no puede
+ * expresar multi-sección (`seccion` es singular), así que se mantienen las DOS entradas
+ * con ids distintos. La verificación es humana (PLANV3 §6): esto solo evita que un caso
+ * YA revisado bloquee el baseline — un cruce nuevo sigue fallando.
+ * Clave: `${urlNormalizada}|${catA}|${catB}` con las categorías (archivo) ordenadas.
+ * Si el sitio deja de listar la obra en una de las dos, borrar la entrada.
+ */
+const CRUCES_REVISADOS = new Set([
+  `${normalizarUrlDup('http://www.fundacionazara.org.ar/img/libros/la-vida-de-los-objetos.pdf')}|antropologia|recursos-educativos`,
+]);
+
+/** ¿El cruce `clave` + par de categorías ya fue revisado a mano? */
+function esCruceRevisado(clave, previos, categoriaActual) {
+  return previos.some(p => CRUCES_REVISADOS.has(
+    `${clave}|${[p.categoria, categoriaActual].sort().join('|')}`
+  ));
 }
 
 for (const archivo of archivos) {
@@ -179,7 +201,11 @@ for (const archivo of archivos) {
       const clave = normalizarUrlDup(libro.linkPdf);
       const previos = linkPdfs.get(clave) || [];
       if (previos.length && previos.every(p => p.id !== libro.id)) {
-        problemas.push(`linkPdf duplicado (ids distintos): ${libro.linkPdf} → ${previos.map(p => `${p.categoria}|${p.titulo}`).join(', ')} y ${categoria}|${libro.titulo}`);
+        if (esCruceRevisado(clave, previos, categoria)) {
+          crucesAceptados.push(`${libro.titulo} (${[previos[0].categoria, categoria].sort().join(' + ')})`);
+        } else {
+          problemas.push(`linkPdf duplicado (ids distintos): ${libro.linkPdf} → ${previos.map(p => `${p.categoria}|${p.titulo}`).join(', ')} y ${categoria}|${libro.titulo}`);
+        }
       }
       previos.push({ categoria, titulo: libro.titulo, id: libro.id });
       linkPdfs.set(clave, previos);
@@ -228,6 +254,10 @@ if (!hayEsqueletos) console.log('   (ninguno)');
 console.log('\n' + '═'.repeat(64));
 console.log(`📦 TOTAL: ${resumenGeneral.total} ítems | ${resumenGeneral.conPdf} con PDF | ${resumenGeneral.conRevision} revisionPendiente | ${resumenGeneral.sinTitulo} sin título`);
 console.log(`🔗 Libros en múltiples categorías (intencional, mismo id): ${multiCategoria.size}`);
+if (crucesAceptados.length) {
+  console.log(`🔗 Cruces entre secciones revisados (aceptados): ${crucesAceptados.length}`);
+  crucesAceptados.forEach(c => console.log(`   • ${c}`));
+}
 if (problemas.length) {
   console.log(`\n❌ ${problemas.length} problema(s) encontrados:`);
   problemas.forEach(p => console.log(`   • ${p}`));
