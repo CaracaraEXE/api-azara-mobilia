@@ -9,6 +9,10 @@
  *   node scripts/scraper-playwright.js --todas                (todas las secciones: libros + recursos educativos + hemeroteca)
  *   --seccion y --categoria son mutuamente excluyentes; --todas es prioritario.
  *   Sin NINGÚN objetivo el CLI aborta con exit 1 (no hay default).
+ *
+ *   --browser=chrome|msedge   usa el navegador YA instalado (sin descargar Chromium).
+ *                             Equivale a PW_CHANNEL=<canal>.
+ *   --dry-run                 muestra objetivo + navegador y sale sin scrapear.
  */
 
 const { chromium } = require('playwright');
@@ -140,6 +144,10 @@ const args = process.argv.slice(2);
 const ARG_TODAS = args.includes('--todas');
 const ARG_SECCION = args.find(a => a.startsWith('--seccion='));
 const ARG_CATEGORIA = args.find(a => a.startsWith('--categoria='));
+// Navegador del sistema a usar: chrome | msedge (evita descargar Chromium).
+const ARG_BROWSER = args.find(a => a.startsWith('--browser='));
+// --dry-run: muestra objetivo y navegador sin scrapear (verificación de config).
+const ARG_DRY_RUN = args.includes('--dry-run');
 
 // --todas es prioritario (compat con el uso histórico); --seccion y --categoria
 // son mutuamente excluyentes: ambos piden un objetivo puntual DISTINTO.
@@ -367,9 +375,18 @@ async function obtenerDatosItem(page, url) {
   // portada. El logo del sitio es SIEMPRE "logo-azara-*" y el banner "banner-azara-*".
   // Fallback: og:image si el loop de <img> no encontró nada.
   let imagenPortada = await page.$$eval('img', imgs => {
-    for (const img of imgs) {
-      const src = img.src || img.getAttribute('data-src') || '';
-      if (src && !/logo-azara|banner-azara/.test(src) && !src.endsWith('.svg')) {
+    // GOTCHA (2026-11-16): el sitio inyecta un popup promocional (ej. "Expedición
+    // Inka") en TODAS las páginas, FUERA de <article>. Su <img> no es .svg ni
+    // "logo-azara" → ganaba como portada. Se prioriza el contenido real del
+    // <article> y se descartan overlays (popup/modal/lightbox/dialog).
+    const enOverlay = el => !!el.closest(
+      '[class*="popup"],[class*="modal"],[class*="overlay"],[id*="popup"],[id*="modal"],dialog,[aria-modal="true"],[class*="lightbox"]'
+    );
+    const delArticulo = imgs.filter(i => i.closest('article'));
+    const lista = delArticulo.length ? delArticulo : imgs;
+    for (const img of lista) {
+      const src = img.currentSrc || img.src || img.getAttribute('data-src') || '';
+      if (src && !enOverlay(img) && !/logo-azara|banner-azara/.test(src) && !src.endsWith('.svg')) {
         return src;
       }
     }
@@ -731,9 +748,17 @@ async function extraerImagenesSueltas(page, coleccion) {
     const norm = t => (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
-    // Imágenes de contenido únicas (dedup por src: clones owl comparten src)
-    const srcs = [...new Set([...document.querySelectorAll('img')]
-      .map(i => i.src || '')
+    // Imágenes de contenido únicas (dedup por src: clones owl comparten src).
+    // GOTCHA (2026-11-16): el popup promocional site-wide (ej. "Expedición Inka")
+    // está FUERA de <article> y se colaba como lámina → creaba un "Tomo NN" falso.
+    const enOverlay = el => !!el.closest(
+      '[class*="popup"],[class*="modal"],[class*="overlay"],[id*="popup"],[id*="modal"],dialog,[aria-modal="true"],[class*="lightbox"]'
+    );
+    const delArticulo = [...document.querySelectorAll('article img')];
+    const baseImgs = delArticulo.length ? delArticulo : [...document.querySelectorAll('img')];
+    const srcs = [...new Set(baseImgs
+      .filter(i => !enOverlay(i))
+      .map(i => i.currentSrc || i.src || i.getAttribute('data-src') || '')
       .filter(s => s.includes('uploads') && s && !/logo-azara|banner-azara/.test(s) && !s.endsWith('.svg')))];
 
     // Párrafo de la serie (autor): el p con "|" o mención a editorial (fix B5)
@@ -1143,11 +1168,18 @@ async function scrapearSeccion(browser, seccion) {
           // Detector de posibles colecciones no catalogadas (PLANV2 §8): la página
           // ya quedó navegada por obtenerDatosItem → solo cuenta, sin goto extra.
           const sospecha = await page.evaluate(() => {
-            const pdfs = document.querySelectorAll('a[href*=".pdf"]').length;
-            const imgs = new Set([...document.querySelectorAll('img')]
-              .map(i => i.src || '')
+            // Solo contenido del <article>: el popup site-wide inflaba imgs y
+            // marcaba TODA página como "posible colección" (2026-11-16).
+            const enOverlay = el => !!el.closest(
+              '[class*="popup"],[class*="modal"],[class*="overlay"],[id*="popup"],[id*="modal"],dialog,[aria-modal="true"],[class*="lightbox"]'
+            );
+            const raiz = document.querySelector('article') || document;
+            const pdfs = raiz.querySelectorAll('a[href*=".pdf"]').length;
+            const imgs = new Set([...raiz.querySelectorAll('img')]
+              .filter(i => !enOverlay(i))
+              .map(i => i.currentSrc || i.src || i.getAttribute('data-src') || '')
               .filter(s => s.includes('uploads') && s && !/logo-azara|banner-azara/.test(s) && !s.endsWith('.svg'))).size;
-            const h4ConImg = [...document.querySelectorAll('h4')]
+            const h4ConImg = [...raiz.querySelectorAll('h4')]
               .filter(h => h.querySelector('img[src*="uploads"]')).length;
             return { pdfs, imgs, h4ConImg };
           });
@@ -1283,8 +1315,32 @@ async function run() {
   }
   console.log(`🎯 ${mensaje}\n`);
   
-  // Iniciar navegador
-  const browser = await chromium.launch({ headless: true });
+  // Navegador: --browser=<canal> o PW_CHANNEL mandan. Sin override usa el
+  // Chromium de Playwright y, si no está instalado, cae solo al Chromium del
+  // sistema (chrome → msedge). Así el comando diario no lleva ningún flag.
+  const CANAL = (ARG_BROWSER ? ARG_BROWSER.split('=')[1] : process.env.PW_CHANNEL) || null;
+
+  // --dry-run: muestra objetivo + navegador y sale SIN tocar la red ni los JSON.
+  if (ARG_DRY_RUN) {
+    console.log(`🌐 Navegador: ${CANAL || 'auto (Chromium → chrome → msedge)'}\n`);
+    console.log('🔍 dry-run: no se scrapea ni se escribe nada.');
+    return;
+  }
+
+  const lanzar = (canal) => chromium.launch(canal ? { headless: true, channel: canal } : { headless: true });
+  let browser = null;
+  let usado = CANAL;
+  try {
+    browser = await lanzar(CANAL);
+  } catch (e) {
+    const noInstalado = /Executable doesn't exist/i.test(e.message);
+    if (CANAL || !noInstalado) throw e;
+    for (const canal of ['chrome', 'msedge']) {
+      try { browser = await lanzar(canal); usado = canal; break; } catch { /* probar el siguiente */ }
+    }
+    if (!browser) throw e;
+  }
+  console.log(`🌐 Navegador: ${usado || 'Chromium bundleado de Playwright'}\n`);
   
   try {
     let fallosTotales = 0; // Fix A: URLs sin ítem en toda la corrida (define el exit code)
