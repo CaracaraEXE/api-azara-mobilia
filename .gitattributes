@@ -1,0 +1,5 @@
+# Los JSON de data/ los genera el scraper con Node, que siempre escribe LF.
+# Con core.autocrlf=true, Git esperaba CRLF en el working tree y marcaba los
+# archivos como modificados SIN cambios de contenido (mismo hash). Forzar LF
+# evita ese ruido y hace los diffs deterministas para todos.
+*.json text eol=lf
