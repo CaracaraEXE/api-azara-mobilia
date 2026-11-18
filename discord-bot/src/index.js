@@ -501,7 +501,7 @@ async function manejarVolverCategorias(interaction, res, payload) {
     // Salto directo (PLANV3 V3.6): si la sección tiene 1 sola categoría, el 🔙
     // vuelve al PASO 1 (select de secciones), no al select de categorías.
     if (categorias.length === 1) {
-      const paso1 = await comandoCategorias();
+      const paso1 = await comandoCatalogo();
       await patchMensajeOriginal(interaction, paso1);
       return;
     }
