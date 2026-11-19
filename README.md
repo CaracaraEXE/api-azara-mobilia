@@ -402,4 +402,4 @@ DISCORD_CLIENT_ID=tu_client_id_aqui
 
 ---
 
-*Proyecto de Programación - 4to año — Fundación Azara*
+*Proyecto de Programación - 4to año — Fundación Azara - Universidad Maimonides*
