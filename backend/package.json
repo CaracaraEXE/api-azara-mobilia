@@ -11,7 +11,9 @@
     "scrape-pw": "node scripts/scraper-playwright.js",
     "scrape-todas": "node scripts/scraper-playwright.js --todas",
     "validar:data": "node scripts/validar-data.js",
-    "reporte:data": "node scripts/reportar-cambios.js"
+    "reporte:data": "node scripts/reportar-cambios.js",
+    "migrate:pg": "node scripts/migrar-a-postgres.js",
+    "verificar:pg": "node scripts/verificar-pg.js"
   },
   "keywords": [
     "api",

@@ -66,15 +66,15 @@ async function listarItems() {
     const item = {
       id: row.id,
       titulo: row.titulo,
-      linkPdf: row.link_pdf,
-      imagenPortada: row.imagen_portada,
+      linkPdf: row.linkPdf,
+      imagenPortada: row.imagenPortada,
       autor: row.autor,
       anio: row.anio,
       // pg devuelve timestamptz como Date; lo dejamos como ISO string, que es
        // exactamente lo que el JSON tenía y lo que el cliente recibe por HTTP.
-      fechaExtraccion: row.fecha_extraccion
-        ? new Date(row.fecha_extraccion).toISOString()
-        : row.fecha_extraccion,
+      fechaExtraccion: row.fechaExtraccion
+        ? new Date(row.fechaExtraccion).toISOString()
+        : row.fechaExtraccion,
       seccion: row.seccion,
       categorias: []
     };

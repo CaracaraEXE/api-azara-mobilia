@@ -219,6 +219,11 @@ module.exports = {
   listarArchivosData,
   listarItems,
   listarCategorias,
+  // Implementaciones JSON crudas: las usa el script de carga Fase 4 para no
+  // depender del adaptador ni abrir el pool cuando USE_PG todavía es false.
+  listarArchivosDataJSON,
+  listarItemsJSON,
+  listarCategoriasJSON,
   nombreDeArchivo,
   normalizarBusqueda,
   normalizarCategoria,
