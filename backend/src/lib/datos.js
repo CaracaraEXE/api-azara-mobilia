@@ -1,10 +1,13 @@
 /**
  * lib/datos.js — Capa de datos COMPARTIDA por las rutas (catalogo, categorias, secciones).
  *
- * Descubre las secciones solas (data/<seccion>/<archivo>.json) y expone:
+ * Expone TRES funciones públicas (async desde Fase 3; el storage va en USE_PG):
  *   - listarArchivosData(): [{ ruta, seccion }]
  *   - listarItems():        todos los ítems con { seccion, categorias[], coleccion? }, dedup por id
  *   - listarCategorias():   [{ nombre, slug, seccion, cantidad, url }]
+ *
+ * Las implementaciones `...JSON` son el storage original; `../db/queries` es el
+ * storage PostgreSQL. Ambas devuelven la MISMA forma: las rutas no notan el cambio.
  *
  * MODELO (2026-10-17): una SECCIÓN se navega por CATEGORÍAS y cada categoría puede
  * tener COLECCIONES (series hiperespecíficas):
@@ -82,7 +85,7 @@ function slugificarCategoria(nombre) {
  *   libros/libros-*.json (13), recursos-educativos/recursos-educativos.json,
  *   periodico-exploracion-y-ciencia/periodico-exploracion-y-ciencia.json, ...
  */
-function listarArchivosData() {
+function listarArchivosDataJSON() {
   const archivos = [];
   if (!fs.existsSync(DATA_DIR)) return archivos;
   for (const carpeta of fs.readdirSync(DATA_DIR, { withFileTypes: true })) {
@@ -109,10 +112,10 @@ function nombreDeArchivo(ruta) {
  * categorías, PLANV2 §10). El campo `categoria` del archivo se DESCARTA del ítem
  * expuesto; en su lugar, cada ítem expone `categorias` (array).
  */
-function listarItems() {
+function listarItemsJSON() {
   const porId = new Map();
 
-  for (const { ruta, seccion } of listarArchivosData()) {
+  for (const { ruta, seccion } of listarArchivosDataJSON()) {
     let arr;
     try {
       arr = JSON.parse(fs.readFileSync(ruta, 'utf8'));
@@ -144,10 +147,10 @@ function listarItems() {
  * `cantidad` = filas crudas de esa categoría (un libro multi-categoría cuenta en
  * cada una, igual que /categorias históricamente).
  */
-function listarCategorias() {
+function listarCategoriasJSON() {
   const porClave = new Map(); // `${seccion}|${nombre}` → { nombre, seccion, cantidad }
 
-  for (const { ruta, seccion } of listarArchivosData()) {
+  for (const { ruta, seccion } of listarArchivosDataJSON()) {
     let arr;
     try {
       arr = JSON.parse(fs.readFileSync(ruta, 'utf8'));
@@ -184,6 +187,31 @@ function listarCategorias() {
 function coincideCategoria(nombreCat, valorCanonico) {
   return normalizarCategoria(nombreCat) === valorCanonico
     || slugificarCategoria(nombreCat) === valorCanonico;
+}
+
+// --- Adaptador de storage (Fase 3) -------------------------------------------
+// Las tres funciones públicas son async para que las rutas no tengan que saber
+// de dónde vienen los datos. Con USE_PG=false se usa la ruta JSON de siempre;
+// con USE_PG=true se carga queries.js de forma LAZY (solo cuando hace falta),
+// para no abrir un pool al arrancar si todavía estamos en modo archivos.
+
+function usarPostgres() {
+  return process.env.USE_PG === 'true';
+}
+
+async function listarArchivosData() {
+  if (usarPostgres()) return require('../db/queries').listarArchivosData();
+  return listarArchivosDataJSON();
+}
+
+async function listarItems() {
+  if (usarPostgres()) return require('../db/queries').listarItems();
+  return listarItemsJSON();
+}
+
+async function listarCategorias() {
+  if (usarPostgres()) return require('../db/queries').listarCategorias();
+  return listarCategoriasJSON();
 }
 
 module.exports = {

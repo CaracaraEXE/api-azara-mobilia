@@ -12,9 +12,9 @@ const router = express.Router();
 const { listarCategorias } = require('../lib/datos');
 
 // GET /api/categorias - Lista todas las categorías
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const categorias = listarCategorias();
+    const categorias = await listarCategorias();
 
     res.json({
       success: true,

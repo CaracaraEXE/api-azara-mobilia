@@ -28,14 +28,15 @@ function coincideCategoria(nombreCat, valorCanonico) {
 }
 
 /** Secciones válidas = subcarpetas de data/ (cada una es una SECCIÓN). */
-function listarSeccionesValidas() {
-  return [...new Set(listarArchivosData().map(a => a.seccion))];
+async function listarSeccionesValidas() {
+  const archivos = await listarArchivosData();
+  return [...new Set(archivos.map(a => a.seccion))];
 }
 
 /** Categorías válidas (para el 400): nombres + slugs, sin repetir. */
-function categoriasValidas() {
+async function categoriasValidas() {
   const set = new Set();
-  for (const c of listarCategorias()) { set.add(c.nombre); set.add(c.slug); }
+  for (const c of await listarCategorias()) { set.add(c.nombre); set.add(c.slug); }
   return [...set];
 }
 
@@ -44,9 +45,9 @@ function categoriasValidas() {
  * `coleccion` de cada ítem: series de Libros (Trazos nativos, ...) y de RE
  * ("Miradas de la Argentina"). `categorias` = a qué categorías pertenece.
  */
-function obtenerColecciones() {
+async function obtenerColecciones() {
   const porNombre = new Map();
-  for (const item of listarItems()) {
+  for (const item of await listarItems()) {
     const nombre = item.coleccion;
     if (!nombre) continue;
     let c = porNombre.get(nombre);
@@ -64,8 +65,9 @@ function obtenerColecciones() {
 }
 
 /** Colecciones válidas (para el 400). */
-function coleccionesValidas() {
-  return obtenerColecciones().map(c => c.nombre);
+async function coleccionesValidas() {
+  const colecciones = await obtenerColecciones();
+  return colecciones.map(c => c.nombre);
 }
 
 // --- Validación de filtros enumerables (400 honesto) -------------------------
@@ -101,30 +103,31 @@ function errorFiltro400(parametro, valor, valoresValidos, sugerenciaCustom) {
 }
 
 // GET /api/catalogo - Lista todos los libros
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { seccion, categoria, coleccion, busqueda, pagina = 1, limite = 20 } = req.query;
 
     // Validación 400 de filtros enumerables (ANTES de paginar). Un valor
     // inexistente no es "0 resultados": es un error del cliente.
-    const seccionesValidas = listarSeccionesValidas();
+    const seccionesValidas = await listarSeccionesValidas();
     const seccionCanonica = seccion ? normalizarCategoria(seccion) : null;
     if (seccion && !seccionesValidas.includes(seccionCanonica)) {
       return res.status(400).json({ success: false, ...errorFiltro400('seccion', seccion, seccionesValidas) });
     }
     if (categoria) {
       const objetivo = normalizarCategoria(categoria);
-      if (!listarCategorias().some(c => coincideCategoria(c.nombre, objetivo))) {
+      const categorias = await listarCategorias();
+      if (!categorias.some(c => coincideCategoria(c.nombre, objetivo))) {
         // Pista útil: si lo que pasaron es en realidad una SECCIÓN, decirlo.
         const esSeccion = seccionesValidas.includes(objetivo);
         const hint = esSeccion
           ? `"${categoria}" es una SECCIÓN, no una categoría. Usá ?seccion=${objetivo}`
           : null;
-        return res.status(400).json({ success: false, ...errorFiltro400('categoria', categoria, categoriasValidas(), hint) });
+        return res.status(400).json({ success: false, ...errorFiltro400('categoria', categoria, await categoriasValidas(), hint) });
       }
     }
     if (coleccion) {
-      const colsValidas = coleccionesValidas();
+      const colsValidas = await coleccionesValidas();
       const objetivo = normalizarCategoria(coleccion);
       const hayParcial = colsValidas.some(c => normalizarCategoria(c).includes(objetivo));
       if (!hayParcial) {
@@ -132,7 +135,7 @@ router.get('/', (req, res) => {
       }
     }
 
-    let libros = listarItems();
+    let libros = await listarItems();
 
     // Filtrar por SECCIÓN: 'libros' | 'recursos-educativos' | 'periodico-...' | 'revista-azara'
     // (el campo `seccion` se deriva de la carpeta de data/). Match exacto por slug.
@@ -188,10 +191,10 @@ router.get('/', (req, res) => {
 });
 
 // GET /api/catalogo/:id - Obtener un libro por ID
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const libros = listarItems();
+    const libros = await listarItems();
 
     const libro = libros.find(l => l.id === id);
 
@@ -207,9 +210,9 @@ router.get('/:id', (req, res) => {
 });
 
 // GET /api/catalogo/colecciones/lista - Lista las colecciones/series (metadata, sin libros)
-router.get('/colecciones/lista', (req, res) => {
+router.get('/colecciones/lista', async (req, res) => {
   try {
-    const colecciones = obtenerColecciones();
+    const colecciones = await obtenerColecciones();
 
     res.json({
       success: true,
@@ -225,9 +228,9 @@ router.get('/colecciones/lista', (req, res) => {
 });
 
 // GET /api/catalogo/categorias/lista - Lista todas las categorías
-router.get('/categorias/lista', (req, res) => {
+router.get('/categorias/lista', async (req, res) => {
   try {
-    const categorias = listarCategorias();
+    const categorias = await listarCategorias();
 
     const lista = categorias.map(cat => ({
       nombre: cat.nombre,
@@ -269,10 +272,10 @@ function resumirItems(items) {
 // GET /api/catalogo/stats/general - Estadísticas del catálogo completo Y por
 // SECCIÓN (deduplicadas por id, PLANV2 §10). Sin claves "libros*": el catálogo
 // sirve 4 secciones (libros | recursos-educativos | periodico-... | revista-azara).
-router.get('/stats/general', (req, res) => {
+router.get('/stats/general', async (req, res) => {
   try {
-    const categorias = listarCategorias();
-    const todos = listarItems();
+    const categorias = await listarCategorias();
+    const todos = await listarItems();
 
     // Categorías (una por archivo o grupo) por sección.
     const categoriasPorSeccion = new Map();

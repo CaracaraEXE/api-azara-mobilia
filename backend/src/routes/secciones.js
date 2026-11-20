@@ -57,10 +57,10 @@ function subdivisionDe(categorias, items) {
 }
 
 // GET /api/secciones — Las 4 secciones con su subdivisión (categorías/colecciones).
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const items = listarItems();
-    const categorias = listarCategorias();
+    const items = await listarItems();
+    const categorias = await listarCategorias();
 
     // Secciones presentes en data/ (una por subcarpeta).
     const slugs = [...new Set(
