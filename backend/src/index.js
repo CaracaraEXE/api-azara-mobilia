@@ -46,14 +46,67 @@ app.get('/', (req, res) => {
       { metodo: 'GET', ruta: '/api/catalogo/categorias/lista', descripcion: 'Categorías de todas las secciones, con cantidad y url.' },
       { metodo: 'GET', ruta: '/api/catalogo/colecciones/lista', descripcion: 'Colecciones/series (con su metadata), de todas las secciones.' },
       { metodo: 'GET', ruta: '/api/secciones', descripcion: 'Las 4 secciones: naturaleza y subdivisiones (categorías con sus colecciones).' },
-      { metodo: 'GET', ruta: '/api/categorias', descripcion: 'Unidades de navegación por sección.' }
+      { metodo: 'GET', ruta: '/api/categorias', descripcion: 'Unidades de navegación por sección.' },
+      { metodo: 'GET', ruta: '/health', descripcion: 'Estado de la API: modo de storage y conexión a PostgreSQL.' }
     ]
   });
 });
 
+/**
+ * Health check para deploy/observabilidad. Sin autenticación: sólo expone el
+ * modo de storage y si PG responde. En modo JSON NO abre el pool (require LAZY).
+ */
+app.get('/health', async (req, res) => {
+  const usaPG = process.env.USE_PG === 'true';
+  const estado = { ok: true, storage: usaPG ? 'postgres' : 'json', db: 'not-used' };
+
+  if (usaPG) {
+    try {
+      const { rows } = await require('./db').query('SELECT 1 AS ok');
+      estado.db = rows[0].ok === 1 ? 'up' : 'down';
+    } catch (error) {
+      estado.ok = false;
+      estado.db = 'down';
+      estado.error = error.message;
+    }
+  }
+
+  res.status(estado.ok ? 200 : 503).json(estado);
+});
+
+/**
+ * Cerrar el pool de PG. En modo JSON no hay pool: no hacer nada. Se expone en
+ * `app.cerrarPool` para poder verificarlo sin depender de señales del SO
+ * (en Windows `child.kill('SIGTERM')` mata el proceso sin correr handlers).
+ */
+async function cerrarPool() {
+  if (process.env.USE_PG !== 'true') return false;
+  await require('./db').end();
+  return true;
+}
+app.cerrarPool = cerrarPool;
+
 // Levantar el server solo si se corre directo (los tests importan `app`).
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`🚀 API escuchando en http://localhost:${PORT}`));
+  const server = app.listen(PORT, () => console.log(`🚀 API escuchando en http://localhost:${PORT}`));
+
+  let cerrando = false;
+  const cerrar = (senal) => {
+    if (cerrando) return;
+    cerrando = true;
+    console.log(`\n${senal} recibido: cerrando API...`);
+    server.close(async () => {
+      try {
+        if (await cerrarPool()) console.log('Pool PG cerrado.');
+      } catch (error) {
+        console.error('Error al cerrar el pool:', error.message);
+      }
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGTERM', () => cerrar('SIGTERM'));
+  process.on('SIGINT', () => cerrar('SIGINT'));
 }
 
 module.exports = app;

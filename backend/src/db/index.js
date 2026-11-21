@@ -6,8 +6,8 @@
  * abiertas y las presta. Analogía: antes llamábamos un taxi por cada viaje;
  * ahora tenemos una parada con 10 taxis esperando.
  *
- * Este archivo SOLO crea el pool. Todavía no lo usa nadie: Fase 3 enchufará
- * datos.js y Fase 4 cargará los datos. Por eso hoy la API sigue leyendo JSON.
+ * Este archivo crea el pool. Lo usa `queries.js` cuando USE_PG=true; en modo
+ * JSON `datos.js` lo requiere de forma LAZY, así que no se abre conexión.
  */
 
 require('dotenv').config();

@@ -17,10 +17,10 @@ Este proyecto permite:
 |------------|-----------|
 | **Express.js** | API REST (backend, puerto 3000) |
 | **Express.js** | Discord HTTP Interactions Endpoint (bot, puerto 3001) |
-| **Archivo JSON** | Storage inicial (uno por categoría) |
+| **Archivo JSON** | Fuente del scraper (uno por categoría); fallback de la API con `USE_PG=false` |
 | **Playwright** | Scraping con navegador real (evita CloudFlare) |
 | **tweetnacl** | Verificación de firma Ed25519 (discord-bot) |
-| **PostgreSQL** | Base de datos (futuro/to-do) |
+| **PostgreSQL** | Storage activo de la API (`USE_PG=true`) |
 
 > **Nota:** El bot de Discord NO usa discord.js — implementa HTTP Interactions Endpoint directamente con Express + tweetnacl.
 
@@ -28,7 +28,7 @@ Este proyecto permite:
 
 Los libros están organizados en **13 categorías**. Actualmente **334 libros listados** (**322 obras únicas** — algunos figuran en más de una categoría), **218 con PDF descargable**.
 
-> El catálogo completo (libros + Recursos Educativos + hemeroteca: Periódico y Revista Azara) suma **448 ítems únicos** en **4 secciones**, **329 con PDF**. El desglose por sección está en `/api/catalogo/stats/general`.
+> El catálogo completo (libros + Recursos Educativos + hemeroteca: Periódico y Revista Azara) suma **450 ítems únicos** en **4 secciones**, **332 con PDF**. El desglose por sección está en `/api/catalogo/stats/general`.
 
 | # | Categoría | Libros | Con PDF | URL |
 |---|-----------|:------:|:-------:|-----|
@@ -237,7 +237,7 @@ Respuesta de `GET /api/catalogo` (paginada):
   "data": [
     { "id": "lib-3zgddm8g", "titulo": "...", "categorias": ["Ambiente"], "seccion": "libros", "linkPdf": "..." }
   ],
-  "meta": { "total": 448, "pagina": 1, "limite": 20, "totalPaginas": 23 }
+  "meta": { "total": 450, "pagina": 1, "limite": 20, "totalPaginas": 23 }
 }
 ```
 
@@ -283,13 +283,19 @@ Respuesta de `GET /api/catalogo` (paginada):
 - [x] Comando `/catalogo` con Select Menu + paginación + Volver
 - [x] IDs de libros visibles en resultados
 
-### Fase 5: PostgreSQL (futuro) 🔲
-- [ ] Configurar base de datos PostgreSQL
-- [ ] Definir schema SQL
-- [ ] Migrar datos de JSON
-- [ ] Actualizar API
+### Fase 5: PostgreSQL y conmutación ✅
+- [x] Configurar base de datos PostgreSQL (`azarae_user` / `azarae_db`)
+- [x] Definir schema SQL (`backend/sql/schema.sql`)
+- [x] Migrar datos de JSON (`npm run migrate:pg`)
+- [x] Actualizar API (`USE_PG` + adaptador en `lib/datos.js`)
+- [x] Verificar paridad (`npm run verificar:pg`)
+- [x] Probar rollback a `USE_PG=false` sin tocar rutas ni bot
 
-### Fase 6: Deploy (pendiente) 🔲
+### Fase 6: Operabilidad ✅
+- [x] `GET /health` con modo de storage y ping a PostgreSQL
+- [x] Cierre limpio del pool en `SIGTERM`/`SIGINT`
+
+### Fase 7: Deploy (pendiente) 🔲
 - [ ] Deploy backend en la nube (Fly.io evaluado)
 - [ ] Deploy Discord Bot
 
@@ -332,6 +338,25 @@ npm start
 npm run dev
 ```
 
+### 🔁 Después de cada re-scrape (runbook)
+
+El scraper escribe JSON; la API con `USE_PG=true` lee PostgreSQL. **Si re-scrapeás y no migrás, la API sigue sirviendo la foto anterior.** Siempre:
+
+```bash
+npm.cmd run migrate:pg     # TRUNCATE + recarga transaccional (idempotente)
+npm.cmd run verificar:pg   # paridad campo por campo JSON vs PG (450/450)
+npm.cmd test               # 72/72
+```
+
+Para probar el rollback sin editar el `.env`:
+
+```bash
+$env:USE_PG='false'; npm.cmd test   # API lee JSON, sin tocar rutas ni bot
+# (en una shell nueva) npm.cmd test  # vuelve a PG según .env
+```
+
+`GET /health` devuelve `storage: "postgres" | "json"` y `db: "up" | "down"`.
+
 ### Discord Bot
 
 ```bash
@@ -373,8 +398,8 @@ Necesitás **3 terminales**:
 PORT=3000
 API_URL=http://localhost:3000
 DATA_DIR=./src/data
-# Para Fase 5:
-# DATABASE_URL=postgres://user:pass@host:5432/azara
+USE_PG=true
+DATABASE_URL=postgres://azarae_user:PASSWORD@localhost:5432/azarae_db
 ```
 
 ### Discord Bot (`discord-bot/.env`)
@@ -395,8 +420,8 @@ DISCORD_CLIENT_ID=tu_client_id_aqui
 - **Scraper optimizado**: Soporta argumentos CLI (`--todas`, `--seccion=<slug>`, `--categoria=<slug>`), guardado incremental, y fallback para páginas sin `<h4>`.
 - **Guardado incremental**: Si el scraper se corta en una categoría grande, el progreso se guarda en un `.temp.json`. Al re-ejecutar, retoma desde donde quedó.
 - **Reporte de cambios**: `npm run reporte:data` compara el catálogo actual contra un snapshot (`scripts/reportar-cambios.js`) y avisa si un libro cambió de categoría — pensado para el cron en la nube.
-- **Datos**: 448 ítems únicos (322 libros + 109 recursos educativos + 3 del Periódico + 14 de Revista Azara), 329 con PDF descargable.
-- **Enfoque incremental**: JSON primero → PostgreSQL después.
+- **Datos**: 450 ítems únicos (324 libros + 109 recursos educativos + 3 del Periódico + 14 de Revista Azara), 332 con PDF descargable.
+- **Enfoque incremental**: PostgreSQL activo con `USE_PG=true`; JSON es la fuente del scraper y el fallback con `USE_PG=false`.
 - **Bot sin discord.js**: Usa Express + HTTP Interactions + tweetnacl para verificar firmas. Más liviano y didáctico.
 - **Paginación**: Los resultados usan `DEFERRED_UPDATE_MESSAGE` (type 6) + PATCH vía webhook de Discord.
 

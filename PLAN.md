@@ -199,13 +199,19 @@ API lee JSON        →   API lee PostgreSQL
 - [x] IDs de libros visibles en resultados
 - [x] Registro de comandos slash (register.js)
 
-### Fase 5: PostgreSQL (futuro) 🔲
-- [ ] Configurar base de datos PostgreSQL
-- [ ] Definir schema SQL
-- [ ] Migrar datos de JSON
-- [ ] Actualizar API para usar DB
+### Fase 5: PostgreSQL y conmutación ✅
+- [x] Configurar base de datos PostgreSQL
+- [x] Definir schema SQL
+- [x] Migrar datos de JSON (`migrate:pg`)
+- [x] Actualizar API para usar DB (`USE_PG` + `datos.js`)
+- [x] Verificar paridad (`verificar:pg`) y rollback
 
-### Fase 6: Deploy (pendiente) 🔲
+### Fase 6: Operabilidad ✅
+- [x] `GET /health` con modo de storage y ping a PG
+- [x] Cierre limpio del pool en SIGTERM/SIGINT
+- [x] Runbook scraper → `migrate:pg` y docs actualizadas
+
+### Fase 7: Deploy (pendiente) 🔲
 - [ ] Deploy backend en la nube (Fly.io evaluado)
 - [ ] Deploy Discord Bot
 
